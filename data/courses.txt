@@ -1,86 +1,29 @@
 CourseID,Course Name,Credit hours,Semester,Instructor,AssignmentWeight,ExamWeight
-ME101,Engineering Mathematics & Modelling I,4,Y1S1,Dr. Brown,40,60
-ME102,Thermofluid Engineering I,4,Y1S1,Prof. Smith,60,40
-ME103,Introduction to Electronics & Electrical Power Machines,3,Y1S1,Dr. Johnson,60,40
-ME104,Engineering Design and Analysis,4,Y1S1,Dr. Miller,70,30
-ME105,Engineering in Society,3,Y1S1,Prof. Davis,70,30
-ME106,Engineering Mathematics & Modelling II,4,Y1S2,Prof. Chen,40,60
-ME107,Materials & Manufacturing,3,Y1S2,Dr. Law,60,40
-ME108,Statics,4,Y1S2,Dr. Mani,50,50
-ME109,Thermofluid Engineering II,4,Y1S2,Dr. Shahab,60,40
-ME110,Engineering Solid Mechanics,4,Y1S2,Dr. Siti,50,50
-ME201,Engineering Mathematics 3,4,Y2S1,Prof. Lim,40,60
-ME202,Fluid Mechanics,4,Y2S1,Dr. Shahab,60,40
-ME203,Entrepreneurial Mindset & Skills,3,Y2S1,Prof. Davis,80,20
-ME204,Engineering Dynamics,3,Y2S1,Dr. Siti,50,50
-ME205,Electronics & Microprocessors,3,Y2S1,Dr. Johnson,60,40
-ME206,Numerical Methods for Engineers,3,Y2S2,Prof. Lim,50,50
-ME207,Heat Transfer,4,Y2S2,Dr. Shahab,60,40
-ME208,Project Management & Engineering Design,3,Y2S2,Dr. Miller,70,30
-ME209,Machine Design,4,Y2S2,Dr. Siti,70,30
-ME210,Automatic Control and Instrumentation,3,Y2S2,Dr. Johnson,60,40
-ME301,Industrial Training,6,Y3S1,Programme Office,100,0
-ME302,Final Year Engineering Project I,4,Y3S1,FYP Committee,100,0
-ME303,Renewable Energy Systems,3,Y3S1,Prof. Daniel,50,50
-ME304,Principles of Sustainable Engineering,3,Y3S1,Dr. Miller,60,40
-ME305,Final Year Engineering Project II,6,Y3S2,FYP Committee,100,0
-ME306,Total Quality Management,4,Y3S2,Prof. Tan,60,40
-ME307,Engineering Economics,3,Y3S2,Prof. Mani,50,50
-ME308,Computer Aided Manufacturing,4,Y3S2,Prof. Davis,60,40
-CS101,Introduction to Artificial Intelligence,4,Y1S1,Dr. Aisha Rahman,60,40
-CS102,Systems Software and Computing Concepts,4,Y1S1,Prof. Daniel Wong,50,50
-CS103,Introduction to Networking,3,Y1S1,Ms. Priya Menon,60,40
-CS104,Python Programming,4,Y1S1,Mr. Jason Lim,70,30
-CS105,Critical Writing and Research Skills,3,Y1S1,Dr. Emily Tan,100,0
-CS106,Integrated Computer Systems,3,Y1S2,Prof. Kelvin Ong,60,40
-CS107,Systems Analysis and Design,4,Y1S2,Dr. Nurul Huda,70,30
-CS108,Mathematical Concepts for Computing,4,Y1S2,Dr. Victor Cheah,40,60
-CS109,Introduction to C Programming,4,Y1S2,Mr. Alex Chua,70,30
-CS110,Fundamental of Entrepreneurship,3,Y1S2,Ms. Sarah Ng,80,20
-CS201,Systems and Network Administration,4,Y2S1,Mr. Hafiz Abdullah,60,40
-CS202,System Development Methods,4,Y2S1,Dr. Melissa Goh,70,30
-CS203,Object Oriented Development with Java,3,Y2S1,Dr. Raymond Lee,70,30
-CS204,Operating System,4,Y2S1,Prof. Irene Koh,60,40
-CS205,Data Structures,3,Y2S1,Dr. Benjamin Ho,60,40
-CS206,Web Applications,3,Y2S2,Ms. Chloe Yap,80,20
-CS207,Concurrent Programming,4,Y2S2,Dr. Patrick Lau,60,40
-CS208,Computer Systems Low Level Technique,4,Y2S2,Prof. Leonard Chan,60,40
-CS209,Database Systems,3,Y2S2,Dr. Felicia Wong,60,40
-CS210,Distributed Computer Systems,3,Y2S2,Dr. Adrian Teo,60,40
-CS301,Machine Learning and Intelligent System,3,Y3S1,Dr. Nadia Osman,70,30
-CS302,Algorithmics,3,Y3S1,Prof. William Tan,40,60
-CS303,Advanced Database Systems,3,Y3S1,Dr. Grace Lim,70,30
-CS304,Human Computer Interaction,3,Y3S1,Ms. Evelyn Phua,80,20
-CS305,Final Year Project I,5,Y3S1,FYP Committee,100,0
-CS306,Optimisation and Deep Learning,3,Y3S2,Dr. Mohan Krishnan,70,30
-CS307,Database Security,3,Y3S2,Dr. Joanne Chia,60,40
-CS308,User Experience,3,Y3S2,Mr. Darren Low,80,20
-CS309,Final Year Project II,7,Y3S2,FYP Committee,100,0
-HM101,Fundamentals of Hospitality and Tourism Industry,4,Y1S1,Dr. Budi Santoso,60,40
-HM102,Introduction to Restaurant Operations,3,Y1S1,Chef Putu Aditya,70,30
-HM103,Small Business Venture,3,Y1S1,Ms. Farah Aziz,80,20
-HM104,Food Safety and Sanitation,4,Y1S1,Dr. Siti Rahmawati,60,40
-HM105,Business Communication,4,Y1S1,Dr. Lim Wei Ling,80,20
-HM106,Hotel Accommodation Operations,4,Y1S2,Mr. Andi Saputra,70,30
-HM107,Cross Cultural Studies,3,Y1S2,Dr. Nur Aisyah,70,30
-HM108,Beverage Management,3,Y1S2,Ms. Melissa Choo,70,30
-HM109,Culinary Essentials,4,Y1S2,Chef Rina Wulandari,80,20
+HM101,Fundamentals of Hospitality and Tourism Industry,4,Y1S1,Dr. Budi Santoso,50,50
+HM102,Introduction to Restaurant Operations,3,Y1S1,Chef Putu Aditya,50,50
+HM103,Small Business Venture,3,Y1S1,Ms. Farah Aziz,50,50
+HM104,Food Safety and Sanitation,4,Y1S1,Dr. Siti Rahmawati,50,50
+HM105,Business Communication,4,Y1S1,Dr. Lim Wei Ling,50,50
+HM106,Hotel Accommodation Operations,4,Y1S2,Mr. Andi Saputra,50,50
+HM107,Cross Cultural Studies,3,Y1S2,Dr. Nur Aisyah,50,50
+HM108,Beverage Management,3,Y1S2,Ms. Melissa Choo,50,50
+HM109,Culinary Essentials,4,Y1S2,Chef Rina Wulandari,50,50
 HM110,Introduction to Hospitality Accounting,4,Y1S2,Prof. Agus Prasetyo,50,50
-HM201,Business Research Methods,3,Y2S1,Dr. Daniel Khoo,80,20
-HM202,Commercial Cookery,4,Y2S1,Chef Putu Aditya,80,20
-HM203,F&B Operations Management,3,Y2S1,Mr. Chong Kai Jun,70,30
-HM204,Introduction to Management and Organisation Theory,3,Y2S1,Dr. Siti Rahmawati,60,40
+HM201,Business Research Methods,3,Y2S1,Dr. Daniel Khoo,50,50
+HM202,Commercial Cookery,4,Y2S1,Chef Putu Aditya,50,50
+HM203,F&B Operations Management,3,Y2S1,Mr. Chong Kai Jun,50,50
+HM204,Introduction to Management and Organisation Theory,3,Y2S1,Dr. Siti Rahmawati,50,50
 HM205,Industrial Placement,6,Y2S1,Placement Office,100,0
 HM206,Business and Hospitality Law,3,Y2S2,Dr. Nadya Kartika,50,50
-HM207,Service Quality Management in Hospitality,3,Y2S2,Dr. Wong Mei Yin,70,30
-HM208,Food and Beverage Cost Control,3,Y2S2,Prof. Agus Prasetyo,60,40
-HM209,Hotel Innovation Management,3,Y2S2,Dr. Syaiful Hakim,70,30
-HM210,MICE Management,3,Y2S2,Ms. Diane Teo,70,30
-HM301,Hospitality Facilities Management and Design,3,Y3S1,Ir. Bambang Hartono,60,40
-HM302,Introduction to Wine and Bar,3,Y3S1,Ms. Melissa Choo,70,30
-HM303,Tourism Planning, Development and Management,3,Y3S1,Dr. Dewi Lestari,70,30
+HM207,Service Quality Management in Hospitality,3,Y2S2,Dr. Wong Mei Yin,50,50
+HM208,Food and Beverage Cost Control,3,Y2S2,Prof. Agus Prasetyo,50,50
+HM209,Hotel Innovation Management,3,Y2S2,Dr. Syaiful Hakim,50,50
+HM210,MICE Management,3,Y2S2,Ms. Diane Teo,50,50
+HM301,Hospitality Facilities Management and Design,3,Y3S1,Ir. Bambang Hartono,50,50
+HM302,Introduction to Wine and Bar,3,Y3S1,Ms. Melissa Choo,50,50
+HM303,Tourism Planning Development and Management,3,Y3S1,Dr. Dewi Lestari,50,50
 HM304,Independent Project I,7,Y3S1,Project Committee,100,0
-HM305,Consumer Behaviour,3,Y3S1,Dr. Wong Mei Yin,60,40
-HM306,Hospitality Management and Leadership,3,Y3S2,Dr. Nadya Kartika,70,30
-HM307,Casino, Club and Resort Management,3,Y3S2,Mr. Raymond Chan,60,40
+HM305,Consumer Behaviour,3,Y3S1,Dr. Wong Mei Yin,50,50
+HM306,Hospitality Management and Leadership,3,Y3S2,Dr. Nadya Kartika,50,50
+HM307,Casino Club and Resort Management,3,Y3S2,Mr. Raymond Chan,50,50
 HM308,Independent Project II,7,Y3S2,Project Committee,100,0
