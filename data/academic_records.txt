@@ -1,1 +1,0 @@
-studentTP,courseCode,assResult,examResult
