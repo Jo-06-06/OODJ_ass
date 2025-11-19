@@ -1,4 +1,61 @@
 CourseID,Course Name,Credit hours,Semester,Instructor,AssignmentWeight,ExamWeight
+ME101,Engineering Mathematics & Modelling I,4,Y1S1,Dr. Brown,50,50
+ME102,Thermofluid Engineering I,4,Y1S1,Prof. Smith,50,50
+ME103,Introduction to Electronics & Electrical Power Machines,3,Y1S1,Dr. Johnson,50,50
+ME104,Engineering Design and Analysis,4,Y1S1,Dr. Miller,50,50
+ME105,Engineering in Society,3,Y1S1,Prof. Davis,50,50
+ME106,Engineering Mathematics & Modelling II,4,Y1S2,Prof. Chen,50,50
+ME107,Materials & Manufacturing,3,Y1S2,Dr. Law,50,50
+ME108,Statics,4,Y1S2,Dr. Mani,50,50
+ME109,Thermofluid Engineering II,4,Y1S2,Dr. Shahab,50,50
+ME110,Engineering Solid Mechanics,4,Y1S2,Dr. Siti,50,50
+ME201,Engineering Mathematics 3,4,Y2S1,Prof. Lim,50,50
+ME202,Fluid Mechanics,4,Y2S1,Dr. Shahab,50,50
+ME203,Entrepreneurial Mindset & Skills,3,Y2S1,Prof. Davis,50,50
+ME204,Engineering Dynamics,3,Y2S1,Dr. Siti,50,50
+ME205,Electronics & Microprocessors,3,Y2S1,Dr. Johnson,50,50
+ME206,Numerical Methods for Engineers,3,Y2S2,Prof. Lim,50,50
+ME207,Heat Transfer,4,Y2S2,Dr. Shahab,50,50
+ME208,Project Management & Engineering Design,3,Y2S2,Dr. Miller,50,50
+ME209,Machine Design,4,Y2S2,Dr. Siti,50,50
+ME210,Automatic Control and Instrumentation,3,Y2S2,Dr. Johnson,50,50
+ME301,Industrial Training,6,Y3S1,Programme Office,100,0
+ME302,Final Year Engineering Project I,4,Y3S1,FYP Committee,100,0
+ME303,Renewable Energy Systems,3,Y3S1,Prof. Daniel,50,50
+ME304,Principles of Sustainable Engineering,3,Y3S1,Dr. Miller,50,50
+ME305,Final Year Engineering Project II,6,Y3S2,FYP Committee,100,0
+ME306,Total Quality Management,4,Y3S2,Prof. Tan,50,50
+ME307,Engineering Economics,3,Y3S2,Prof. Mani,50,50
+ME308,Computer Aided Manufacturing,4,Y3S2,Prof. Davis,50,50
+CS101,Introduction to Artificial Intelligence,4,Y1S1,Dr. Aisha Rahman,50,50
+CS102,Systems Software and Computing Concepts,4,Y1S1,Prof. Daniel Wong,50,50
+CS103,Introduction to Networking,3,Y1S1,Ms. Priya Menon,50,50
+CS104,Python Programming,4,Y1S1,Mr. Jason Lim,50,50
+CS105,Critical Writing and Research Skills,3,Y1S1,Dr. Emily Tan,50,50
+CS106,Integrated Computer Systems,3,Y1S2,Prof. Kelvin Ong,50,50
+CS107,Systems Analysis and Design,4,Y1S2,Dr. Nurul Huda,50,50
+CS108,Mathematical Concepts for Computing,4,Y1S2,Dr. Victor Cheah,50,50
+CS109,Introduction to C Programming,4,Y1S2,Mr. Alex Chua,50,50
+CS110,Fundamental of Entrepreneurship,3,Y1S2,Ms. Sarah Ng,50,50
+CS201,Systems and Network Administration,4,Y2S1,Mr. Hafiz Abdullah,50,50
+CS202,System Development Methods,4,Y2S1,Dr. Melissa Goh,50,50
+CS203,Object Oriented Development with Java,3,Y2S1,Dr. Raymond Lee,50,50
+CS204,Operating System,4,Y2S1,Prof. Irene Koh,50,50
+CS205,Data Structures,3,Y2S1,Dr. Benjamin Ho,50,50
+CS206,Web Applications,3,Y2S2,Ms. Chloe Yap,50,50
+CS207,Concurrent Programming,4,Y2S2,Dr. Patrick Lau,50,50
+CS208,Computer Systems Low Level Technique,4,Y2S2,Prof. Leonard Chan,50,50
+CS209,Database Systems,3,Y2S2,Dr. Felicia Wong,50,50
+CS210,Distributed Computer Systems,3,Y2S2,Dr. Adrian Teo,50,50
+CS301,Machine Learning and Intelligent System,3,Y3S1,Dr. Nadia Osman,50,50
+CS302,Algorithmics,3,Y3S1,Prof. William Tan,50,50
+CS303,Advanced Database Systems,3,Y3S1,Dr. Grace Lim,50,50
+CS304,Human Computer Interaction,3,Y3S1,Ms. Evelyn Phua,50,50
+CS305,Final Year Project I,5,Y3S1,FYP Committee,100,0
+CS306,Optimisation and Deep Learning,3,Y3S2,Dr. Mohan Krishnan,50,50
+CS307,Database Security,3,Y3S2,Dr. Joanne Chia,50,50
+CS308,User Experience,3,Y3S2,Mr. Darren Low,50,50
+CS309,Final Year Project II,7,Y3S2,FYP Committee,100,0
 HM101,Fundamentals of Hospitality and Tourism Industry,4,Y1S1,Dr. Budi Santoso,50,50
 HM102,Introduction to Restaurant Operations,3,Y1S1,Chef Putu Aditya,50,50
 HM103,Small Business Venture,3,Y1S1,Ms. Farah Aziz,50,50
