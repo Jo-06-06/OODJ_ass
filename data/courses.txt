@@ -1,4 +1,4 @@
-CourseID,Course Name,Credit hours,Semester,Instructor,AssignmentWeight,ExamWeight
+CourseID,CourseName,CreditHours,Semester,Instructor,AssignmentWeight,ExamWeight
 ME101,Engineering Mathematics & Modelling I,4,Y1S1,Dr. Brown,50,50
 ME102,Thermofluid Engineering I,4,Y1S1,Prof. Smith,50,50
 ME103,Introduction to Electronics & Electrical Power Machines,3,Y1S1,Dr. Johnson,50,50
