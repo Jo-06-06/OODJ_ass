@@ -1,5 +1,5 @@
 StudentID,FirstName,LastName,Major,Year,Email
-S001,Fiona,Smith,Bachelor of Mechanical Engineering,Y1S1,fiona.smith@university.edu
+S001,Fiona,Wong,Bachelor of Mechanical Engineering,Y1S1,tp086246@mail.apu.edu.my
 S002,George,Wilson,Bachelor of Science in Computer Science,Y1S1,george.wilson@university.edu
 S003,Ivan,Wilson,Bachelor of International Hospitality Management,Y1S1,ivan.wilson@university.edu
 S004,Evia,Cheng,Bachelor of Mechanical Engineering,Y1S2,evia.cheng@university.edu
