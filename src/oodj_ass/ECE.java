@@ -14,7 +14,7 @@ import java.util.*;
 public class ECE {
 
     // convert mark to grade
-    public static class GradeConverter {
+       public static class GradeConverter {
 
         public static String getAlphabetGrade(int marks) {
             if (marks >= 80) return "A+";
@@ -30,7 +30,6 @@ public class ECE {
             else return "F-";
         }
 
-        //convert grade to gradePoint
         public static double getGradePoint(String g) {
             switch (g) {
                 case "A+": return 4.0;
@@ -48,43 +47,8 @@ public class ECE {
             }
         }
     }
-    
-    //save the convert data
-    public static void saveUpdatedRecords(ArrayList<String[]> list) {
 
-    try (BufferedWriter bw = new BufferedWriter(new FileWriter("academicRecords.txt"))) {
-
-        // header again
-        bw.write("StudentID,CourseID,assResult,examResult,grade,gpa");
-        bw.newLine();
-
-        for (String[] r : list) {
-            bw.write(String.join(",", r));
-            bw.newLine();
-        }
-
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
-
-    System.out.println("academicRecords.txt updated successfully!");
-}
-
-    
-    public static class Course {
-        public String courseID;
-        public int creditHours;
-        public int assWeight;
-        public int examWeight;
-
-        public Course(String courseID, int creditHours, int assWeight, int examWeight) {
-            this.courseID = courseID;
-            this.creditHours = creditHours;
-            this.assWeight = assWeight;
-            this.examWeight = examWeight;
-        }
-    }
-    
+    // load csv file
     public static ArrayList<String[]> loadFile(String filename, boolean hasHeader) {
         ArrayList<String[]> list = new ArrayList<>();
 
@@ -92,35 +56,11 @@ public class ECE {
             String line;
 
             if (hasHeader) {
-                br.readLine(); // skip header line
+                br.readLine(); // skip header
             }
 
             while ((line = br.readLine()) != null) {
-                String[] parts = line.split(",");
-                list.add(parts); 
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return list;
-    }
- 
-    // Load a CSV file 
-    public static ArrayList<String[]> loadFile(String filename, boolean hasHeader) {
-        ArrayList<String[]> list = new ArrayList<>();
-
-        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
-            String line;
-
-            if (hasHeader) {
-                br.readLine(); // skip header line
-            }
-
-            while ((line = br.readLine()) != null) {
-                String[] parts = line.split(",");
-                list.add(parts); 
+                list.add(line.split(","));
             }
 
         } catch (Exception e) {
@@ -130,16 +70,71 @@ public class ECE {
         return list;
     }
 
-    //find the course using courseID    
     public static String[] findCourseRow(String courseID, ArrayList<String[]> courseList) {
         for (String[] row : courseList) {
-            // row[0] = CourseID
             if (row[0].trim().equals(courseID)) {
                 return row;
             }
         }
-        return null; 
+        return null;
     }
+
+    public static void saveUpdatedRecords(ArrayList<String[]> list) {
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("academicRecords.txt"))) {
+
+            bw.write("StudentID,CourseID,assResult,examResult,grade,gpa");
+            bw.newLine();
+
+            for (String[] r : list) {
+                bw.write(String.join(",", r));
+                bw.newLine();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // update the gpa 
+    public static void convertAndSave() {
+
+        ArrayList<String[]> courseList = loadFile("courses.txt", true);
+        ArrayList<String[]> recordList = loadFile("academicRecords.txt", true);
+
+        for (String[] r : recordList) {
+
+            String courseID = r[1].trim();
+            int assMark  = Integer.parseInt(r[2]);
+            int examMark = Integer.parseInt(r[3]);
+
+            // find the course weights
+            String[] course = findCourseRow(courseID, courseList);
+
+            int assWeight  = Integer.parseInt(course[5]); // AssignmentWeight
+            int examWeight = Integer.parseInt(course[6]); // ExamWeight
+
+            // calculate weighted final mark
+            double finalMark = (assMark * assWeight / 100.0) + (examMark * examWeight / 100.0);
+            int rounded = (int)Math.round(finalMark);
+
+            // convert to grade & GPA
+            String grade = GradeConverter.getAlphabetGrade(rounded);
+            double gpa   = GradeConverter.getGradePoint(grade);
+
+            // update row (replace empty fields)
+            r[4] = grade;
+            r[5] = String.valueOf(gpa);
+        }
+
+        saveUpdatedRecords(recordList);
+    }
+
+    // ===================== MAIN =====================
+    public static void main(String[] args) {
+        convertAndSave(); // run STEP 1
+    }
+ 
         
         
 }
