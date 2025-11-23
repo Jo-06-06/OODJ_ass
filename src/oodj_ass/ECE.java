@@ -49,6 +49,27 @@ public class ECE {
         }
     }
     
+    //save the convert data
+    public static void saveUpdatedRecords(ArrayList<String[]> list) {
+
+    try (BufferedWriter bw = new BufferedWriter(new FileWriter("academicRecords.txt"))) {
+
+        // header again
+        bw.write("StudentID,CourseID,assResult,examResult,grade,gpa");
+        bw.newLine();
+
+        for (String[] r : list) {
+            bw.write(String.join(",", r));
+            bw.newLine();
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    System.out.println("academicRecords.txt updated successfully!");
+}
+
     
     public static class Course {
         public String courseID;
@@ -85,14 +106,40 @@ public class ECE {
 
         return list;
     }
-    
-        //fine the course by courseID
-        public static String[] findCourseRow(String courseID, ArrayList<String[]> courseList) {
+ 
+    // Load a CSV file 
+    public static ArrayList<String[]> loadFile(String filename, boolean hasHeader) {
+        ArrayList<String[]> list = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+            String line;
+
+            if (hasHeader) {
+                br.readLine(); // skip header line
+            }
+
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(",");
+                list.add(parts); 
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    //find the course using courseID    
+    public static String[] findCourseRow(String courseID, ArrayList<String[]> courseList) {
         for (String[] row : courseList) {
+            // row[0] = CourseID
             if (row[0].trim().equals(courseID)) {
                 return row;
             }
         }
-        return null; // not found
+        return null; 
     }
+        
+        
 }
