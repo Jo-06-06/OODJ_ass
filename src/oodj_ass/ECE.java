@@ -12,7 +12,6 @@ import java.io.*;
 import java.util.*;
 
 public class ECE {
-
     // convert mark to grade
        public static class GradeConverter {
 
@@ -48,7 +47,7 @@ public class ECE {
         }
     }
 
-    // load csv file
+    // load file
     public static ArrayList<String[]> loadFile(String filename, boolean hasHeader) {
         ArrayList<String[]> list = new ArrayList<>();
 
@@ -131,10 +130,104 @@ public class ECE {
 
     saveUpdatedRecords(recordList);
 }
+ 
+    //calculate cgpa 
+    public static ArrayList<String[]> cgpaList = new ArrayList<>();
 
+    public static void calculateCGPA() {
+
+        ArrayList<String[]> records = loadFile("data/academicRecords.txt", true);
+        ArrayList<String[]> courses = loadFile("data/courses.txt", true);
+
+        ArrayList<String> studentIDs = new ArrayList<>();
+        cgpaList.clear(); // reset old results
+
+        // Collect unique student IDs
+        for (String[] r : records) {
+            String sid = r[0];
+            if (!studentIDs.contains(sid)) {
+                studentIDs.add(sid);
+            }
+        }
+
+        // Calculate CGPA for each student
+        for (String studentID : studentIDs) {
+
+            double totalGradePoints = 0;
+            int totalCredits = 0;
+            int failCount = 0;
+
+            System.out.println("\n===== Student: " + studentID + " =====");
+
+            for (String[] row : records) {
+
+                if (!row[0].equals(studentID)) continue;
+
+                String courseID = row[1];
+                String grade = row[4];
+                double gpa = Double.parseDouble(row[5]);
+
+                String[] courseRow = findCourseRow(courseID, courses);
+                int credit = Integer.parseInt(courseRow[2]);
+
+                double gp = gpa * credit;
+
+                totalGradePoints += gp;
+                totalCredits += credit;
+
+                if (grade.equals("D") || grade.equals("F+") || grade.equals("F") || grade.equals("F-")) {
+                    failCount++;
+                }
+
+                System.out.println(
+                    courseID + " | Grade: " + grade +
+                    " (" + String.format("%.2f", gpa) + ") * " +
+                    credit + " credits = " + String.format("%.2f", gp)
+                );
+            }
+
+            double cgpa = totalCredits == 0 ? 0 : totalGradePoints / totalCredits;
+
+            System.out.println("Total Grade Points = " + String.format("%.2f", totalGradePoints));
+            System.out.println("Total Credit Hours = " + totalCredits);
+            System.out.println("CGPA = " + String.format("%.2f", cgpa));
+
+            boolean eligible = (cgpa >= 2.0 && failCount <= 3);
+
+            System.out.println("Failed courses = " + failCount);
+            System.out.println("Eligible Next Year: " + (eligible ? "YES" : "NO"));
+
+            // Store CGPA (backend)
+            cgpaList.add(new String[]{
+                studentID,
+                String.format("%.2f", cgpa)
+            });
+        }
+    }
+
+    //Save CGPA
+    public static void saveCGPA() {
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("data/result.txt"))) {
+
+            bw.write("StudentID,CGPA");
+            bw.newLine();
+
+            for (String[] row : cgpaList) {
+                bw.write(row[0] + "," + row[1]);
+                bw.newLine();
+            }
+
+        } catch (Exception e) {
+        }
+    }
+
+ 
     // ===================== MAIN =====================
     public static void main(String[] args) {
         convertAndSave(); 
+        calculateCGPA();
+        saveCGPA(); 
     }
  
         
