@@ -106,10 +106,8 @@ public class ECE {
 
         String[] r = recordList.get(i);
 
-        // FIX #1: Guarantee row has EXACTLY 6 columns
         r = Arrays.copyOf(r, 6);
 
-        // update the row back into list
         recordList.set(i, r);
 
         String courseID = r[1].trim();
@@ -136,7 +134,7 @@ public class ECE {
 
     // ===================== MAIN =====================
     public static void main(String[] args) {
-        convertAndSave(); // run STEP 1
+        convertAndSave(); 
     }
  
         
