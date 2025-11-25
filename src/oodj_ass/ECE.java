@@ -81,7 +81,7 @@ public class ECE {
 
     public static void saveUpdatedRecords(ArrayList<String[]> list) {
 
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter("academicRecords.txt"))) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("data/academicRecords.txt"))) {
 
             bw.write("StudentID,CourseID,assResult,examResult,grade,gpa");
             bw.newLine();
@@ -97,38 +97,42 @@ public class ECE {
     }
 
     // update the gpa 
-    public static void convertAndSave() {
+ public static void convertAndSave() {
 
-        ArrayList<String[]> courseList = loadFile("courses.txt", true);
-        ArrayList<String[]> recordList = loadFile("academicRecords.txt", true);
+    ArrayList<String[]> courseList = loadFile("data/courses.txt", true);
+    ArrayList<String[]> recordList = loadFile("data/academicRecords.txt", true);
 
-        for (String[] r : recordList) {
+    for (int i = 0; i < recordList.size(); i++) {
 
-            String courseID = r[1].trim();
-            int assMark  = Integer.parseInt(r[2]);
-            int examMark = Integer.parseInt(r[3]);
+        String[] r = recordList.get(i);
 
-            // find the course weights
-            String[] course = findCourseRow(courseID, courseList);
+        // FIX #1: Guarantee row has EXACTLY 6 columns
+        r = Arrays.copyOf(r, 6);
 
-            int assWeight  = Integer.parseInt(course[5]); // AssignmentWeight
-            int examWeight = Integer.parseInt(course[6]); // ExamWeight
+        // update the row back into list
+        recordList.set(i, r);
 
-            // calculate weighted final mark
-            double finalMark = (assMark * assWeight / 100.0) + (examMark * examWeight / 100.0);
-            int rounded = (int)Math.round(finalMark);
+        String courseID = r[1].trim();
+        int assMark  = Integer.parseInt(r[2].trim());
+        int examMark = Integer.parseInt(r[3].trim());
 
-            // convert to grade & GPA
-            String grade = GradeConverter.getAlphabetGrade(rounded);
-            double gpa   = GradeConverter.getGradePoint(grade);
+        String[] course = findCourseRow(courseID, courseList);
 
-            // update row (replace empty fields)
-            r[4] = grade;
-            r[5] = String.valueOf(gpa);
-        }
+        int assWeight  = Integer.parseInt(course[5].trim());
+        int examWeight = Integer.parseInt(course[6].trim());
 
-        saveUpdatedRecords(recordList);
+        double finalMark = (assMark * assWeight / 100.0) + (examMark * examWeight / 100.0);
+        int rounded = (int)Math.round(finalMark);
+
+        String grade = GradeConverter.getAlphabetGrade(rounded);
+        double gpa   = GradeConverter.getGradePoint(grade);
+
+        r[4] = grade;
+        r[5] = String.valueOf(gpa);
     }
+
+    saveUpdatedRecords(recordList);
+}
 
     // ===================== MAIN =====================
     public static void main(String[] args) {
