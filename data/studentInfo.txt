@@ -1,19 +1,19 @@
-StudentID,FirstName,LastName,Major,Year,Email
-S001,Fiona,Wong,Bachelor of Mechanical Engineering,Y1S1,tp086246@mail.apu.edu.my
-S002,George,Wilson,Bachelor of Science in Computer Science,Y1S1,george.wilson@university.edu
-S003,Ivan,Wilson,Bachelor of International Hospitality Management,Y1S1,ivan.wilson@university.edu
-S004,Evia,Cheng,Bachelor of Mechanical Engineering,Y1S2,evia.cheng@university.edu
-S005,Steven,Goh,Bachelor of Science in Computer Science,Y1S2,steven.goh@university.edu
-S006,Quinn,Chen,Bachelor of International Hospitality Management,Y1S2,quinn.chen@university.edu
-S007,Oscar,Smith,Bachelor of Mechanical Engineering,Y2S1,oscar.smith@university.edu
-S008,Eric,Teo,Bachelor of Science in Computer Science,Y2S1,eric.teo@university.edu
-S009,Rachel,Davis,Bachelor of International Hospitality Management,Y2S1,rachel.davis@university.edu
-S010,Charlie,Miller,Bachelor of Mechanical Engineering,Y2S2,charlie.miller@university.edu
-S011,Ivy,Smith,Bachelor of Science in Computer Science,Y2S2,ivy.smith@university.edu
-S012,Quinn,Chen,Bachelor of International Hospitality Management,Y2S2,quinn.chen@university.edu
-S013,Alys,Chow,Bachelor of Mechanical Engineering,Y3S1,alys.chow@university.edu
-S014,Diana,Brown,Bachelor of Science in Computer Science,Y3S1,diana.brown@university.edu
-S015,Alice,Wilson,Bachelor of International Hospitality Management,Y3S1,alice.wilson@university.edu
-S016,Hannah,Lim,Bachelor of Mechanical Engineering,Y3S2,hannah.lim@university.edu
-S017,Joel,Johnson,Bachelor of Science in Computer Science,Y3S2,joel.johnson@university.edu
-S018,Julia,Davis,Bachelor of International Hospitality Management,Y3S2,julia.davis@university.edu
+studentID,firstName,lastName,major,email
+S001,Fiona,Smith,Bachelor of Mechanical Engineering,fiona.smith@university.edu
+S002,George,Wilson,Bachelor of Science in Computer Science,george.wilson@university.edu
+S003,Ivan,Wilson,Bachelor of International Hospitality Management,ivan.wilson@university.edu
+S004,Evia,Cheng,Bachelor of Mechanical Engineering,evia.cheng@university.edu
+S005,Steven,Goh,Bachelor of Science in Computer Science,steven.goh@university.edu
+S006,Quinn,Chen,Bachelor of International Hospitality Management,quinn.chen@university.edu
+S007,Oscar,Smith,Bachelor of Mechanical Engineering,oscar.smith@university.edu
+S008,Eric,Teo,Bachelor of Science in Computer Science,eric.teo@university.edu
+S009,Rachel,Davis,Bachelor of International Hospitality Management,rachel.davis@university.edu
+S010,Charlie,Miller,Bachelor of Mechanical Engineering,charlie.miller@university.edu
+S011,Ivy,Smith,Bachelor of Science in Computer Science,ivy.smith@university.edu
+S012,Quinn,Chen,Bachelor of International Hospitality Management,quinn.chen@university.edu
+S013,Alys,Chow,Bachelor of Mechanical Engineering,alys.chow@university.edu
+S014,Diana,Brown,Bachelor of Science in Computer Science,diana.brown@university.edu
+S015,Alice,Wilson,Bachelor of International Hospitality Management,alice.wilson@university.edu
+S016,Hannah,Lim,Bachelor of Mechanical Engineering,hannah.lim@university.edu
+S017,Joel,Johnson,Bachelor of Science in Computer Science,joel.johnson@university.edu
+S018,Julia,Davis,Bachelor of International Hospitality Management,julia.davis@university.edu
