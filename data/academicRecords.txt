@@ -1,4 +1,4 @@
-StudentID,CourseID,assResult,examResult,grade,gpa
+studentID,courseID,assScore,examScore,grade,gpa,attemptNum
 S001,ME101,56,69,C+,2.7
 S001,ME102,78,68,B+,3.3
 S001,ME103,57,41,D,1.7
