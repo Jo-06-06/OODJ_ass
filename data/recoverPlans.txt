@@ -1,0 +1,2 @@
+PlanID,StudentID,CourseID,Attempt,Status,CreatedBy,CreatedDate,LastModified
+RP001,S001,CS101,2,Active,CA001,,,

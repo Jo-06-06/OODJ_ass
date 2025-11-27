@@ -1,13 +1,10 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package oodj_ass;
 
-/**
- *
- * @author jolin
- */
+import javax.mail.*;
+import javax.mail.internet.*;
+import java.util.Properties;
+
+
 public class Email {
-    
+   
 }
