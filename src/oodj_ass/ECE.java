@@ -80,9 +80,9 @@ public class ECE {
 
     public static void saveUpdatedRecords(ArrayList<String[]> list) {
 
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter("data/academicRecords.txt"))) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("data/grades.txt"))) {
 
-            bw.write("StudentID,CourseID,assResult,examResult,grade,gpa");
+            bw.write("studentID,courseID,assScore,examScore,grade,gpa,attemptNum");
             bw.newLine();
 
             for (String[] r : list) {
@@ -99,13 +99,13 @@ public class ECE {
  public static void convertAndSave() {
 
     ArrayList<String[]> courseList = loadFile("data/courses.txt", true);
-    ArrayList<String[]> recordList = loadFile("data/academicRecords.txt", true);
+    ArrayList<String[]> recordList = loadFile("data/grades.txt", true);
 
     for (int i = 0; i < recordList.size(); i++) {
 
         String[] r = recordList.get(i);
 
-        r = Arrays.copyOf(r, 6);
+        r = Arrays.copyOf(r, 7);
 
         recordList.set(i, r);
 
@@ -125,7 +125,7 @@ public class ECE {
         double gpa   = GradeConverter.getGradePoint(grade);
 
         r[4] = grade;
-        r[5] = String.valueOf(gpa);
+        r[5] = String.format("%.2f", gpa);
     }
 
     saveUpdatedRecords(recordList);
@@ -136,7 +136,7 @@ public class ECE {
 
     public static void calculateCGPA() {
 
-        ArrayList<String[]> records = loadFile("data/academicRecords.txt", true);
+        ArrayList<String[]> records = loadFile("data/grades.txt", true);
         ArrayList<String[]> courses = loadFile("data/courses.txt", true);
 
         ArrayList<String> studentIDs = new ArrayList<>();
@@ -229,7 +229,5 @@ public class ECE {
         calculateCGPA();
         saveCGPA(); 
     }
- 
-        
         
 }
