@@ -77,7 +77,7 @@ HM209,Hotel Innovation Management,4,Y2S2,Dr. Syaiful Hakim,50,50
 HM210,MICE Management,4,Y2S2,Ms. Diane Teo,50,50
 HM301,Hospitality Facilities Management and Design,3,Y3S1,Ir. Bambang Hartono,50,50
 HM302,Introduction to Wine and Bar,3,Y3S1,Ms. Melissa Choo,50,50
-HM303,Tourism Planning, Development and Management,3,Y3S1,Dr. Dewi Lestari,50,50
+HM303,Tourism Planning and Management,3,Y3S1,Dr. Dewi Lestari,50,50
 HM304,Independent Project I,7,Y3S1,Project Committee,100,0
 HM305,Consumer Behaviour,3,Y3S2,Dr. Wong Mei Yin,50,50
 HM306,Hospitality Management and Leadership,3,Y3S2,Dr. Nadya Kartika,50,50
