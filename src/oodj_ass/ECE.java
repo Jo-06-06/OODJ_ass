@@ -170,22 +170,19 @@ public class ECE {
 
         boolean eligible = (cgpa >= 2.0 && failCount <= 3);
         System.out.println("Eligible Next Year: " + (eligible ? "YES" : "NO"));
-        eligibilityList.add(new String[]{
-            sid,
-            (eligible ? "YES" : "NO")
-        });
 
         // store to result
         resultList.add(new String[]{
                 sid,
                 sem,
-                String.format("%.2f", cgpa)
+                String.format("%.2f", cgpa),
+                (eligible ? "YES" : "NO")
         });
     }
         
         // save result
     try (BufferedWriter bw = new BufferedWriter(new FileWriter("data/result.txt"))) {
-        bw.write("studentID,semester,CGPA");
+        bw.write("studentID,semester,CGPA,eligibility");
         bw.newLine();
 
         for (String[] r : resultList) {
@@ -195,31 +192,10 @@ public class ECE {
     } catch (Exception e) {}
 }
 
-    public static ArrayList<String[]> eligibilityList = new ArrayList<>();
-
-    public static void saveEligibility() {
-
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter("data/eligibility.txt"))) {
-
-            bw.write("studentID,eligibility");
-            bw.newLine();
-
-            for (String[] e : eligibilityList) {
-                bw.write(e[0] + "," + e[1]);
-                bw.newLine();
-            }
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-
-       
     // ===================== MAIN =====================
     public static void main(String[] args) {
         updateCurrentGrades();
         calculateCurrentCGPA();
-        saveEligibility();
     }
         
 }
