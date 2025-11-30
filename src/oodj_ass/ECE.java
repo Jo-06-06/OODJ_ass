@@ -12,40 +12,39 @@ import java.io.*;
 import java.util.*;
 
 public class ECE {
-    // convert mark to grade
+    // convert mark to gpa
        public static class GradeConverter {
-        public static String getAlphabetGrade(int marks) {
-            if (marks >= 80) return "A+";
-            else if (marks >= 75) return "A";
-            else if (marks >= 70) return "B+";
-            else if (marks >= 65) return "B";
-            else if (marks >= 60) return "C+";
-            else if (marks >= 55) return "C";
-            else if (marks >= 50) return "C-";
-            else if (marks >= 40) return "D";
-            else if (marks >= 30) return "F+";
-            else if (marks >= 20) return "F";
-            else return "F-";
+        // convert mark to gpa
+        public static double getGradePoint(int marks) {
+
+            if (marks >= 80) return 4.0;
+            else if (marks >= 75) return 3.7;
+            else if (marks >= 70) return 3.3;
+            else if (marks >= 65) return 3.0;
+            else if (marks >= 60) return 2.7;
+            else if (marks >= 55) return 2.3;
+            else if (marks >= 50) return 2.0;
+            else if (marks >= 40) return 1.7;
+            else if (marks >= 30) return 1.3;
+            else if (marks >= 20) return 1.0;
+            else return 0.0;
         }
 
-        public static double getGradePoint(String g) {
-            switch (g) {
-                case "A+": return 4.0;
-                case "A":  return 3.7;
-                case "B+": return 3.3;
-                case "B":  return 3.0;
-                case "C+": return 2.7;
-                case "C":  return 2.3;
-                case "C-": return 2.0;
-                case "D":  return 1.7;
-                case "F+": return 1.3;
-                case "F":  return 1.0;
-                case "F-": return 0.0;
-                default:   return 0.0;
-            }
+        //convert gpa to alphabet
+        public static String getAlphabetGrade(double gpa) {
+
+            if (gpa >= 4.0) return "A+";
+            else if (gpa >= 3.7) return "A";
+            else if (gpa >= 3.3) return "B+";
+            else if (gpa >= 3.0) return "B";
+            else if (gpa >= 2.7) return "C+";
+            else if (gpa >= 2.3) return "C";
+            else if (gpa >= 2.0) return "C-";
+            else return "F";
         }
     }
        
+
     // Load file
     public static ArrayList<String[]> loadFile(String filename, boolean hasHeader) {
         ArrayList<String[]> list = new ArrayList<>();
@@ -93,8 +92,8 @@ public class ECE {
 
             int finalMark = (int)Math.round((ass * assW / 100.0) + (exam * examW / 100.0));
 
-            String grade = GradeConverter.getAlphabetGrade(finalMark);
-            double gpa = GradeConverter.getGradePoint(grade);
+            double gpa = GradeConverter.getGradePoint(finalMark);
+            String grade = GradeConverter.getAlphabetGrade(gpa);
 
             g[4] = grade;
             g[5] = String.format("%.2f", gpa);
