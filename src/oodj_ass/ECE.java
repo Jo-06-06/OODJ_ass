@@ -8,12 +8,14 @@ package oodj_ass;
  *
  * @author jolin
  */
+
 import java.io.*;
 import java.util.*;
 
 public class ECE {
-    // convert mark to gpa
-       public static class GradeConverter {
+
+    public static class GradeConverter {
+
         // convert mark to gpa
         public static double getGradePoint(int marks) {
 
@@ -30,172 +32,235 @@ public class ECE {
             else return 0.0;
         }
 
-        //convert gpa to alphabet
+        // convert gpa to alphabet
         public static String getAlphabetGrade(double gpa) {
 
-            if (gpa >= 4.0) return "A+";
+            if (gpa == 4.0) return "A+";
             else if (gpa >= 3.7) return "A";
             else if (gpa >= 3.3) return "B+";
             else if (gpa >= 3.0) return "B";
             else if (gpa >= 2.7) return "C+";
             else if (gpa >= 2.3) return "C";
             else if (gpa >= 2.0) return "C-";
-            else return "F";
+            else return "F"; 
         }
     }
-       
 
-    // Load file
-    public static ArrayList<String[]> loadFile(String filename, boolean hasHeader) {
+    // load files
+    public static ArrayList<String[]> loadFile(String file, boolean header) {
         ArrayList<String[]> list = new ArrayList<>();
 
-        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("data/" + file))) {
             String line;
+            if (header) br.readLine();
 
-            if (hasHeader) br.readLine();
-
-            while ((line = br.readLine()) != null) {
+            while ((line = br.readLine()) != null)
                 list.add(line.split(","));
-            }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return list;
     }
-       
-    // find course row
-    public static String[] findCourse(String cid, ArrayList<String[]> courses) {
-        for (String[] c : courses) {
-            if (c[0].equals(cid)) return c;
+
+    public static void saveGrades(ArrayList<String[]> list) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("data/grades.txt"))) {
+
+            bw.write("studentID,courseID,semester,assScore,examScore,grade,gpa,attemptNum\n");
+
+            for (String[] r : list)
+                bw.write(String.join(",", r) + "\n");
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
+
+    public static void saveResults(ArrayList<String[]> list) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("data/result.txt"))) {
+
+            bw.write("studentID,semester,CGPA,eligibility\n");
+
+            for (String[] r : list)
+                bw.write(String.join(",", r) + "\n");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // course
+    public static String[] findCourse(String courseID, ArrayList<String[]> courses) {
+        for (String[] c : courses)
+            if (c[0].equals(courseID))
+                return c;
         return null;
     }
-    
-    //update grade and gpa
-       public static void updateCurrentGrades() {
 
-        ArrayList<String[]> courses = loadFile("data/courses.txt", true);
-        ArrayList<String[]> grades = loadFile("data/grades.txt", true);
+    // update grade
+
+    public static void updateGrades() {
+
+        ArrayList<String[]> grades = loadFile("grades.txt", true);
+        ArrayList<String[]> studentInfo = loadFile("studentInfo.txt", true);
+        ArrayList<String[]> courses = loadFile("courses.txt", true);
+        
+        //match studentid with current semester
+        HashMap<String, String> currentSemMap = new HashMap<>();
+        for (String[] s : studentInfo)
+            currentSemMap.put(s[0], s[1]); 
 
         for (String[] g : grades) {
 
-            String courseID = g[1];
-            int ass = Integer.parseInt(g[2]);
-            int exam = Integer.parseInt(g[3]);
+            String sid = g[0];
+            String sem = g[2];
 
+            // skip past semesters
+            if (!currentSemMap.containsKey(sid)) continue;
+            if (!currentSemMap.get(sid).equals(sem)) continue;
+
+            // course data
+            String courseID = g[1];
             String[] c = findCourse(courseID, courses);
+            if (c == null) continue;
 
             int assW = Integer.parseInt(c[5]);
             int examW = Integer.parseInt(c[6]);
 
-            int finalMark = (int)Math.round((ass * assW / 100.0) + (exam * examW / 100.0));
+            int ass = Integer.parseInt(g[3]);
+            int exam = Integer.parseInt(g[4]);
 
-            double gpa = GradeConverter.getGradePoint(finalMark);
-            String grade = GradeConverter.getAlphabetGrade(gpa);
+            double finalMark = (ass * assW / 100.0) + (exam * examW / 100.0);
+            int rounded = (int) Math.round(finalMark);
 
-            g[4] = grade;
-            g[5] = String.format("%.2f", gpa);
+            double gpa = GradeConverter.getGradePoint(rounded);
+            String alpha = GradeConverter.getAlphabetGrade(gpa);
+
+            g[5] = alpha;
+            g[6] = String.format("%.2f", gpa);
         }
 
-        // save back
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter("data/grades.txt"))) {
-            bw.write("studentID,courseID,assScore,examScore,grade,gpa,attemptNum");
-            bw.newLine();
-
-            for (String[] g : grades) {
-                bw.write(String.join(",", g));
-                bw.newLine();
-            }
-
-        } catch (Exception e) {}
+        saveGrades(grades);
     }
-    
-    //calculate cgpa
-    public static void calculateCurrentCGPA() {
 
-        ArrayList<String[]> grades = loadFile("data/grades.txt", true);
-        ArrayList<String[]> courses = loadFile("data/courses.txt", true);
-        ArrayList<String[]> studentInfo = loadFile("data/studentInfo.txt", true);
+    // calculate cgpa
 
-        ArrayList<String[]> resultList = new ArrayList<>();
-        
-        // get current studentID + semester
+    public static void calculateCGPA() {
+
+        ArrayList<String[]> grades = loadFile("grades.txt", true);
+        ArrayList<String[]> studentInfo = loadFile("studentInfo.txt", true);
+        ArrayList<String[]> courses = loadFile("courses.txt", true);
+
+        ArrayList<String[]> results = new ArrayList<>();
+
         for (String[] s : studentInfo) {
 
-        String sid = s[0];
-        String sem = s[1];
+            String sid = s[0];
+            String currentSem = s[1];
+
+            double totalGP = 0;
+            int totalCH = 0;
+            int failCount = 0;
+
+            for (String[] g : grades) {
+
+                if (!g[0].equals(sid)) continue;
+                if (!g[2].equals(currentSem)) continue;
+
+                String courseID = g[1];
+                String[] c = findCourse(courseID, courses);
+                if (c == null) continue;
+
+                int credit = Integer.parseInt(c[2]);
+                double gpa = Double.parseDouble(g[6]);
+
+                totalGP += gpa * credit;
+                totalCH += credit;
+
+                if (gpa < 2.0)
+                    failCount++;
+            }
+
+            double cgpa = totalCH == 0 ? 0 : totalGP / totalCH;
+            boolean eligible = (cgpa >= 2.0 && failCount <= 3);
+
+            results.add(new String[]{
+                    sid,
+                    currentSem,
+                    String.format("%.2f", cgpa),
+                    eligible ? "YES" : "NO"
+            });
+        }
+
+        saveResults(results);
+    }
+
+    
+    public static void displayEligibility() {
+
+    ArrayList<String[]> grades = loadFile("grades.txt", true);
+    ArrayList<String[]> studentInfo = loadFile("studentInfo.txt", true);
+    ArrayList<String[]> courses = loadFile("courses.txt", true);
+    ArrayList<String[]> result = loadFile("result.txt", true);
+
+    System.out.println("\n======= Eligibility Details =======");
+
+    for (String[] res : result) {
+
+        String sid = res[0];
+        String sem = res[1];
+        double finalCGPA = Double.parseDouble(res[2]);
+        String eligibilityStatus = res[3];
+
+        System.out.println("\n===== Student: " + sid + " (" + sem + ") =====");
 
         double totalGP = 0;
         int totalCH = 0;
         int failCount = 0;
 
-        System.out.println("\n===== Student: " + sid + " (" + sem + ") =====");
-
+        // PRINT COURSE DETAILS
         for (String[] g : grades) {
 
-            if (!g[0].equals(sid)) continue;
+            if (!g[0].equals(sid)) continue;        // match student
+            if (!g[2].equals(sem)) continue;        // match semester
 
+            double gpa = Double.parseDouble(g[6]);
+            String grade = g[5];
             String courseID = g[1];
-            String grade = g[4];
-            double gpa = Double.parseDouble(g[5]);
 
-            // match semester using courses file
             String[] c = findCourse(courseID, courses);
-            if (!c[3].equals(sem)) continue;
-
             int credit = Integer.parseInt(c[2]);
+
             double gp = gpa * credit;
 
             totalGP += gp;
             totalCH += credit;
-
             if (gpa < 2.0) failCount++;
 
             System.out.println(
                 courseID + " | Grade: " + grade +
-                " (" + g[5] + ") * " + credit +
-                " = " + String.format("%.2f", gp)
+                " (" + String.format("%.2f", gpa) + ") * " +
+                credit + " credits = " + String.format("%.2f", gp)
             );
         }
 
-        double cgpa = totalCH == 0 ? 0 : totalGP / totalCH;
-
+        // SUMMARY
         System.out.println("Total Grade Points = " + String.format("%.2f", totalGP));
-        System.out.println("Total Credits = " + totalCH);
-        System.out.println("CGPA = " + String.format("%.2f", cgpa));
+        System.out.println("Total Credit Hours = " + totalCH);
         System.out.println("Total Fails = " + failCount);
-
-        boolean eligible = (cgpa >= 2.0 && failCount <= 3);
-        System.out.println("Eligible Next Year: " + (eligible ? "YES" : "NO"));
-
-        // store to result
-        resultList.add(new String[]{
-                sid,
-                sem,
-                String.format("%.2f", cgpa),
-                (eligible ? "YES" : "NO")
-        });
+        System.out.println("CGPA = " + String.format("%.2f", finalCGPA));
+        System.out.println("Eligible Next Year: " + eligibilityStatus);
     }
-        
-        // save result
-    try (BufferedWriter bw = new BufferedWriter(new FileWriter("data/result.txt"))) {
-        bw.write("studentID,semester,CGPA,eligibility");
-        bw.newLine();
 
-        for (String[] r : resultList) {
-            bw.write(String.join(",", r));
-            bw.newLine();
-        }
-    } catch (Exception e) {}
+    System.out.println("\n===================================\n");
 }
 
-    // ===================== MAIN =====================
+    
+    // =============================== MAIN ================================
+
     public static void main(String[] args) {
-        updateCurrentGrades();
-        calculateCurrentCGPA();
+        updateGrades();
+        calculateCGPA();
+        displayEligibility();
     }
-        
 }
-
