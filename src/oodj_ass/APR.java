@@ -12,8 +12,9 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 import java.util.Collections;
+import java.util.HashMap;   
+import java.util.Map;       
 
-// iText: ONLY import the exact classes we use (avoid Font conflict)
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
@@ -43,7 +44,10 @@ public class APR {
     static String currentStudentName = "";
     static String currentProgram = "";
     static String currentIntake = "All";
-    
+    static Map<String, StringBuilder> achievementsMap = new HashMap<>();  // Key Achievements of each sem
+    static Map<String, StringBuilder> weaknessesMap  = new HashMap<>();   // Areas to Improve
+    static Map<String, StringBuilder> improveMap     = new HashMap<>();   // Recommendations
+
     //Main UI
    public static void main(String[] args) {
 
@@ -55,7 +59,6 @@ public class APR {
         //Top BG
         frame.getContentPane().setBackground(new Color(245, 246, 250));
 
-        
         //StudentID, Intake, Search
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         topPanel.setBorder(BorderFactory.createEmptyBorder(8, 10, 8, 10));
@@ -114,7 +117,7 @@ public class APR {
                 new Font("Segoe UI", Font.BOLD, 12)));
 
         // Main split pane (top = tables, bottom = summary)
-        mainSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, tableScroll, summaryScroll);
+        JSplitPane mainSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, tableScroll, summaryScroll);
         mainSplit.setDividerLocation(320);
         mainSplit.setResizeWeight(0.6);
         mainSplit.setBorder(null);
@@ -174,11 +177,23 @@ public class APR {
                         clearDisplay();
                         return;
                     }
-
+                       
+                    //Fill combo: Sem + Year + All
                     cbIntake.removeAllItems();
                     for (String s : semList) {
                         cbIntake.addItem(s);
                     }
+                    
+                    boolean hasY1 = false, hasY2 = false, hasY3 = false;
+                    for (String s : semList) {
+                        if (s.startsWith("Y1")) hasY1 = true;
+                        else if (s.startsWith("Y2")) hasY2 = true;
+                        else if (s.startsWith("Y3")) hasY3 = true;
+                    }
+                    if (hasY1) cbIntake.addItem("Year 1");
+                    if (hasY2) cbIntake.addItem("Year 2");
+                    if (hasY3) cbIntake.addItem("Year 3");
+                    
                     cbIntake.addItem("All");
                     cbIntake.setSelectedItem("All");
                     cbIntake.setEnabled(true);
@@ -236,7 +251,7 @@ public class APR {
         frame.setVisible(true);
     }
     
-        //JTable
+        //Table Style
         private static void styleCoursesTable() {
              tblCourses.setRowHeight(24);
              tblCourses.setFont(new Font("Segoe UI", Font.PLAIN, 12));
@@ -285,32 +300,48 @@ public class APR {
             if (semesters.isEmpty()) {
                 throw new Exception("No semester found.");
             }
-
+            
+            achievementsMap.clear();
+            weaknessesMap.clear();
+            improveMap.clear();
+            
             //Filter
             ArrayList<String> filtered = new ArrayList<>();
-            if (intakeSelection.equalsIgnoreCase("All")) {
+            
+            if ("All".equalsIgnoreCase(intakeSelection)) {
                 filtered.addAll(semesters);
-            } else {
-                for (String s : semesters) {
-                    if (s.equals(intakeSelection)) filtered.add(s);
-                }
-            }
 
+            } else if (intakeSelection.startsWith("Year")) {
+
+                // Year 1 → Y1S1 Y1S2
+                String yearNum = intakeSelection.substring(5).trim(); 
+                for (String s : semesters) {
+                    if (s.startsWith("Y" + yearNum)) 
+                        filtered.add(s);
+                    }
+
+            } else {
+
+                // Single Semester (Y1S1)
+                for (String s : semesters) {
+                    if (s.equals(intakeSelection)) 
+                        filtered.add(s);
+                    }
+                }
+                
+                if (filtered.isEmpty()) 
+                    filtered.addAll(semesters);
+                
             //Table
             tableModel.setRowCount(0);  
 
             double totalCGPA = 0;
             int semCount = 0;
-
-            StringBuilder achievements = new StringBuilder();
-            StringBuilder weaknesses = new StringBuilder();
-            StringBuilder improvements = new StringBuilder();
-
             boolean repeatSemester = false;
             int failTotal = 0;
 
             for (String sem : filtered) {
-
+                
                 ArrayList<String[]> courseList = loadStudentCourses(studentID, sem);
                 double semCGPA = loadCGPA(studentID, sem);
 
@@ -321,6 +352,10 @@ public class APR {
 
                 int failCounter = 0;
 
+                StringBuilder achievements = new StringBuilder();
+                StringBuilder weaknesses = new StringBuilder();
+                StringBuilder improvements = new StringBuilder();
+                
                 for (String[] c : courseList) {
                     String code = c[0];
                     String titleTxt = c[1];
@@ -334,27 +369,35 @@ public class APR {
 
                     // Add JTable
                     tableModel.addRow(new Object[]{sem, code, titleTxt, credit, grade, gpa});
-
-                    if (grade.startsWith("A")) {
+                    
+                    //Achievements
+                    if (grade.startsWith("A")) 
                         achievements.append("- Strong performance in ").append(code).append(".\n");
-                    }
-
+                    
+                    //Weakness
                     double gpaValue = 0;
-                    try { gpaValue = Double.parseDouble(gpa); } catch (Exception ignore) {}
+                    try { 
+                        gpaValue = Double.parseDouble(gpa); 
+                    } catch (Exception ignore) {}
 
                     if (gpaValue < 2.00) {
                         weaknesses.append("- Weak performance in ").append(code).append(".\n");
                         failCounter++;
                     }
-
+                    
+                    //Improvements
                     if (ass < 50) improvements.append("- Resit assignment for " + code + ".\n");
                     if (exam < 50) improvements.append("- Resit examination for " + code + ".\n");
-                }
-
-                failTotal += failCounter;
+                }           
+               
                 if (semCGPA < 2.00 && semCGPA > 0) repeatSemester = true;
+                 failTotal += failCounter;
+            
+                achievementsMap.put(sem, achievements);
+                weaknessesMap.put(sem, weaknesses);
+                improveMap.put(sem, improvements);
             }
-
+            
             // CGPA
             double finalCGPA = (semCount > 0) ? totalCGPA / semCount : 0;
             lblCgpaValue.setText(String.format("%.2f", finalCGPA));
@@ -366,6 +409,14 @@ public class APR {
             summary.append("Student ID   : ").append(studentID).append("\n");
             summary.append("Program      : ").append(stu[1]).append("\n");
             summary.append("Intake       : ").append(intakeSelection).append("\n\n");
+            
+            if ("All".equalsIgnoreCase(intakeSelection) || intakeSelection.startsWith("Year")) {
+
+                for (String sem : filtered) {
+                    double semCGPA = loadCGPA(studentID, sem);
+
+                    summary.append("Semester : ").append(sem).append("\n");
+                    summary.append("CGPA     : ").append(String.format("%.2f", semCGPA)).append("\n\n");
 
             summary.append("Summary of Progress:\n");
             if (finalCGPA >= 3.50)
@@ -377,23 +428,65 @@ public class APR {
             else
                 summary.append("- The student requires significant academic improvement.\n\n");
 
-            if (achievements.length() > 0)
-                summary.append("Key Achievements:\n").append(achievements).append("\n");
+            StringBuilder ach = achievementsMap.get(sem);
+            StringBuilder weak = weaknessesMap.get(sem);
+            StringBuilder impr = improveMap.get(sem);
+            
+            if (ach != null && ach.length() > 0)
+                summary.append("Key Achievements:\n").append(ach).append("\n");
 
-            if (weaknesses.length() > 0)
-                summary.append("Areas to Improve:\n").append(weaknesses).append("\n");
+            if (weak != null && weak.length() > 0)
+                summary.append("Areas to Improve:\n").append(weak).append("\n");
 
             summary.append("Recommendations of Improvement:\n");
-            if (improvements.length() > 0)
-                summary.append(improvements);
+            if (impr != null && impr.length() > 0)
+                summary.append(impr);
             else
                 summary.append("- The student has shown good learning attitude and consistent effort.\n");
 
-            if (failTotal >= 4 || repeatSemester)
-                summary.append("- Repeating the semester is recommended.\n");
-
-            txtSummary.setText(summary.toString());
+            summary.append("\n\n");
         }
+
+        if (failTotal >= 4 || repeatSemester) {
+            summary.append("Note:\n");
+            summary.append("- Repeating the semester is recommended based on overall performance.\n");
+        }
+
+    } else {
+                
+        summary.append("Summary of Progress:\n");
+        if (finalCGPA >= 3.50)
+            summary.append("- The student demonstrates excellent academic performance.\n\n");
+        else if (finalCGPA >= 3.00)
+            summary.append("- The student shows good consistent progress.\n\n");
+        else if (finalCGPA >= 2.00)
+            summary.append("- The student achieved satisfactory performance, improvement needed.\n\n");
+        else
+            summary.append("- The student requires significant academic improvement.\n\n");
+
+        String sem = filtered.get(0);
+        StringBuilder ach = achievementsMap.get(sem);
+        StringBuilder weak = weaknessesMap.get(sem);
+        StringBuilder impr = improveMap.get(sem);
+            
+        if (ach != null && ach.length() > 0)
+            summary.append("Key Achievements:\n").append(ach).append("\n");
+
+        if (weak != null && weak.length() > 0)
+            summary.append("Areas to Improve:\n").append(weak).append("\n");
+
+        summary.append("Recommendations of Improvement:\n");
+        if (impr != null && impr.length() > 0)
+            summary.append(impr);
+        else
+            summary.append("- The student has shown good learning attitude and consistent effort.\n");
+
+        if (failTotal >= 4 || repeatSemester)
+            summary.append("- Repeating the semester is recommended.\n");
+    }
+
+    txtSummary.setText(summary.toString());
+    }
 
         //File Loading Functions
         public static String[] loadStudentNameProgram(String id) throws IOException {
@@ -462,7 +555,6 @@ public class APR {
         }
 
         Collections.sort(list); 
-
         return list;
     }
 
@@ -474,9 +566,11 @@ public class APR {
             String line = br.readLine(); 
             while ((line = br.readLine()) != null) {
                 StringTokenizer st = new StringTokenizer(line, ",");
-                if (!st.hasMoreTokens()) continue;
+                if (!st.hasMoreTokens()) 
+                    continue;
                 String sid = st.nextToken();
-                if (!st.hasMoreTokens()) continue;
+                if (!st.hasMoreTokens()) 
+                    continue;
                 String sem = st.nextToken();
                 if (sid.equals(id) && !list.contains(sem)) {
                     list.add(sem);
@@ -541,9 +635,11 @@ public class APR {
             while ((line = br.readLine()) != null) {
                 StringTokenizer st = new StringTokenizer(line, ",");
 
-                if (!st.hasMoreTokens()) continue;
+                if (!st.hasMoreTokens()) 
+                    continue;
                 String sid = st.nextToken();
-                if (!st.hasMoreTokens()) continue;
+                if (!st.hasMoreTokens()) 
+                    continue;
                 String courseID = st.nextToken();
 
                 String semFromFile = null;
@@ -628,121 +724,193 @@ public class APR {
             return 0.0;
         }
 
+      
         //PDF Export
         public static void exportToPDF() throws Exception {
 
-        if (currentStudentId == null) {
-            return;
-        }
-
-        Document doc = new Document(PageSize.A4, 40, 40, 40, 40);
-        String fileName = "AcademicReport_" + currentStudentId + ".pdf";
-        PdfWriter.getInstance(doc, new FileOutputStream(fileName));
-        doc.open();
-
-        com.itextpdf.text.Font titleFont =
-                new com.itextpdf.text.Font(
-                        com.itextpdf.text.Font.FontFamily.HELVETICA,
-                        16,
-                        com.itextpdf.text.Font.BOLD
-                );
-
-        com.itextpdf.text.Font infoFont =
-                new com.itextpdf.text.Font(
-                        com.itextpdf.text.Font.FontFamily.HELVETICA,
-                        11,
-                        com.itextpdf.text.Font.NORMAL
-                );
-
-        com.itextpdf.text.Font semTitleFont =
-                new com.itextpdf.text.Font(
-                        com.itextpdf.text.Font.FontFamily.HELVETICA,
-                        12,
-                        com.itextpdf.text.Font.BOLD
-                );
-
-        com.itextpdf.text.Font headerFont =
-                new com.itextpdf.text.Font(
-                        com.itextpdf.text.Font.FontFamily.HELVETICA,
-                        11,
-                        com.itextpdf.text.Font.BOLD
-                );
-
-        // Report Title
-        Paragraph title = new Paragraph("Academic Performance Report", titleFont);
-        title.setAlignment(Element.ALIGN_CENTER);
-        title.setSpacingAfter(15f);
-        doc.add(title);
-
-        // Student Info
-        doc.add(new Paragraph("Student Name : " + currentStudentName, infoFont));
-        doc.add(new Paragraph("Student ID   : " + currentStudentId, infoFont));
-        doc.add(new Paragraph("Program      : " + currentProgram, infoFont));
-        doc.add(new Paragraph("CGPA         : " + lblCgpaValue.getText(), infoFont));
-        doc.add(Chunk.NEWLINE);
-
-        //Generate tables by sem
-        ArrayList<String> semesters = loadAllSemesters(currentStudentId);
-        if (!"All".equals(currentIntake)) {
-
-            semesters.clear();
-            semesters.add(currentIntake);
-        }
-
-        for (String sem : semesters) {
-
-            //Sem Title
-            Paragraph semTitle = new Paragraph("Semester: " + sem, semTitleFont);
-            semTitle.setSpacingBefore(8f);
-            semTitle.setSpacingAfter(4f);
-            doc.add(semTitle);
-
-            //Table
-            PdfPTable pdfTable = new PdfPTable(5);
-            pdfTable.setWidthPercentage(100);
-            pdfTable.setWidths(new float[]{15f, 45f, 8f, 10f, 10f});
-
-            String[] headers = {"Course Code", "Course Title", "Credit", "Grade", "GPA"};
-            for (String h : headers) {
-                PdfPCell cell = new PdfPCell(new Phrase(h, headerFont));
-                cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
-                cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-                pdfTable.addCell(cell);
+            if (currentStudentId == null) {
+                return;
             }
 
-            //Course by Sem
-            ArrayList<String[]> courseList = loadStudentCourses(currentStudentId, sem);
-            for (String[] c : courseList) {
-                String code = c[0];
-                String titleTxt = c[1];
-                String credit = c[2];
+            Document doc = new Document(PageSize.A4, 40, 40, 40, 40);
+            String fileName = "AcademicReport_" + currentStudentId + ".pdf";
+            PdfWriter.getInstance(doc, new FileOutputStream(fileName));
+            doc.open();
 
-                String[] gradeData = loadGrade(currentStudentId, code, sem);
-                String grade = gradeData[0];
-                String gpa = gradeData[1];
+            com.itextpdf.text.Font titleFont =
+                    new com.itextpdf.text.Font(
+                            com.itextpdf.text.Font.FontFamily.HELVETICA,
+                            16,
+                            com.itextpdf.text.Font.BOLD
+                    );
 
-                pdfTable.addCell(new Phrase(code, infoFont));
-                pdfTable.addCell(new Phrase(titleTxt, infoFont));
-                pdfTable.addCell(new Phrase(credit, infoFont));
-                pdfTable.addCell(new Phrase(grade, infoFont));
-                pdfTable.addCell(new Phrase(gpa, infoFont));
-            }
+            com.itextpdf.text.Font infoFont =
+                    new com.itextpdf.text.Font(
+                            com.itextpdf.text.Font.FontFamily.HELVETICA,
+                            11,
+                            com.itextpdf.text.Font.NORMAL
+                    );
 
-            doc.add(pdfTable);
+            com.itextpdf.text.Font semTitleFont =
+                    new com.itextpdf.text.Font(
+                            com.itextpdf.text.Font.FontFamily.HELVETICA,
+                            12,
+                            com.itextpdf.text.Font.BOLD
+                    );
+
+            com.itextpdf.text.Font headerFont =
+                    new com.itextpdf.text.Font(
+                            com.itextpdf.text.Font.FontFamily.HELVETICA,
+                            11,
+                            com.itextpdf.text.Font.BOLD
+                    );
+
+            // Report Title
+            Paragraph title = new Paragraph("Academic Performance Report", titleFont);
+            title.setAlignment(Element.ALIGN_CENTER);
+            title.setSpacingAfter(15f);
+            doc.add(title);
+
+            // Student Info
+            doc.add(new Paragraph("Student Name : " + currentStudentName, infoFont));
+            doc.add(new Paragraph("Student ID   : " + currentStudentId, infoFont));
+            doc.add(new Paragraph("Program      : " + currentProgram, infoFont));
             doc.add(Chunk.NEWLINE);
-        }
 
-        // Summary & Recommendations
-        String fullSummary = txtSummary.getText();
-        String summarySection = fullSummary;
+            //Generate tables by sem
+            ArrayList<String> semesters = loadAllSemesters(currentStudentId);
+            ArrayList<String> filtered = new ArrayList<>();
 
-        int idx = fullSummary.indexOf("Summary of Progress:");
-        if (idx >= 0) {
-            summarySection = fullSummary.substring(idx);
-        }
+            if (currentIntake == null || "All".equalsIgnoreCase(currentIntake)) {
+                filtered.addAll(semesters);
+            } else if (currentIntake.startsWith("Year")) {
+                String yearNum = currentIntake.substring(5).trim();
+                for (String s : semesters) {
+                    if (s.startsWith("Y" + yearNum)) filtered.add(s);
+                }
+            } else {
+                for (String s : semesters) {
+                    if (s.equals(currentIntake)) filtered.add(s);
+                }
+            }
+            if (filtered.isEmpty()) filtered.addAll(semesters);
 
-             doc.add(new Paragraph(summarySection, infoFont));
+            for (String sem : filtered) {
+
+                //Sem Title
+                Paragraph semTitle = new Paragraph("Semester: " + sem, semTitleFont);
+                semTitle.setSpacingBefore(8f);
+                semTitle.setSpacingAfter(4f);
+                doc.add(semTitle);
+
+                //Course Table
+                PdfPTable pdfTable = new PdfPTable(5);
+                pdfTable.setWidthPercentage(100);
+                pdfTable.setWidths(new float[]{15f, 45f, 8f, 10f, 10f});
+
+                String[] headers = {"Course Code", "Course Title", "Credit", "Grade", "GPA"};
+                for (String h : headers) {
+                    PdfPCell cell = new PdfPCell(new Phrase(h, headerFont));
+                    cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    pdfTable.addCell(cell);
+                }
+
+                //Course by Sem
+                ArrayList<String[]> courseList = loadStudentCourses(currentStudentId, sem);
+                int totalCreditHours = 0;
+
+                for (String[] c : courseList) {
+                    String code = c[0];
+                    String titleTxt = c[1];
+                    String credit = c[2];
+
+                    String[] gradeData = loadGrade(currentStudentId, code, sem);
+                    String grade = gradeData[0];
+                    String gpa = gradeData[1];
+
+                    //Accumulate credit
+                    try {
+                        totalCreditHours += Integer.parseInt(credit.trim());
+                    } catch (Exception ignore) {}
+
+                    pdfTable.addCell(new Phrase(code, infoFont));
+                    pdfTable.addCell(new Phrase(titleTxt, infoFont));
+                    pdfTable.addCell(new Phrase(credit, infoFont));
+                    pdfTable.addCell(new Phrase(grade, infoFont));
+                    pdfTable.addCell(new Phrase(gpa, infoFont));
+                }
+
+                doc.add(pdfTable);
+
+                // Summary rows under table: Total Credit Hours + CGPA
+                double semCGPA = loadCGPA(currentStudentId, sem);
+
+                PdfPTable summaryTable = new PdfPTable(2);
+                summaryTable.setWidthPercentage(40);
+                summaryTable.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                summaryTable.setSpacingBefore(4f);
+
+                PdfPCell c1 = new PdfPCell(new Phrase("Total Credit Hours", headerFont));
+                PdfPCell c2 = new PdfPCell(new Phrase(String.valueOf(totalCreditHours), infoFont));
+                c1.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                c2.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                summaryTable.addCell(c1);
+                summaryTable.addCell(c2);
+
+                PdfPCell c3 = new PdfPCell(new Phrase("CGPA", headerFont));
+                PdfPCell c4 = new PdfPCell(new Phrase(String.format("%.2f", semCGPA), infoFont));
+                c3.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                c4.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                summaryTable.addCell(c3);
+                summaryTable.addCell(c4);
+
+                doc.add(summaryTable);
+
+                //Summary below All Table
+                Paragraph semSummaryTitle = new Paragraph("Summary for " + sem, semTitleFont);
+                semSummaryTitle.setSpacingBefore(5f);
+                semSummaryTitle.setSpacingAfter(2f);
+                doc.add(semSummaryTitle);
+
+                Paragraph p = new Paragraph();
+                p.setFont(infoFont);
+
+                // Summary of Progress
+                p.add("Summary of Progress:\n");
+                if (semCGPA >= 3.50)
+                    p.add("- The student demonstrates excellent academic performance.\n\n");
+                else if (semCGPA >= 3.00)
+                    p.add("- The student shows good consistent progress.\n\n");
+                else if (semCGPA >= 2.00)
+                    p.add("- The student achieved satisfactory performance, improvement needed.\n\n");
+                else
+                    p.add("- The student requires significant academic improvement.\n\n");
+
+                // Key Achievements
+                StringBuilder ach = (achievementsMap != null) ? achievementsMap.get(sem) : null;
+                if (ach != null && ach.length() > 0) {
+                    p.add("Key Achievements:\n");
+                    p.add(ach.toString());
+                    p.add("\n");
+                }
+
+                // Recommendations
+                StringBuilder impr = (improveMap != null) ? improveMap.get(sem) : null;
+                p.add("Recommendations of Improvement:\n");
+                if (impr != null && impr.length() > 0) {
+                    p.add(impr.toString());
+                    p.add("\n");
+                } else {
+                    p.add("- The student has shown good learning attitude and consistent effort.\n");
+                }
+
+                doc.add(p);
+                doc.add(Chunk.NEWLINE);
+            }
 
             doc.close();
         }
-    }                 
+        
+}
+
