@@ -3,13 +3,13 @@ package oodj_ass;
 public class RecoveryMilestone {
     private String studyWeek;
     private String task;
-    private boolean isCompleted;
-    public String notes;
+    private boolean completed;
+    private String notes;
     
     public RecoveryMilestone(String studyWeek, String task) {
         this.studyWeek = studyWeek;
         this.task = task;
-        this.isCompleted = false;
+        this.completed = false;
         this.notes = "";
     }
     
@@ -22,7 +22,7 @@ public class RecoveryMilestone {
     }
     
     public boolean isCompleted() {
-        return isCompleted;
+        return completed;
     }
     
     public String getNotes() {
@@ -38,7 +38,7 @@ public class RecoveryMilestone {
     }
     
     public void setCompleted(boolean completed) {
-        this.isCompleted = completed;
+        this.completed = completed;
     }
     
     public void setNotes(String notes) {
@@ -46,43 +46,33 @@ public class RecoveryMilestone {
     }
     
     public void markCompleted(String notes) {
-        this.isCompleted = true;
-        this.notes = notes;
+        this.completed = true;
+        this.notes = notes != null ? notes : "";
     }
     
     public void markCompleted() {
-        this.isCompleted = true;
-        this.notes = "Completed";
-    }
+        markCompleted("Completed");
+    } 
     
     public void markIncomplete() {
-        this.isCompleted = false;
+        this.completed = false;
         this.notes = "";
     }
+    
     @Override 
     public String toString() {
-        String checkbox = isCompleted ? "[✓]" : "[ ]";
+        String checkbox = completed ? "[✓]" : "[ ]";
         return checkbox + " " + studyWeek + ": " + task;
     }
     
     public String getDetailedInfo() {
-        StringBuilder info = new StringBuilder();
-        info.append("Study Week: ").append(studyWeek).append("\n");
-        info.append("Task: ").append(task).append("\n");
-        info.append("Status: ").append(isCompleted ? "✓ COMPLETED" : "○ PENDING").append("\n");
-        
-        if (isCompleted && notes != null && !notes.isEmpty()) {
-            info.append("Notes: ").append(notes).append("\n");
-        }
-        
-        return info.toString();
-    }
-    
-    public String getStatusIcon() {
-        return isCompleted ? "✓" : "○";
-    }
-    
-    public String getStatusText() {
-        return isCompleted ? "COMPLETED" : "PENDING";
+        StringBuilder sb = new StringBuilder();
+        sb.append("Study Week : ").append(studyWeek).append("\n");
+        sb.append("Task       : ").append(task).append("\n");
+        sb.append("Status     : ").append(completed ? "COMPLETED" : "PENDING").append("\n");
+        if (completed && notes != null && !notes.isEmpty()) {
+            sb.append("Notes      : ").append(notes).append("\n");
+            }
+        return sb.toString();
     }
 }

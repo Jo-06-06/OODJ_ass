@@ -9,6 +9,8 @@ public class Student {
     private String lastName;
     private String major;
     private String email;
+    
+    private String currentSemester;
     private double cgpa;
     private List<Course> courses;
     
@@ -17,6 +19,10 @@ public class Student {
         this.firstName = firstName;
         this.lastName = lastName;
         this.courses = new ArrayList<>();
+        this.major="";
+        this.email="";
+        this.currentSemester = "";
+        this.cgpa = 0.0;
     }
     
     public String getStudentID() {
@@ -43,6 +49,10 @@ public class Student {
         return email;
     }
     
+    public String getCurrentSemester() {
+        return currentSemester;
+    }
+    
     public double getCgpa() {
         return cgpa;
     }
@@ -51,12 +61,12 @@ public class Student {
         return courses;
     }
     
-    public int getFailedCourseCount() {
-        return getFailedCourses().size();
-    }
-    
     public void setMajor(String major) {
         this.major = major;
+    }
+    
+    public void setCurrentSemester(String sem) {
+        this.currentSemester = sem;
     }
     
     public void setEmail(String email) {
@@ -67,16 +77,18 @@ public class Student {
         this.cgpa = cgpa;
     }
     
+    /** All courses where at least one component is below 50. */
     public List<Course> getFailedCourses() {
-        List<Course> failedCourses = new ArrayList<>();
+        List<Course> failed = new ArrayList<>();
         for (Course course : courses) {
             if (course.isFailed()) {
-                failedCourses.add(course);
+                failed.add(course);
             }
         }
-        return failedCourses;
+        return failed;
     }
     
+    /** Lowest grade course (used for Scenario: CGPA < 2 but no failed components). */
     public Course getLowestGradeCourse() {
         Course lowest =  null;
         for (Course course : courses) {
@@ -106,6 +118,7 @@ public class Student {
         }
     }
     
+    /** check if the student needs any recovery at all */
     public boolean isRecoveryCandidate() {
         return(cgpa < 2.0) || (!getFailedCourses().isEmpty());
     }

@@ -8,136 +8,170 @@ import java.time.format.DateTimeFormatter;
 public class RecoveryPlan {
     private String planID;
     private Student student;
-    private Course failedCourse;
+    private Course course;
     private String recommendation;
     private List<RecoveryMilestone> milestones;
+
+    /** PENDING → IN_PROGRESS → AWAITING_GRADE → COMPLETED-PASSED / COMPLETED-FAILED */
     private String status;
     private Double recoveryGrade;
     private String createdDate;
     private String lastUpdated;
-    
+
     public RecoveryPlan(String planID, Student student, Course failedCourse) {
         this.planID = planID;
         this.student = student;
-        this.failedCourse = failedCourse;
+        this.course = failedCourse;
+
         this.milestones = new ArrayList<>();
         this.status = "PENDING";
-        this.recommendation = "";
         this.recoveryGrade = null;
-        this.createdDate = getCurrentDateTime();
-        this.lastUpdated = getCurrentDateTime();
+
+        String nowText = now();
+        this.createdDate = nowText;
+        this.lastUpdated = nowText;
+
+        // **** NEW: auto-generate a clear, initial recommendation text
+        this.recommendation = buildInitialRecommendation();
     }
-    
-     public String getPlanID() {
+
+    public String getPlanID() {
         return planID;
     }
-    
+
     public Student getStudent() {
         return student;
     }
-    
-    public Course getFailedCourse() {
-        return failedCourse;
+
+    public Course getCourse() {
+        return course;
     }
-    
+
     public String getRecommendation() {
         return recommendation;
     }
-    
+
     public List<RecoveryMilestone> getMilestones() {
         return milestones;
     }
-    
+
     public String getStatus() {
         return status;
     }
-    
+
     public Double getRecoveryGrade() {
         return recoveryGrade;
     }
-    
+
     public String getCreatedDate() {
         return createdDate;
     }
-    
+
     public String getLastUpdated() {
         return lastUpdated;
     }
-    
+
     public void setRecommendation(String recommendation) {
-        this.recommendation = recommendation;
+        this.recommendation = (recommendation != null ? recommendation : "");
         updateTimestamp();
     }
-    
+
     public void setStatus(String status) {
         this.status = status;
         updateTimestamp();
     }
-    
+
     public void setRecoveryGrade(Double grade) {
         this.recoveryGrade = grade;
         updateTimestamp();
     }
-    
+
+    // **** OPTIONAL (for loading from file: CRP can use these to keep timestamps) ****
+    public void setCreatedDateRaw(String createdDate) {
+        if (createdDate != null && !createdDate.trim().isEmpty()) {
+            this.createdDate = createdDate.trim();
+        }
+    }
+
+    public void setLastUpdatedRaw(String lastUpdated) {
+        if (lastUpdated != null && !lastUpdated.trim().isEmpty()) {
+            this.lastUpdated = lastUpdated.trim();
+        }
+    }
+
+    // MILESTONE MANAGEMENT
     public void addMilestone(RecoveryMilestone milestone) {
+        if (milestone == null) return;
+
         milestones.add(milestone);
-        //Update status if first milestone added
-        if (status.equals("PENDING") && (!milestones.isEmpty())) {
+
+        // When first milestone is created, move PENDING → IN_PROGRESS
+        if ("PENDING".equals(status) && !milestones.isEmpty()) {
             this.status = "IN_PROGRESS";
         }
         updateTimestamp();
     }
-    
-    public void addMilestone(String studyWeek, String task) {
-        RecoveryMilestone milestone = new RecoveryMilestone(studyWeek, task);
-        addMilestone(milestone);
-    }
-    
-    public boolean updateMilestone(int index, String newStudyWeek, String newTask) {
-        if (index >= 0 && index < milestones.size()) {
-            RecoveryMilestone milestone = milestones.get(index);
-            milestone.setStudyWeek(newStudyWeek);
-            milestone.setTask(newTask);
-            updateTimestamp();
-            return true;
-        }
-        return false;
-    }
-    
-    public boolean removeMilestone(int index) {
-        if (index >= 0 && index < milestones.size()) {
-            milestones.remove(index);
-            updateTimestamp();
-            return true;
-        }
-        return false;
-    }
-    
 
-    public RecoveryMilestone getMilestone(int index) {
-        if (index >= 0 && index < milestones.size()) {
-            return milestones.get(index);
-        }
-        return null;
+    public void addMilestone(String studyWeek, String task) {
+        addMilestone(new RecoveryMilestone(studyWeek, task));
     }
-    
+
+    public boolean updateMilestone(int index, String newStudyWeek, String newTask) {
+        if (index < 0 || index >= milestones.size()) {
+            return false;
+        }
+        RecoveryMilestone milestone = milestones.get(index);
+        milestone.setStudyWeek(newStudyWeek);
+        milestone.setTask(newTask);
+        updateTimestamp();
+        return true;
+    }
+
+    public boolean removeMilestone(int index) {
+        if (index < 0 || index >= milestones.size()) {
+            return false;
+        }
+        milestones.remove(index);
+        updateTimestamp();
+        return true;
+    }
+
+    /**
+     * Mark a specific milestone as completed with optional notes.
+     * **** FIXED INDEX CHECK: previously used (index < 0 && index >= size) which was always false.
+     */
+    public boolean markMilestoneCompleted(int index, String notes) {
+        if (index < 0 || index >= milestones.size()) {
+            return false;
+        }
+
+        milestones.get(index).markCompleted(notes);
+
+        // Auto-update status if all milestones are completed
+        if (areAllMilestonesCompleted() && !"COMPLETED-PASSED".equals(status)
+                                        && !"COMPLETED-FAILED".equals(status)) {
+            this.status = "AWAITING_GRADE";
+        }
+
+        updateTimestamp();
+        return true;
+    }
+
+    public boolean areAllMilestonesCompleted() {
+        if (milestones.isEmpty()) return false;
+
+        for (RecoveryMilestone milestone : milestones) {
+            if (!milestone.isCompleted()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public int getMilestoneCount() {
         return milestones.size();
     }
-    
-    public double getProgressPercentage() {
-        if(milestones.isEmpty()) {
-            return 0.0;
-        }
-        int completedCount = 0;
-        for (RecoveryMilestone milestone : milestones) {
-            if (milestone.isCompleted()) {
-                completedCount++;
-            }
-        }
-        return (completedCount * 100.0) / milestones.size();
-    }
-    
+
     public int getCompletedMilestoneCount() {
         int count = 0;
         for (RecoveryMilestone milestone : milestones) {
@@ -147,104 +181,149 @@ public class RecoveryPlan {
         }
         return count;
     }
-    
-    public boolean areAllMilestonesCompleted() {
-        if (milestones.isEmpty()) {
-            return false;
-        }
-        for (RecoveryMilestone milestone : milestones) {
-            if (!milestone.isCompleted()) {
-                return false;
-            }
-        }
-        return true;
+
+    public double getProgressPercentage() {
+        if (milestones.isEmpty()) return 0.0;
+        return (getCompletedMilestoneCount() * 100.0) / milestones.size();
     }
-    // mark a specific milestone as completed
-    public boolean markMilestoneCompleted(int index, String notes) {
-        if (index >= 0 && index < milestones.size()) {
-            milestones.get(index).markCompleted(notes);
-            
-            // Auto-update status if all milestones completed
-            if (areAllMilestonesCompleted()) {
-                this.status = "AWAITING_GRADE";
-            }
-            
-            updateTimestamp();
-            return true;
-        }
-        return false;
-    }
-    
-    @Override
-    public String toString() {
-        return String.format("Plan %s: %s - %s [%s]", 
-            planID, 
-            student.getFullName(), 
-            failedCourse.getCourseID(), 
-            status);
-    }
-    
+
     public String getSummary() {
-        StringBuilder summary = new StringBuilder();
-        summary.append("-------------------------------------------------\n");
-        summary.append("RECOVERY PLAN: ").append(planID).append("\n");
-        summary.append("-------------------------------------------------\n");
-        summary.append("Student: ").append(student.getFullName())
-               .append(" (").append(student.getStudentID()).append(")\n");
-        summary.append("Course: ").append(failedCourse.getCourseID())
-               .append(" - ").append(failedCourse.getCourseName()).append("\n");
-        summary.append("Failed Component: ").append(failedCourse.getFailedComponent()).append("\n");
-        summary.append("Status: ").append(status).append("\n");
-        summary.append("Progress: ").append(String.format("%.1f", getProgressPercentage())).append("%");
-        summary.append(" (").append(getCompletedMilestoneCount()).append("/")
-               .append(getMilestoneCount()).append(" completed)\n");
-        
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("--------------------------------------------------\n");
+        sb.append("RECOVERY PLAN: ").append(planID).append("\n");
+        sb.append("--------------------------------------------------\n");
+        sb.append("Student: ").append(student.getFullName())
+          .append(" (").append(student.getStudentID()).append(")\n");
+        sb.append("Course: ").append(course.getCourseID())
+          .append(" - ").append(course.getCourseName()).append("\n");
+        sb.append("Attempt: ").append(course.getAttemptNumber()).append("\n");
+        sb.append("Failed Component: ").append(course.getFailedComponent()).append("\n");
+        sb.append("Requirement: ").append(course.getRecoveryRequirement()).append("\n");
+        sb.append("Status: ").append(status).append("\n\n");
+
+        sb.append("Progress: ").append(String.format("%.1f", getProgressPercentage())).append("%\n");
+        sb.append("Completed: ").append(getCompletedMilestoneCount())
+          .append("/").append(getMilestoneCount()).append("\n");
+
         if (recoveryGrade != null) {
-            summary.append("Recovery Grade: ").append(String.format("%.2f", recoveryGrade)).append("\n");
+            sb.append("Recovery Grade: ").append(String.format("%.2f", recoveryGrade)).append("\n");
         }
-        
-        summary.append("Created: ").append(createdDate).append("\n");
-        summary.append("Last Updated: ").append(lastUpdated).append("\n");
-        summary.append("======================================\n");
-        
-        return summary.toString();
+
+        sb.append("Created: ").append(createdDate).append("\n");
+        sb.append("Last Updated: ").append(lastUpdated).append("\n");
+        sb.append("--------------------------------------------------\n");
+
+        return sb.toString();
     }
-    
+
     public String getDetailedInfo() {
-        StringBuilder info = new StringBuilder();
-        
-        info.append(getSummary());
-        
+        StringBuilder sb = new StringBuilder();
+        sb.append(getSummary());
+
         // Recommendation
         if (recommendation != null && !recommendation.isEmpty()) {
-            info.append("\nRECOMMENDATION:\n");
-            info.append(recommendation).append("\n");
+            sb.append("\nRECOMMENDATION:\n");
+            sb.append(recommendation).append("\n");
         }
-        
+
         // Milestones
-        info.append("\nACTION PLAN (MILESTONES):\n");
-        info.append("───────────────────────────────────────\n");
-        
+        sb.append("\nMILESTONES:\n");
+        sb.append("-----------------------------------------------\n");
+
         if (milestones.isEmpty()) {
-            info.append("No milestones set yet.\n");
+            sb.append("No milestones set.\n");
         } else {
             for (int i = 0; i < milestones.size(); i++) {
-                RecoveryMilestone m = milestones.get(i);
-                info.append(String.format("%d. %s\n", i + 1, m.toString()));
+                sb.append((i + 1)).append(". ").append(milestones.get(i).toString()).append("\n");
             }
         }
-        
-        info.append("───────────────────────────────────────\n");
-        
-        return info.toString();
+
+        sb.append("-----------------------------------------------\n");
+        return sb.toString();
     }
-    
+
     private void updateTimestamp() {
-        this.lastUpdated = getCurrentDateTime();
+        this.lastUpdated = now();
     }
-     
-    private String getCurrentDateTime() {        
-        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+    private String now() {
+        return LocalDateTime.now()
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
-  
+
+    /**
+     * **** NEW: Auto-generate a clear, human recommendation based on:
+     * - failed component type
+     * - attempt number
+     * - student CGPA risk (simple heuristic)
+     */
+    private String buildInitialRecommendation() {
+        String failedComponent = course.getFailedComponent();
+        int attempt = course.getAttemptNumber();
+        double cgpa = student.getCgpa();
+
+        StringBuilder rec = new StringBuilder();
+
+        rec.append("Student ").append(student.getFullName())
+           .append(" is advised to focus on ");
+
+        switch (failedComponent) {
+            case "Assignment Only":
+                rec.append("improving assignment performance for ")
+                   .append(course.getCourseID())
+                   .append(" by attending consultation, revising feedback, ")
+                   .append("and submitting higher quality written work.");
+                break;
+
+            case "Exam Only":
+                rec.append("exam preparation for ")
+                   .append(course.getCourseID())
+                   .append(" through extra past-year practice, revision classes, ")
+                   .append("and better time management during the exam.");
+                break;
+
+            case "Both Components":
+                rec.append("both coursework and examination for ")
+                   .append(course.getCourseID())
+                   .append(". The student should strengthen understanding of core topics, ")
+                   .append("seek lecturer guidance, and plan weekly study tasks to close the gap.");
+                break;
+
+            case "None":
+            default:
+                rec.append(course.getCourseID())
+                   .append(". No failed component is detected at this moment. ")
+                   .append("This plan can be used to monitor additional support activities if needed.");
+                break;
+        }
+
+        rec.append(" ");
+
+        if (attempt >= 3) {
+            rec.append("Since this is attempt ")
+               .append(attempt)
+               .append(", a full course retake is recommended with close monitoring of progress.");
+        } else {
+            rec.append("This is attempt ")
+               .append(attempt)
+               .append(", so targeted recovery on the failed component(s) is sufficient at this stage.");
+        }
+
+        if (cgpa > 0 && cgpa < 2.0) {
+            rec.append(" The student is currently at academic risk (CGPA below 2.00), ")
+               .append("therefore additional follow-up sessions and mentoring are strongly encouraged.");
+        }
+
+        return rec.toString();
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Plan %s: %s - %s [%s]",
+                planID,
+                student.getFullName(),
+                course.getCourseID(),
+                status);
+    }
 }

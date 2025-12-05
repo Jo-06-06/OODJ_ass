@@ -8,26 +8,29 @@ public class main {
 
     public static void main(String[] args) {
         //FileHandler.createFiles();
-        
-        FileLoader loader = new FileLoader();
-        loader.loadAll();
+        /*Email mailer = new Email();
 
-        Student fiona = loader.getStudents().get(0);  // assuming S001 is first
-        System.out.println("\nCourses & scores for " + fiona.getFullName() + ":");
-        for (Course c : fiona.getCourses()) {
-            System.out.printf("%s  A:%d  E:%d  grade:%s  attempt:%d  failed? %s%n",
-                    c.getCourseID(),
-                    c.getAssignmentScore(),
-                    c.getExamScore(),
-                    c.getGrade(),
-                    c.getAttemptNumber(),
-                    c.isFailed());
+        FileLoader fl = new FileLoader();
+        fl.loadAll();
+        List<Student> students = fl.getStudents();
+        
+        CRP crp = new CRP(students, mailer); 
+        
+        Student s = students.get(0);
+        Course failed = null;
+
+        for (Student stu : students) {
+            for (Course c : stu.getCourses()) {
+                if (c.isFailed()) {
+                    crp.createRecoveryPlan(stu, c);
+                }
+            }
         }
 
-
-    // Provide public access if other UIs want direct loader
-    /*public static FileLoader getLoader() {
-        return loader;
-    }*/    
+        if (failed != null) {
+            crp.createRecoveryPlan(s, failed); 
+        } else {
+            System.out.println("No failed course found for this student.");
+        }*/
     }
 }

@@ -12,10 +12,13 @@ public class FileHandler {
             "data/courses.txt",
             "data/logs.txt",
             "data/recoveryPlans.txt",
-            "data/reportHistory.txt",
+            "data/result.txt",
+            "data/resultArchive.txt",
             "data/emailRecords.txt",
             "data/recoveryMilestones.txt",
-            "data/recoveryProgress.txt",
+            "data/gradeArchive.txt",
+            "data/studentInfo.txt",
+            "data/studentCourse.txt"
         };
         
         for (String name : filenames) {
