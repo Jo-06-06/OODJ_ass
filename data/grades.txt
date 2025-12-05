@@ -1,4 +1,4 @@
-studentID,courseID,semester,assScore,examScore,grade,gpa,attemptNum
+studentID,courseID,semester,assScore,examScore,grade,gradePoint,attemptNum
 S001,ME101,Y1S1,56,69,C+,2.70,1
 S001,ME102,Y1S1,78,68,B+,3.30,1
 S001,ME103,Y1S1,57,41,F,1.70,1
