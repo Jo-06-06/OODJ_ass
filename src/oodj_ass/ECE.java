@@ -256,6 +256,22 @@ public class ECE {
 }
 
     
+    public static void displayEligibilityFor(String studentID) {
+    ArrayList<String[]> grades = loadFile("grades.txt", true);
+    ArrayList<String[]> courses = loadFile("courses.txt", true);
+
+    System.out.println("\n======= Search Result for " + studentID + " =======");
+
+    for (String[] g : grades) {
+        if (!g[0].equals(studentID)) continue;
+
+        System.out.println(
+            g[1] + " | Grade: " + g[5] + " (" + g[6] + ")"
+        );
+    }
+}
+
+    
     // =============================== MAIN ================================
 
     public static void main(String[] args) {
