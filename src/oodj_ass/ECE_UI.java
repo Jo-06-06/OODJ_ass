@@ -138,13 +138,13 @@ public class ECE_UI extends javax.swing.JFrame {
         jTextField1 = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         jComboBox1 = new javax.swing.JComboBox<>();
-        jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         jPanel2 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Eligibility Checker");
+        setTitle("Eligibility Check and Enrolment");
         setMaximumSize(new java.awt.Dimension(950, 700));
         setMinimumSize(new java.awt.Dimension(950, 700));
         setPreferredSize(new java.awt.Dimension(950, 700));
@@ -157,9 +157,7 @@ public class ECE_UI extends javax.swing.JFrame {
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jTextField1.setFont(new java.awt.Font("Times New Roman", 0, 18)); // NOI18N
-        jTextField1.setText("Enter Student ID");
         jTextField1.setPreferredSize(new java.awt.Dimension(150, 30));
-        jTextField1.setRequestFocusEnabled(false);
         jTextField1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextField1ActionPerformed(evt);
@@ -179,36 +177,17 @@ public class ECE_UI extends javax.swing.JFrame {
         jComboBox1.setFont(new java.awt.Font("Times New Roman", 0, 18)); // NOI18N
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "All", "Eligible", "No Eligible" }));
         jComboBox1.setPreferredSize(new java.awt.Dimension(180, 30));
+        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox1ActionPerformed(evt);
+            }
+        });
         jPanel1.add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 160, -1, -1));
-
-        jLabel1.setFont(new java.awt.Font("Times New Roman", 0, 36)); // NOI18N
-        jLabel1.setText("Eligibility Checker");
-        jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 30, -1, -1));
 
         jTable1.setFont(new java.awt.Font("Times New Roman", 0, 18)); // NOI18N
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null}
+
             },
             new String [] {
                 "Student ID", "Semester", "CGPA", "Eligibility", "Details"
@@ -221,15 +200,26 @@ public class ECE_UI extends javax.swing.JFrame {
 
         jPanel2.setPreferredSize(new java.awt.Dimension(950, 100));
 
+        jLabel1.setFont(new java.awt.Font("Times New Roman", 0, 36)); // NOI18N
+        jLabel1.setText("Eligibility Check and Enrolment");
+        jLabel1.setToolTipText("");
+        jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 950, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(239, 239, 239)
+                .addComponent(jLabel1)
+                .addContainerGap(253, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(27, 27, 27)
+                .addComponent(jLabel1)
+                .addContainerGap(30, Short.MAX_VALUE))
         );
 
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
@@ -240,7 +230,7 @@ public class ECE_UI extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addGap(0, 71, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -253,29 +243,14 @@ public class ECE_UI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
-        String selected = jComboBox1.getSelectedItem().toString();
-        ArrayList<String[]> resultList = loadFile("result.txt");
-        ArrayList<String[]> filtered = new ArrayList<>();
-
-        for (String[] r : resultList) {
-            if (selected.equals("All")) {
-                filtered.add(r);
-            } 
-            else if (selected.equals("Eligible") && r[3].equals("YES")) {
-                filtered.add(r);
-            } 
-            else if (selected.equals("No Eligible") && r[3].equals("NO")) {
-                filtered.add(r);
-            }
-        }
-
-        updateTable(filtered);
+        jButton1ActionPerformed(evt);
     }//GEN-LAST:event_jTextField1ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         String searchID = jTextField1.getText().trim();
-        if (searchID.equals("")) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Enter a Student ID!");
+
+        if (searchID.isEmpty() || searchID.equals("Enter Student ID")) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Please enter a Student ID!");
             return;
         }
 
@@ -283,7 +258,7 @@ public class ECE_UI extends javax.swing.JFrame {
         ArrayList<String[]> matched = new ArrayList<>();
 
         for (String[] r : resultList) {
-            if (r[0].equalsIgnoreCase(searchID)) {
+            if (r[0].equalsIgnoreCase(searchID)) {   // Match Student ID
                 matched.add(r);
             }
         }
@@ -292,8 +267,28 @@ public class ECE_UI extends javax.swing.JFrame {
             javax.swing.JOptionPane.showMessageDialog(this, "Student not found!");
         }
 
-        updateTable(matched);
+        updateTable(matched); 
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+        String selected = jComboBox1.getSelectedItem().toString();
+        ArrayList<String[]> resultList = loadFile("result.txt");
+        ArrayList<String[]> filtered = new ArrayList<>();
+
+        for (String[] r : resultList) {
+            if (selected.equals("All")) {
+                filtered.add(r);
+            } 
+            else if (selected.equals("Eligible") && r[3].equalsIgnoreCase("YES")) {
+                filtered.add(r);
+            } 
+            else if (selected.equals("No Eligible") && r[3].equalsIgnoreCase("NO")) {
+                filtered.add(r);
+            }
+        }
+
+        updateTable(filtered);
+    }//GEN-LAST:event_jComboBox1ActionPerformed
 
     /**
      * @param args the command line arguments
