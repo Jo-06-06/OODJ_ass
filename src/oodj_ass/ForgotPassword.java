@@ -1,15 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package oodj_ass;
 
 import javax.swing.JOptionPane;
 
-/**
- *
- * @author priyanka.kannan
- */
+
 public class ForgotPassword extends javax.swing.JFrame {
     
     private final UserManager userManager;
@@ -124,8 +117,6 @@ public class ForgotPassword extends javax.swing.JFrame {
                 + "</body></html>";
                 
         JOptionPane.showMessageDialog(this, message, "System Notification (Email Simulation)", JOptionPane.INFORMATION_MESSAGE);
-        
-        // 5. Close window so user can login
         this.dispose();
     }//GEN-LAST:event_btnResetActionPerformed
 
