@@ -148,10 +148,9 @@ public class ECE_UI extends javax.swing.JFrame {
         setTitle("Eligibility Check and Enrolment");
         setMaximumSize(new java.awt.Dimension(1160, 700));
         setMinimumSize(new java.awt.Dimension(1160, 700));
-        setPreferredSize(new java.awt.Dimension(1160, 700));
         setResizable(false);
 
-        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel1.setBackground(new java.awt.Color(183, 201, 197));
         jPanel1.setMaximumSize(new java.awt.Dimension(1160, 700));
         jPanel1.setMinimumSize(new java.awt.Dimension(1160, 700));
         jPanel1.setPreferredSize(new java.awt.Dimension(1160, 700));
@@ -164,9 +163,9 @@ public class ECE_UI extends javax.swing.JFrame {
                 jTextField1ActionPerformed(evt);
             }
         });
-        jPanel1.add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 160, -1, -1));
+        jPanel1.add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 160, -1, -1));
 
-        jComboBox1.setFont(new java.awt.Font("Times New Roman", 0, 18)); // NOI18N
+        jComboBox1.setFont(new java.awt.Font("Noto Serif SC", 0, 18)); // NOI18N
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "All", "Eligible", "No Eligible" }));
         jComboBox1.setPreferredSize(new java.awt.Dimension(180, 30));
         jComboBox1.addActionListener(new java.awt.event.ActionListener() {
@@ -174,9 +173,9 @@ public class ECE_UI extends javax.swing.JFrame {
                 jComboBox1ActionPerformed(evt);
             }
         });
-        jPanel1.add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 160, -1, -1));
+        jPanel1.add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(930, 160, -1, -1));
 
-        jTable1.setFont(new java.awt.Font("Times New Roman", 0, 18)); // NOI18N
+        jTable1.setFont(new java.awt.Font("Noto Serif SC", 0, 18)); // NOI18N
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -188,11 +187,13 @@ public class ECE_UI extends javax.swing.JFrame {
         jTable1.setRowHeight(35);
         jScrollPane1.setViewportView(jTable1);
 
-        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 230, 900, -1));
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 230, 870, -1));
 
+        jPanel2.setBackground(new java.awt.Color(95, 106, 105));
         jPanel2.setPreferredSize(new java.awt.Dimension(950, 100));
 
-        jLabel1.setFont(new java.awt.Font("Times New Roman", 0, 36)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Noto Serif SC", 1, 36)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("Eligibility Check and Enrolment");
         jLabel1.setToolTipText("");
         jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -204,14 +205,14 @@ public class ECE_UI extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(239, 239, 239)
                 .addComponent(jLabel1)
-                .addContainerGap(253, Short.MAX_VALUE))
+                .addContainerGap(123, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(27, 27, 27)
                 .addComponent(jLabel1)
-                .addContainerGap(30, Short.MAX_VALUE))
+                .addContainerGap(20, Short.MAX_VALUE))
         );
 
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 0, -1, -1));
@@ -223,9 +224,9 @@ public class ECE_UI extends javax.swing.JFrame {
                 jButton1ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 160, -1, -1));
+        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 160, -1, -1));
 
-        jPanel3.setBackground(new java.awt.Color(242, 242, 255));
+        jPanel3.setBackground(new java.awt.Color(0, 0, 0));
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
