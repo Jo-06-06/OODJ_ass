@@ -52,7 +52,7 @@ public class APR {
    public static void main(String[] args) {
 
         JFrame frame = new JFrame("Student Academic Performance Reporting");
-        frame.setSize(1160, 700);
+        frame.setSize(950, 700);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
 
@@ -912,4 +912,3 @@ public class APR {
         }
         
 }
-
