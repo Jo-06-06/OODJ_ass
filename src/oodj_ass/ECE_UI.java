@@ -146,15 +146,15 @@ public class ECE_UI extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Eligibility Check and Enrolment");
-        setMaximumSize(new java.awt.Dimension(950, 700));
-        setMinimumSize(new java.awt.Dimension(950, 700));
-        setPreferredSize(new java.awt.Dimension(950, 700));
+        setMaximumSize(new java.awt.Dimension(1160, 700));
+        setMinimumSize(new java.awt.Dimension(1160, 700));
+        setPreferredSize(new java.awt.Dimension(1160, 700));
         setResizable(false);
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel1.setMaximumSize(new java.awt.Dimension(1050, 700));
-        jPanel1.setMinimumSize(new java.awt.Dimension(1050, 700));
-        jPanel1.setPreferredSize(new java.awt.Dimension(1050, 700));
+        jPanel1.setMaximumSize(new java.awt.Dimension(1160, 700));
+        jPanel1.setMinimumSize(new java.awt.Dimension(1160, 700));
+        jPanel1.setPreferredSize(new java.awt.Dimension(1160, 700));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jTextField1.setFont(new java.awt.Font("Times New Roman", 0, 18)); // NOI18N
@@ -188,7 +188,7 @@ public class ECE_UI extends javax.swing.JFrame {
         jTable1.setRowHeight(35);
         jScrollPane1.setViewportView(jTable1);
 
-        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 230, 900, -1));
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 230, 900, -1));
 
         jPanel2.setPreferredSize(new java.awt.Dimension(950, 100));
 
