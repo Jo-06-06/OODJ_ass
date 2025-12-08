@@ -47,10 +47,8 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="btnUserMgmt" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="btnCRP" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="btnCourseRecovery" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="btnLogout" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="btnECE" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="btnAPR" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
@@ -62,13 +60,9 @@
                   <Component id="textField" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Component id="btnUserMgmt" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="34" max="32767" attributes="0"/>
-                  <Component id="btnECE" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace type="separate" max="-2" attributes="0"/>
-                  <Component id="btnAPR" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
-                  <Component id="btnCRP" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="41" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="39" max="-2" attributes="0"/>
+                  <Component id="btnCourseRecovery" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace pref="128" max="32767" attributes="0"/>
                   <Component id="btnLogout" min="-2" max="-2" attributes="0"/>
                   <EmptySpace min="-2" pref="30" max="-2" attributes="0"/>
               </Group>
@@ -89,12 +83,12 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnUserMgmtActionPerformed"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JButton" name="btnCRP">
+        <Component class="javax.swing.JButton" name="btnCourseRecovery">
           <Properties>
             <Property name="text" type="java.lang.String" value="Course Recovery"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCRPActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCourseRecoveryActionPerformed"/>
           </Events>
         </Component>
         <Component class="javax.swing.JButton" name="btnLogout">
@@ -103,22 +97,6 @@
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnLogoutActionPerformed"/>
-          </Events>
-        </Component>
-        <Component class="javax.swing.JButton" name="btnECE">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Eligibity Check"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnECEActionPerformed"/>
-          </Events>
-        </Component>
-        <Component class="javax.swing.JButton" name="btnAPR">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Academic Reporting"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnAPRActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>

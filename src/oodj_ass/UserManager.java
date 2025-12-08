@@ -9,7 +9,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ *
+ * @author priyanka.kannan
+ */
 public class UserManager {
     
     private final String FILE_NAME = "data/users.txt";

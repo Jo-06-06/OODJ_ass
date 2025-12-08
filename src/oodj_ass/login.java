@@ -1,10 +1,17 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package oodj_ass;
 
-
+/**
+ *
+ * @author jolin
+ */
 public class login {
     
     private final UserManager userManager;
-    private final String LOG_FILE = "login_log.dat"; 
+    private final String LOG_FILE = "login_log.dat"; // Binary file as required 
     
     public login(UserManager userManager){
         this.userManager = userManager;
@@ -17,9 +24,9 @@ public class login {
 
         User user = userManager.findByUsername(username.trim());
 
-        if (user == null) return null; 
-        if (!user.isActive()) return null; 
-        if (!user.getPassword().equals(password)) return null; 
+        if (user == null) return null; // User doesn't exist
+        if (!user.isActive()) return null; // User is banned/inactive
+        if (!user.getPassword().equals(password)) return null; // Wrong password
         String expectedRole;
         if ("Admin".equals(selectedRole)) {
             expectedRole = "ADMIN";
