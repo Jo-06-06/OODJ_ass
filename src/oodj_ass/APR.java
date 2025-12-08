@@ -586,15 +586,11 @@ public class APR {
             String line;
 
             while ((line = br.readLine()) != null) {
-                StringTokenizer st = new StringTokenizer(line, ",");
-                String c = st.nextToken();
-                String title = st.nextToken();
-                String credit = st.nextToken();
-                st.nextToken(); 
+                String[] parts = line.split(",");
+                if (parts.length < 7) continue;
 
-                if (c.equals(code)) {
-                    br.close();
-                    return new String[]{c, title, credit};
+                if (parts[0].equals(code)) {
+                    return new String[]{parts[0], parts[1], parts[2]}; 
                 }
             }
             br.close();
@@ -676,10 +672,7 @@ public class APR {
         //Grades + gradeArchive
         public static String[] loadGrade(String id, String code, String sem) throws IOException {
 
-            String[] data = loadGradeFromFile(id, code, sem, "data/grades.txt", false);
-            if (data != null) return data;
-
-            data = loadGradeFromFile(id, code, sem, "data/gradeArchive.txt", true);
+            String[] data = loadGradeFromFile(id, code, sem, "data/grades.txt", true);
             if (data != null) return data;
 
             return new String[]{"-", "0.00", "0", "0"};
@@ -891,7 +884,7 @@ public class APR {
                 StringBuilder ach = (achievementsMap != null) ? achievementsMap.get(sem) : null;
                 if (ach != null && ach.length() > 0) {
                     p.add("Key Achievements:\n");
-                    p.add(ach.toString());
+                    p  .add(ach.toString());
                     p.add("\n");
                 }
 
