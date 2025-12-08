@@ -908,7 +908,6 @@ public class APR {
                 doc.add(p);
                 doc.add(Chunk.NEWLINE);
             }
-
             
         }
         
