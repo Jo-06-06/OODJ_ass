@@ -12,10 +12,6 @@ package oodj_ass;
 import java.util.ArrayList;
 import java.io.*;
 import java.awt.Color;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
-
 
 public class ECE_UI extends javax.swing.JFrame {
     
@@ -63,58 +59,11 @@ public class ECE_UI extends javax.swing.JFrame {
         ArrayList<String[]> grades = loadFile("grades.txt");
         ArrayList<String[]> courses = loadFile("courses.txt");
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("===== Student: ").append(studentID)
-          .append(" (").append(semester).append(") =====\n\n");
-
-        double totalGP = 0;
-        int totalCH = 0;
-        int failCount = 0;
-
-        for (String[] g : grades) {
-            if (!g[0].equals(studentID)) continue;
-            if (!g[2].equals(semester)) continue;
-
-            String courseID = g[1];
-            String grade = g[5];
-            double gpa = Double.parseDouble(g[6]);
-
-            // Find course details
-            String[] c = null;
-            for (String[] x : courses) {
-                if (x[0].equals(courseID)) {
-                    c = x;
-                    break;
-                }
-            }
-
-            int credit = Integer.parseInt(c[2]);
-            double gp = gpa * credit;
-
-            totalGP += gp;
-            totalCH += credit;
-            if (gpa < 2.0) failCount++;
-
-            sb.append(String.format("%-6s | Grade: %-2s (%.2f) × %d credits = %.2f\n",
-                    courseID, grade, gpa, credit, gp));
-        }
-
-        double cgpa = totalGP / totalCH;
-
-        sb.append("\n-----------------------------------\n");
-        sb.append(String.format("Total Grade Points = %.2f\n", totalGP));
-        sb.append("Total Credit Hours = ").append(totalCH).append("\n");
-        sb.append("Total Fails = ").append(failCount).append("\n");
-        sb.append(String.format("CGPA = %.2f\n", cgpa));
-        sb.append("Eligible Next Year: ").append(cgpa >= 2.0 && failCount <= 3 ? "YES" : "NO");
-
-        javax.swing.JOptionPane.showMessageDialog(
-                this,
-                sb.toString(),
-                "Student Result Details",
-                javax.swing.JOptionPane.INFORMATION_MESSAGE
-        );
+        // Open the ECEView_UI window
+        ECEView_UI view = new ECEView_UI(studentID, semester, grades, courses);
+        view.setVisible(true);
     }
+
     
     
     private void addSidebarHover(javax.swing.JButton btn) {
@@ -367,7 +316,7 @@ public class ECE_UI extends javax.swing.JFrame {
         title.setText("Eligibility Check and Enrolment");
         title.setToolTipText("");
         title.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        backgroud.add(title, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 20, -1, -1));
+        backgroud.add(title, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 40, -1, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
