@@ -1,5 +1,7 @@
 package oodj_ass;
 
+import javax.swing.JOptionPane;
+
 public class MainDashboard extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MainDashboard.class.getName());
@@ -8,12 +10,13 @@ public class MainDashboard extends javax.swing.JFrame {
     public MainDashboard(User user) {
         initComponents();
         this.currentUser = user;
-        
-        textField.setText("Welcome, " + user.getFullName() + " (" + user.getRole() + ")");
+    
+        textField.setText("Welcome, " + user.getUsername() + " (" + user.getRole() + ")");
 
-        if (!currentUser.getRole().equalsIgnoreCase("ADMIN")) {
-            btnUserMgmt.setVisible(false); 
-        }
+        btnUserMgmt.setVisible(true);       
+        btnECE.setVisible(true);
+        btnAPR.setVisible(true);
+        btnCRP.setVisible(true);   
     }
 
     /**
@@ -28,8 +31,10 @@ public class MainDashboard extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         textField = new javax.swing.JLabel();
         btnUserMgmt = new javax.swing.JButton();
-        btnCourseRecovery = new javax.swing.JButton();
+        btnCRP = new javax.swing.JButton();
         btnLogout = new javax.swing.JButton();
+        btnECE = new javax.swing.JButton();
+        btnAPR = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -42,10 +47,10 @@ public class MainDashboard extends javax.swing.JFrame {
             }
         });
 
-        btnCourseRecovery.setText("Course Recovery");
-        btnCourseRecovery.addActionListener(new java.awt.event.ActionListener() {
+        btnCRP.setText("Course Recovery");
+        btnCRP.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCourseRecoveryActionPerformed(evt);
+                btnCRPActionPerformed(evt);
             }
         });
 
@@ -53,6 +58,20 @@ public class MainDashboard extends javax.swing.JFrame {
         btnLogout.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnLogoutActionPerformed(evt);
+            }
+        });
+
+        btnECE.setText("Eligibity Check");
+        btnECE.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnECEActionPerformed(evt);
+            }
+        });
+
+        btnAPR.setText("Academic Reporting");
+        btnAPR.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAPRActionPerformed(evt);
             }
         });
 
@@ -68,8 +87,10 @@ public class MainDashboard extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnUserMgmt)
-                    .addComponent(btnCourseRecovery)
-                    .addComponent(btnLogout))
+                    .addComponent(btnCRP)
+                    .addComponent(btnLogout)
+                    .addComponent(btnECE)
+                    .addComponent(btnAPR))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -78,9 +99,13 @@ public class MainDashboard extends javax.swing.JFrame {
                 .addComponent(textField)
                 .addGap(18, 18, 18)
                 .addComponent(btnUserMgmt)
-                .addGap(39, 39, 39)
-                .addComponent(btnCourseRecovery)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 128, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 34, Short.MAX_VALUE)
+                .addComponent(btnECE)
+                .addGap(18, 18, 18)
+                .addComponent(btnAPR)
+                .addGap(28, 28, 28)
+                .addComponent(btnCRP)
+                .addGap(41, 41, 41)
                 .addComponent(btnLogout)
                 .addGap(30, 30, 30))
         );
@@ -112,17 +137,37 @@ public class MainDashboard extends javax.swing.JFrame {
         this.dispose();
     }//GEN-LAST:event_btnLogoutActionPerformed
 
-    private void btnCourseRecoveryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCourseRecoveryActionPerformed
+    private void btnCRPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCRPActionPerformed
         // TODO add your handling code here:
-        javax.swing.JOptionPane.showMessageDialog(this, "Course Recovery Module coming soon!");
-    }//GEN-LAST:event_btnCourseRecoveryActionPerformed
+        if (currentUser.getRole().equalsIgnoreCase("ADMIN")) {
+            JOptionPane.showMessageDialog(this, 
+                "ACCESS DENIED: Course Recovery is for Academic Officers only.", 
+                "Restricted Access", 
+                JOptionPane.WARNING_MESSAGE);
+            return; 
+        }
+
+        JOptionPane.showMessageDialog(this, "Opening Course Recovery Plan...");
+    }//GEN-LAST:event_btnCRPActionPerformed
+
+    private void btnECEActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnECEActionPerformed
+        // TODO add your handling code here:
+        JOptionPane.showMessageDialog(this, "Opening Eligibility Check and Enrolment...");
+    }//GEN-LAST:event_btnECEActionPerformed
+
+    private void btnAPRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAPRActionPerformed
+        // TODO add your handling code here:
+        JOptionPane.showMessageDialog(this, "Opening Academic Performance Reports...");
+    }//GEN-LAST:event_btnAPRActionPerformed
 
 
     
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnCourseRecovery;
+    private javax.swing.JButton btnAPR;
+    private javax.swing.JButton btnCRP;
+    private javax.swing.JButton btnECE;
     private javax.swing.JButton btnLogout;
     private javax.swing.JButton btnUserMgmt;
     private javax.swing.JPanel jPanel1;

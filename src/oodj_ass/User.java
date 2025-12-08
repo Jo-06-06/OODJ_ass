@@ -1,13 +1,6 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package oodj_ass;
 
-/**
- *
- * @author jolin
- */
+
 public class User {
     private String userId;
     private String username;
@@ -30,7 +23,9 @@ public class User {
     public String getUserId() {
         return userId;
     }
-
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
     public String getUsername() {
         return username;

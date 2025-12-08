@@ -1,17 +1,10 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package oodj_ass;
 
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
-/**
- *
- * @author priyanka.kannan
- */
+
 public class AdminDashboard extends javax.swing.JFrame {
     private final UserManager userManager;
     private DefaultTableModel model;
@@ -24,28 +17,50 @@ public class AdminDashboard extends javax.swing.JFrame {
         
         this.userManager = new UserManager();
         initTable();
-        loadTableData(); 
+        loadTableData(""); 
+        
+        if (!currentUser.getRole().equalsIgnoreCase("ADMIN")) {
+
+            btnAdd.setVisible(false);
+            btnUpdate.setVisible(false);
+            btnDeactivate.setVisible(false);
+            btnReactivate.setVisible(false); 
+
+            txtUsername.setEditable(false);
+            txtPassword.setEditable(false);
+            txtName.setEditable(false);
+            txtEmail.setEditable(false);
+            cmbRole.setEnabled(false);
+
+            this.setTitle("User Directory (Search Only Mode)");
+        }
+        
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(null);
     }
     private void initTable() {
         model = (DefaultTableModel) tblUsers.getModel();
         model.setColumnIdentifiers(new Object[]{"ID", "Username", "Name", "Role", "Active"});
     }
     
-    private void loadTableData() {
-        model.setRowCount(0);
- 
+    private void loadTableData(String query) {
+        model.setRowCount(0); // Clear table
         List<User> users = userManager.getAllUsers();
+        
         for (User u : users) {
-            model.addRow(new Object[]{
-                u.getUserId(),
-                u.getUsername(),
-                u.getFullName(),
-                u.getRole(),
-                u.isActive()
-            });
+            boolean matches = query.isEmpty() || 
+                              u.getUsername().toLowerCase().contains(query.toLowerCase()) ||
+                              u.getUserId().toLowerCase().contains(query.toLowerCase()) ||
+                              u.getFullName().toLowerCase().contains(query.toLowerCase());
+            
+            if (matches) {
+                model.addRow(new Object[]{
+                    u.getUserId(), u.getUsername(), u.getFullName(), 
+                    u.getEmail(), u.getRole(), u.isActive()
+                });
+            }
         }
     }
-    
     
     
     private void clearFields() {
@@ -80,6 +95,9 @@ public class AdminDashboard extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         btnBack = new javax.swing.JButton();
         btnReactivate = new javax.swing.JButton();
+        txtSearch = new javax.swing.JTextField();
+        btnSearch = new javax.swing.JButton();
+        jLabel5 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -96,7 +114,12 @@ public class AdminDashboard extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(tblUsers);
 
-        cmbRole.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Admin", "Acdemic Officer", " " }));
+        cmbRole.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Pick Role", "Admin", "Academic Officer", " " }));
+        cmbRole.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbRoleActionPerformed(evt);
+            }
+        });
 
         btnAdd.setText("add user");
         btnAdd.addActionListener(new java.awt.event.ActionListener() {
@@ -119,13 +142,13 @@ public class AdminDashboard extends javax.swing.JFrame {
             }
         });
 
-        jLabel1.setText("username");
+        jLabel1.setText("Username");
 
-        jLabel2.setText("password");
+        jLabel2.setText("Password");
 
-        jLabel3.setText("name");
+        jLabel3.setText("Name");
 
-        jLabel4.setText("email");
+        jLabel4.setText("E-mail");
 
         btnBack.setText("Main Menu");
         btnBack.addActionListener(new java.awt.event.ActionListener() {
@@ -141,86 +164,110 @@ public class AdminDashboard extends javax.swing.JFrame {
             }
         });
 
+        txtSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtSearchActionPerformed(evt);
+            }
+        });
+
+        btnSearch.setText("Search:");
+        btnSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSearchActionPerformed(evt);
+            }
+        });
+
+        jLabel5.setText("Role");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(6, 6, 6)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addComponent(cmbRole, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnBack))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(jLabel2))
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(jLabel3))
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(jLabel4))
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addComponent(txtUsername, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(jLabel1)))
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
+                                    .addComponent(jLabel1)
+                                    .addComponent(jLabel2))
+                                .addGap(40, 40, 40)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(btnAdd, javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(btnUpdate, javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(btnDeactivate, javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(btnReactivate, javax.swing.GroupLayout.Alignment.TRAILING))))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 249, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
+                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(txtEmail, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
+                                        .addComponent(txtName)
+                                        .addComponent(txtPassword)
+                                        .addComponent(txtUsername))
+                                    .addComponent(cmbRole, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(61, 61, 61)
+                                .addComponent(btnAdd)
+                                .addGap(121, 121, 121)
+                                .addComponent(btnUpdate)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addGap(130, 130, 130)
+                        .addComponent(btnDeactivate)
+                        .addGap(152, 152, 152)
+                        .addComponent(btnReactivate)
+                        .addGap(154, 154, 154)
+                        .addComponent(btnBack)
+                        .addGap(30, 30, 30))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel4))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnSearch)
+                        .addGap(18, 18, 18))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(16, 16, 16)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnAdd)
+                    .addComponent(btnUpdate)
+                    .addComponent(btnDeactivate)
+                    .addComponent(btnReactivate)
+                    .addComponent(btnBack))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1)
+                    .addComponent(txtUsername, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel2)
+                    .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel3)
+                    .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(12, 12, 12)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel4)
+                    .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(btnAdd)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnUpdate)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnDeactivate)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnReactivate)
-                        .addGap(31, 31, 31)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(txtUsername, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel1))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel2))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jLabel3))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel4)))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cmbRole, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnBack))
-                .addContainerGap(9, Short.MAX_VALUE))
+                            .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnSearch))
+                        .addGap(1, 1, 1))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(cmbRole, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel5))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -244,9 +291,13 @@ public class AdminDashboard extends javax.swing.JFrame {
         String email = txtEmail.getText().trim();
         String role = (String) cmbRole.getSelectedItem();
 
-        if(user.isEmpty() || pass.isEmpty() || name.isEmpty() || email.isEmpty()) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Please fill in all fields.");
-            return;
+        if(user.isEmpty() || pass.isEmpty() || name.isEmpty() || email.isEmpty() || role.equals("Pick Role")) {
+            if (role.equals("Pick Role")) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Please select a valid Role (Admin or Academic Officer).");
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(this, "Please fill in all fields.");
+            }
+            return; 
         }
 
         if (!isValidEmail(email)) {
@@ -266,8 +317,8 @@ public class AdminDashboard extends javax.swing.JFrame {
         }
 
         String newID = generateNextUserId(role);
-
         User newUser;
+        
         if(role.equals("Admin")) {
             newUser = new Admin(newID, user, pass, name, email, true);
         } else {
@@ -276,7 +327,7 @@ public class AdminDashboard extends javax.swing.JFrame {
 
         userManager.getAllUsers().add(newUser);
         userManager.saveUsersToFile();
-        loadTableData();
+        loadTableData("");
         
         javax.swing.JOptionPane.showMessageDialog(this, "User Added! ID: " + newID);
         clearFields();
@@ -295,7 +346,7 @@ public class AdminDashboard extends javax.swing.JFrame {
         if (userToBan != null) {
             userToBan.setActive(false); // Deactivate
             userManager.saveUsersToFile(); // Save changes to file
-            loadTableData(); // Refresh UI
+            loadTableData(""); // Refresh UI
             JOptionPane.showMessageDialog(this, "User Deactivated.");
         }
     }//GEN-LAST:event_btnDeactivateActionPerformed
@@ -314,14 +365,13 @@ public class AdminDashboard extends javax.swing.JFrame {
             String newName = txtName.getText().trim();
             String newEmail = txtEmail.getText().trim();
             String newPass = txtPassword.getText().trim();
-            String newRole = (String) cmbRole.getSelectedItem(); 
+            String selectedRoleString = (String) cmbRole.getSelectedItem(); 
 
             if (!newEmail.isEmpty()) {
                 if (!isValidEmail(newEmail)) {
                     javax.swing.JOptionPane.showMessageDialog(this, "Invalid Email Format!");
                     return;
                 }
-
                 for (User u : userManager.getAllUsers()) {
                     if (u.getEmail().equalsIgnoreCase(newEmail) && !u.getUsername().equals(currentUsername)) {
                         javax.swing.JOptionPane.showMessageDialog(this, "Email belongs to another account.");
@@ -334,15 +384,26 @@ public class AdminDashboard extends javax.swing.JFrame {
             if(!newName.isEmpty()) userToUpdate.setFullName(newName);
             if(!newPass.isEmpty()) userToUpdate.setPassword(newPass);
 
-            if (newRole != null) {
-                if (newRole.equalsIgnoreCase("Admin")) userToUpdate.setRole("ADMIN");
-                else if (newRole.equalsIgnoreCase("Academic Officer")) userToUpdate.setRole("ACADEMIC_OFFICER");
-                else userToUpdate.setRole(newRole.toUpperCase());
+            if (selectedRoleString != null && !selectedRoleString.equals("Pick Role")) {
+                
+                String targetRole = selectedRoleString.equalsIgnoreCase("Admin") ? "ADMIN" : "ACADEMIC_OFFICER";
+                
+                if (!userToUpdate.getRole().equalsIgnoreCase(targetRole)) {
+                    
+                    String newId = generateNextUserId(selectedRoleString);
+                    
+                    userToUpdate.setRole(targetRole);
+                    userToUpdate.setUserId(newId); 
+                    
+                    javax.swing.JOptionPane.showMessageDialog(this, 
+                        "Role changed to " + selectedRoleString + ".\n" +
+                        "User ID automatically updated to: " + newId);
+                }
             }
 
             userManager.saveUsersToFile();
-            loadTableData();
-            javax.swing.JOptionPane.showMessageDialog(this, "User details updated!");
+            loadTableData(""); 
+            javax.swing.JOptionPane.showMessageDialog(this, "User details updated successfully!");
             clearFields();
         }
     }//GEN-LAST:event_btnUpdateActionPerformed
@@ -364,10 +425,24 @@ public class AdminDashboard extends javax.swing.JFrame {
         if (userToActivate != null) {
             userToActivate.setActive(true); 
             userManager.saveUsersToFile();
-            loadTableData();
+            loadTableData("");
             JOptionPane.showMessageDialog(this, "User Reactivated!");
         }
     }//GEN-LAST:event_btnReactivateActionPerformed
+
+    private void txtSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSearchActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtSearchActionPerformed
+
+    private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
+        // TODO add your handling code here:
+        String query = txtSearch.getText().trim();
+        loadTableData(query);
+    }//GEN-LAST:event_btnSearchActionPerformed
+
+    private void cmbRoleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbRoleActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cmbRoleActionPerformed
 
     private String generateNextUserId(String role) {
         String prefix;
@@ -405,18 +480,21 @@ public class AdminDashboard extends javax.swing.JFrame {
     private javax.swing.JButton btnBack;
     private javax.swing.JButton btnDeactivate;
     private javax.swing.JButton btnReactivate;
+    private javax.swing.JButton btnSearch;
     private javax.swing.JButton btnUpdate;
     private javax.swing.JComboBox<String> cmbRole;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tblUsers;
     private javax.swing.JTextField txtEmail;
     private javax.swing.JTextField txtName;
     private javax.swing.JTextField txtPassword;
+    private javax.swing.JTextField txtSearch;
     private javax.swing.JTextField txtUsername;
     // End of variables declaration//GEN-END:variables
 }
