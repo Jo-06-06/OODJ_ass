@@ -1,228 +1,418 @@
 package oodj_ass;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.List;
-import java.util.ArrayList;
+import java.io.*;
+import java.util.*;
 
 public class FileLoader {
-    
-    private static final String STUDENT_FILE = "data/studentInfo.txt";
-    private static final String COURSE_FILE = "data/courses.txt";
-    private static final String RECORDS_FILE = "data/academicRecords.txt";
-    private static final String ENROLLMENT_FILE = "data/studentCourse.txt";
 
-    private final List<Student> students = new ArrayList<>();
-    private final List<Course> courseInfoList = new ArrayList<>();
+    private static final String STUDENT_FILE       = "data/students.txt";
+    private static final String STUDENT_INFO_FILE  = "data/studentInfo.txt";
+    private static final String COURSE_FILE        = "data/courses.txt";
+    private static final String ENROLL_FILE        = "data/studentCourse.txt";
+    private static final String GRADES_FILE        = "data/grades.txt";
+    private static final String CGPA_FILE          = "data/result.txt";
 
-    // Master Load Method
+    private final List<Student> students       = new ArrayList<>();
+    private final List<Course>  courseInfoList = new ArrayList<>();
+
     public void loadAll() {
-        System.out.println("=== Loading System Data ===\n");
+        System.out.println("=== Loading System Data ===");
 
         try {
-            loadCourseInfo();    // courses.txt
-            loadStudents();           // studentInfo.txt
-            loadAcademicRecords();    // academicRecords.txt
-            loadStudentCourse();   // studentCourse.txt
-            
-        } catch (IOException e) {
-            System.err.println("Data loading error: " + e.getMessage());
+            loadCourses();
+            loadStudentBasic();
+            loadStudentSemester();
+            loadStudentEnrolments();
+            loadGrades();
+            loadCGPA();
+        } catch (Exception e) {
+            System.err.println("Error loading data: " + e.getMessage());
+            e.printStackTrace();
         }
     }
-    
 
-    // 1. Load Course information 
-    private void loadCourseInfo() throws IOException {
-        System.out.println("Loading Courses...");
+    // 1. Load all course info (courses.txt)
+    private void loadCourses() throws IOException {
+        System.out.println("Loading courses...");
+
+        int totalRows = 0;
+        int loadedRows = 0;
+        int skippedRows = 0;
 
         try (BufferedReader br = new BufferedReader(new FileReader(COURSE_FILE))) {
+            String header = br.readLine(); // skip header
+            int lineNo = 1;                // header line
 
-            String line = br.readLine(); // skip header
-            int count = 0;
-
+            String line;
             while ((line = br.readLine()) != null) {
+                lineNo++;
                 if (line.trim().isEmpty()) continue;
+                totalRows++;
 
-                String[] p = line.split(",");
+                String[] p = line.split(",", -1);
+                if (p.length < 7) {
+                    skippedRows++;
+                    System.err.println("[COURSES] Invalid column count at line " + lineNo + ": " + line);
+                    continue;
+                }
 
-                // courseID,courseName,creditHours,semester,instructor,assignmentWeight,examWeight
-                if (p.length < 7) continue;
+                try {
+                    String courseID   = p[0].trim();
+                    String courseName = p[1].trim();
+                    int creditHours   = Integer.parseInt(p[2].trim());
+                    String semester   = p[3].trim();
+                    String instructor = p[4].trim();
+                    int assWeight     = Integer.parseInt(p[5].trim());
+                    int examWeight    = Integer.parseInt(p[6].trim());
 
-                Course c = new Course(
-                        p[0].trim(),                      // courseID
-                        p[1].trim(),                      // courseName
-                        Integer.parseInt(p[2].trim()),    // creditHours
-                        p[3].trim(),                      // semester
-                        p[4].trim(),                      // instructor
-                        Integer.parseInt(p[5].trim()),    // assignmentWeight
-                        Integer.parseInt(p[6].trim())     // examWeight
-                );
+                    Course c = new Course(courseID, courseName, creditHours,
+                                          semester, instructor, assWeight, examWeight);
 
-                courseInfoList.add(c);
-                count++;
+                    courseInfoList.add(c);
+                    loadedRows++;
+
+                } catch (NumberFormatException ex) {
+                    skippedRows++;
+                    System.err.println("[COURSES] Number parse error at line " + lineNo + ": " + ex.getMessage());
+                }
             }
-
-            System.out.println("Courses Loaded: " + count);
         }
+
+        System.out.println("Courses loaded: " + loadedRows +
+                " (total lines: " + totalRows + ", skipped: " + skippedRows + ")");
     }
 
-    
+    // 2. Load students basic info (students.txt)
+    private void loadStudentBasic() throws IOException {
+        System.out.println("Loading student basic info...");
 
-    // 2. Load Students
-    private void loadStudents() throws IOException {
-        System.out.println("Loading Students...");
+        int totalRows = 0;
+        int loadedRows = 0;
+        int skippedRows = 0;
 
         try (BufferedReader br = new BufferedReader(new FileReader(STUDENT_FILE))) {
+            String header = br.readLine(); // skip header
+            int lineNo = 1;
 
-            String line =br.readLine(); 
-            int count = 0;
-
+            String line;
             while ((line = br.readLine()) != null) {
-
+                lineNo++;
                 if (line.trim().isEmpty()) continue;
+                totalRows++;
 
-                String[] p = line.split(",");
-
-                if (p.length < 5) continue;
-
-                    Student s = new Student(p[0].trim(), p[1].trim(), p[2].trim());
-                    s.setMajor(p[3].trim());
-                    s.setEmail(p[4].trim());
-
-                    students.add(s);
-                    count++;
-                }
-
-            System.out.println("Students Loaded: " + count);
-        }
-    }
-    
-    
-
-    // 3. Load academic records(academicRecords.txt)
-    private void loadAcademicRecords() throws IOException {
-        System.out.println("Loading Academic Records...");
-
-        try (BufferedReader br = new BufferedReader(new FileReader(RECORDS_FILE))) {
-
-            String line = br.readLine();
-            int count = 0;
-            
-            while ((line = br.readLine()) != null) {
-
-                if (line.trim().isEmpty()) continue;
-
-                String[] p = line.split(",");
-
-                if (p.length < 4) continue;
-
-                String studentID = p[0].trim();
-                String courseID  = p[1].trim();
-
-                Student s = findStudent(studentID);
-                if (s == null) continue;
-
-                Course c = findStudentCourse(s, courseID);
-                if (c == null) {
-                    // Optional debug:
-                    System.out.printf("[WARN] No enrolled course %s for %s in records%n", courseID, studentID);
+                String[] p = line.split(",", -1);
+                // students.txt: studentID,firstName,lastName,major,email
+                if (p.length < 5) {
+                    skippedRows++;
+                    System.err.println("[STUDENTS] Invalid column count at line " + lineNo + ": " + line);
                     continue;
                 }
 
-                // scores
-                int ass  = Integer.parseInt(p[2].trim());
-                int exam = Integer.parseInt(p[3].trim());
-                c.setScores(ass, exam);
+                String sid       = p[0].trim();
+                String firstName = p[1].trim();
+                String lastName  = p[2].trim();
+                String major     = p[3].trim();
+                String email     = p[4].trim();
 
-                // grade (may be empty)
-                if (p.length >= 5 && !p[4].trim().isEmpty()) {
-                    c.setGrade(p[4].trim());
-                }
+                Student s = new Student(sid, firstName, lastName);
+                s.setMajor(major);
+                s.setEmail(email);
 
-                // attemptNum (optional)
-                if (p.length >= 7 && !p[6].trim().isEmpty()) {
-                    c.setAttemptNumber(Integer.parseInt(p[6].trim()));
-                }
-
-                count++;
+                students.add(s);
+                loadedRows++;
             }
-
-            System.out.println("Academic Records Loaded: " + count);
         }
+
+        System.out.println("Student basic loaded: " + loadedRows +
+                " (total lines: " + totalRows + ", skipped: " + skippedRows + ")");
     }
 
-    
-    // 4. Load student course(studentCourse.txt)
-    private void loadStudentCourse() throws IOException {
-        System.out.println("Loading Student Course Enrolments...");
+    // 3. Load student semester (studentInfo.txt)
+    private void loadStudentSemester() throws IOException {
+        System.out.println("Loading student semester...");
 
-        try (BufferedReader br = new BufferedReader(new FileReader(ENROLLMENT_FILE))) {
+        int totalRows = 0;
+        int loadedRows = 0;
+        int skippedRows = 0;
 
-            String line = br.readLine(); // header
-            int count = 0;
+        try (BufferedReader br = new BufferedReader(new FileReader(STUDENT_INFO_FILE))) {
+            String header = br.readLine(); // skip header
+            int lineNo = 1;
+
+            String line;
             while ((line = br.readLine()) != null) {
-
+                lineNo++;
                 if (line.trim().isEmpty()) continue;
+                totalRows++;
 
-                String[] p = line.split(",");
-
-                if (p.length < 3) continue;
-
-                String studentID = p[0].trim();
-                String courseID  = p[2].trim();
-
-                Student s = findStudent(studentID);
-                Course  base = findCourseInfo(courseID);
-
-                if (s == null || base == null) {
-                    System.out.printf("[WARN] enrolment skipped: %s - %s%n", studentID, courseID);
+                String[] p = line.split(",", -1);
+                // studentInfo.txt: studentID,semester
+                if (p.length < 2) {
+                    skippedRows++;
+                    System.err.println("[STUDENT_INFO] Invalid column count at line " + lineNo + ": " + line);
                     continue;
                 }
 
-                // Create a course instance for THIS student
-                Course enrolled = new Course(
-                        base.getCourseID(),
-                        base.getCourseName(),
-                        base.getCreditHours(),
-                        base.getSemester(),
-                        base.getCourseInstructor(),
-                        base.getAssignmentWeight(),
-                        base.getExamWeight()
+                String sid = p[0].trim();
+                String sem = p[1].trim();
+
+                Student s = findStudent(sid);
+                if (s == null) {
+                    skippedRows++;
+                    System.err.println("[STUDENT_INFO] Student not found for ID " + sid +
+                                       " at line " + lineNo);
+                    continue;
+                }
+
+                s.setCurrentSemester(sem);
+                loadedRows++;
+            }
+        }
+
+        System.out.println("Student semester records loaded: " + loadedRows +
+                " (total lines: " + totalRows + ", skipped: " + skippedRows + ")");
+    }
+
+    // 4. Load enrolled courses (studentCourse.txt)
+    private void loadStudentEnrolments() throws IOException {
+        System.out.println("Loading student enrolments...");
+
+        int totalRows = 0;
+        int loadedRows = 0;
+        int skippedRows = 0;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(ENROLL_FILE))) {
+            String header = br.readLine(); 
+            int lineNo = 1;
+
+            String line;
+            while ((line = br.readLine()) != null) {
+                lineNo++;
+                if (line.trim().isEmpty()) continue;
+                totalRows++;
+
+                String[] p = line.split(",", -1);
+                // studentCourse.txt: studentID,semester,courseID
+                if (p.length < 3) {
+                    skippedRows++;
+                    System.err.println("[ENROL] Invalid column count at line " + lineNo + ": " + line);
+                    continue;
+                }
+
+                String sid      = p[0].trim();
+                String sem      = p[1].trim(); 
+                String courseId = p[2].trim();
+
+                Student s = findStudent(sid);
+                Course template = findCourseInfo(courseId);
+
+                if (s == null || template == null) {
+                    skippedRows++;
+                    System.err.println("[ENROL] Missing student or course (sid=" + sid +
+                                       ", course=" + courseId + ") at line " + lineNo);
+                    continue;
+                }
+
+                Course c = new Course(
+                        template.getCourseID(),
+                        template.getCourseName(),
+                        template.getCreditHours(),
+                        template.getSemester(),
+                        template.getCourseInstructor(),
+                        template.getAssignmentWeight(),
+                        template.getExamWeight()
                 );
 
-                s.getCourses().add(enrolled);
-                count++;
+                s.getCourses().add(c);
+                loadedRows++;
             }
-
-            System.out.println("Enrolments Loaded: " + count);
         }
-        
+
+        System.out.println("Student enrolments loaded: " + loadedRows +
+                " (total lines: " + totalRows + ", skipped: " + skippedRows + ")");
     }
 
-    Student findStudent(String studentID) {
+    // 5. Load grades (grades.txt)
+    private void loadGrades() throws IOException {
+        System.out.println("Loading grades (multi-attempt)...");
+
+        File gradeFile = new File(GRADES_FILE);
+        if (!gradeFile.exists()) {
+            System.out.println("  ⚠ grades.txt not found, skipping.");
+            return;
+        }
+
+        // Inner helper structure to hold the latest attempt per (student,course)
+        class GradeRecord {
+            String semester;
+            int assScore;
+            int examScore;
+            String grade;
+            double gpa;
+            int attemptNum;
+        }
+
+        // key = "studentID|courseID"
+        Map<String, GradeRecord> latestGradeMap = new HashMap<>();
+
+        int totalRows   = 0;
+        int usedRows    = 0;
+        int skippedRows = 0;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(gradeFile))) {
+
+            String header = br.readLine();
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                if (line.trim().isEmpty()) continue;
+
+                totalRows++;
+                String[] p = line.split(",", -1);
+
+                // Expected: studentID,courseID,semester,assScore,examScore,grade,gpa,attemptNum
+                if (p.length < 8) {
+                    skippedRows++;
+                    System.err.println("  Skipping invalid grade row (columns < 8): " + line);
+                    continue;
+                }
+
+                String sid = p[0].trim();
+                String cid = p[1].trim();
+                String sem = p[2].trim();
+
+                try {
+                    int assScore   = Integer.parseInt(p[3].trim());
+                    int examScore  = Integer.parseInt(p[4].trim());
+                    String grade   = p[5].trim();
+                    double gpa     = Double.parseDouble(p[6].trim());
+                    int attemptNum = Integer.parseInt(p[7].trim());
+
+                    String key = sid + "|" + cid;
+                    GradeRecord current = latestGradeMap.get(key);
+
+                    // *** CHANGED: keep ONLY the highest attemptNum for each (sid,cid)
+                    if (current == null || attemptNum > current.attemptNum) {
+                        GradeRecord gr = new GradeRecord();
+                        gr.semester   = sem;
+                        gr.assScore   = assScore;
+                        gr.examScore  = examScore;
+                        gr.grade      = grade;
+                        gr.gpa        = gpa;
+                        gr.attemptNum = attemptNum;
+                        latestGradeMap.put(key, gr);
+                    }
+
+                } catch (NumberFormatException nfe) {
+                    skippedRows++;
+                    System.err.println("  Skipping grade row (number format error): " + line);
+                }
+            }
+        }
+
+        // Now push the latest grade info into each student's Course object
+        int courseUpdated = 0;
+
         for (Student s : students) {
-            if (s.getStudentID().equals(studentID)) return s;
+            for (Course c : s.getCourses()) {
+                String key = s.getStudentID() + "|" + c.getCourseID();
+                GradeRecord gr = latestGradeMap.get(key);
+
+                if (gr != null) {
+                    c.setScores(gr.assScore, gr.examScore);
+                    c.setGrade(gr.grade);
+                    c.setAttemptNumber(gr.attemptNum);
+                    courseUpdated++;
+                }
+            }
+        }
+
+        System.out.println("  Grades rows read   : " + totalRows);
+        System.out.println("  Courses updated    : " + courseUpdated);
+        System.out.println("  Rows skipped       : " + skippedRows);
+    }
+
+    // 6. Load CGPA (result.txt)
+    private void loadCGPA() throws IOException {
+        System.out.println("Loading CGPA...");
+
+        File f = new File(CGPA_FILE);
+        if (!f.exists()) {
+            System.out.println("result.txt not found – skipping CGPA load.");
+            return;
+        }
+
+        int totalRows = 0;
+        int loadedRows = 0;
+        int skippedRows = 0;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(CGPA_FILE))) {
+            String header = br.readLine(); // skip header
+            int lineNo = 1;
+
+            String line;
+            while ((line = br.readLine()) != null) {
+                lineNo++;
+                if (line.trim().isEmpty()) continue;
+                totalRows++;
+
+                String[] p = line.split(",", -1);
+                // result.txt: studentID,semester,CGPA,eligibility
+                if (p.length < 4) {
+                    skippedRows++;
+                    System.err.println("[CGPA] Invalid column count at line " + lineNo + ": " + line);
+                    continue;
+                }
+
+                String sid = p[0].trim();
+                String sem = p[1].trim();
+                String cgpaText = p[2].trim();
+                // eligibility = p[3].trim(); // not needed here
+
+                Student s = findStudent(sid);
+                if (s == null) {
+                    skippedRows++;
+                    System.err.println("[CGPA] Student not found for ID " + sid + " at line " + lineNo);
+                    continue;
+                }
+
+                try {
+                    double cgpa = Double.parseDouble(cgpaText);
+                    s.setCgpa(cgpa);
+                    loadedRows++;
+                } catch (NumberFormatException ex) {
+                    skippedRows++;
+                    System.err.println("[CGPA] Number parse error at line " + lineNo + ": " + ex.getMessage());
+                }
+            }
+        }
+
+        System.out.println("CGPA records loaded: " + loadedRows +
+                " (total lines: " + totalRows + ", skipped: " + skippedRows + ")");
+    }
+
+    // Helper search methods
+    private Student findStudent(String id) {
+        for (Student s : students) {
+            if (s.getStudentID().equals(id)) return s;
         }
         return null;
     }
 
-    private Course findCourseInfo(String courseID) {
+    private Course findCourseInfo(String id) {
         for (Course c : courseInfoList) {
-            if (c.getCourseID().equals(courseID)) return c;
-        }
-        return null;
-    }
-    
-    private Course findStudentCourse(Student s, String courseID) {
-        for (Course c : s.getCourses()) {
-            if (c.getCourseID().equals(courseID))
-                return c;
+            if (c.getCourseID().equals(id)) return c;
         }
         return null;
     }
 
-    // Getter for use by modules
+    private Course findStudentCourse(Student s, String id) {
+        for (Course c : s.getCourses()) {
+            if (c.getCourseID().equals(id)) return c;
+        }
+        return null;
+    }
+
     public List<Student> getStudents() {
         return students;
     }
@@ -230,5 +420,4 @@ public class FileLoader {
     public List<Course> getCourseInfo() {
         return courseInfoList;
     }
-
- }
+}

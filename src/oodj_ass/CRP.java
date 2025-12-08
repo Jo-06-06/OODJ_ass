@@ -1,449 +1,717 @@
 package oodj_ass;
 
-import java.util.List;
-import java.util.ArrayList;
+import java.io.*;
 import java.util.*;
 
 public class CRP {
-    private List<RecoveryPlan> recoveryPlans;
-    private int planIDCounter;
+    private static final String PLAN_FILE_PATH      = "data/recoveryPlans.txt";
+    private static final String MILESTONE_FILE_PATH = "data/recoveryMilestones.txt";
+    private static final String GRADES_FILE_PATH    = "data/grades.txt";
+    private static final String RESULT_FILE_PATH    = "data/result.txt";
+
+    private final List<Student> studentPool;
+    private final List<RecoveryPlan> planList = new ArrayList<>();
+    private final Map<String, RecoveryPlan> planIndex = new LinkedHashMap<>();
+
+    private int nextPlanNumber = 0;
+    private Email mailer;
     
-    public CRP() {
-        this.recoveryPlans = new ArrayList<>();
-        this.planIDCounter = 1;
+    public CRP(List<Student> students, Email mailer) {
+        this.studentPool = (students != null) ? students : new ArrayList<>();
+        this.mailer = mailer;
+
+        loadRecoveryPlans();
+        loadPlanMilestones();
+        initialisePlanCounter();
+        
     }
-    //---------1. List all failed courses------------
-    public void listFailedComponenets(Student student) {
-        List<Course> failedCourses = student.getFailedCourses();
-        
-        System.out.println("\n##############################################################");
-        System.out.println("FAILED COMPONENTS FOR: " + student.getStudentID());
-        System.out.println("Student ID: " + student.getStudentID());
-        System.out.println("Major: " + student.getMajor());
-        System.out.println("CGPA: " + String.format("%.2f", student.getCgpa()));
-        System.out.println("##############################################################");
-        
-        if (failedCourses.isEmpty()) {
-            System.out.println("No failed courses. Student is eligible to progress.");
-            System.out.println("#############################################################");
-            return;
-        }
-        System.out.println("\nTotal Failed Courses: " + failedCourses.size());
-        System.out.println();
-        
-        // Table header
-        System.out.printf("%-10s %-35s %-12s %-10s %-20s\n", 
-            "Course", "Course Name", "Assignment", "Exam", "Failed Component");
-        System.out.println("─".repeat(90));
-        
-        // Table rows
-        for (Course course : failedCourses) {
-            System.out.printf("%-10s %-35s %-12d %-10d %-20s\n",
-                course.getCourseID(),
-                course.getCourseName(),
-                course.getAssignmentScore(),
-                course.getExamScore(),
-                course.getFailedComponent());
-        }
-        
-        System.out.println("═══════════════════════════════════════════════════════════════");
-    }
-    
-    //Get failed courses as a List
-    public List<Course> getFailedCourses(Student student) {
-        return student.getFailedCourses();
-    }
-    
-    public RecoveryPlan createRecoveryPlan(Student student, Course failedCourse) {
-        String planID = String.format("RP%04d", planIDCounter++);
-        RecoveryPlan plan = new RecoveryPlan(planID, student, failedCourse);
-        //Add to list
-        recoveryPlans.add(plan);
-        return plan;
-    }
-    
-    public void generatePlansForStudent(Student student) {
-        System.out.println("\n=== Checking Recovery Needs for " + student + " ===");
 
-        List<Course> failed = student.getFailedCourses();
-
-        // Scenario 1,2,3
-        if (!failed.isEmpty()) {
-            failed.sort(Comparator.comparingDouble(course -> Student.getGradePoint(course.getGrade())));
-
-            for (Course course : failed) {
-
-                RecoveryPlan plan = createRecoveryPlan(student, course);
-
-                int attempt = course.getAttemptNumber();
-                String requirement = course.getRecoveryRequirement();
-
-                autoGenerateMilestones(plan, attempt, requirement);
-
-                System.out.println(plan.getDetailedInfo());
+    // PLAN ID MANAGEMENT
+    private void initialisePlanCounter() {
+        int highest = 0;
+        for (RecoveryPlan rp : planList) {
+            String id = rp.getPlanID();
+            if (id != null && id.startsWith("RP")) {
+                try {
+                    int n = Integer.parseInt(id.substring(2));
+                    if (n > highest) highest = n;
+                } catch (NumberFormatException ignore) {
+                    // ignore bad IDs
+                }
             }
+        }
+        this.nextPlanNumber = highest;
+    }
+
+    private String generatePlanID() {
+        nextPlanNumber++;
+        return String.format("RP%04d", nextPlanNumber);
+    }
+
+    // FILE LOADING - PLANS
+    private void loadRecoveryPlans() {
+        planList.clear();
+        planIndex.clear();
+
+        File f = new File(PLAN_FILE_PATH);
+        if (!f.exists()) {
+            System.out.println("No existing recoveryPlans.txt found (first run).");
             return;
         }
 
-        // Scenario 4
-        if (student.getCgpa() < 2.0) {
-            Course weakest = student.getLowestGradeCourse();
+        System.out.println("Loading recoveryPlans.txt...");
 
-            if (weakest != null) {
-                RecoveryPlan plan = createRecoveryPlan(student, weakest);
-                autoGenerateMilestones(plan, weakest.getAttemptNumber(), 
-                                       "ALL Components (Full Course Retake)");
+        int loaded = 0;
+        int skipped = 0;
 
-                System.out.println(plan.getDetailedInfo());
+        try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+            String header = br.readLine(); // skip header
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                if (line.trim().isEmpty()) continue;
+
+                String[] p = line.split(",", -1);
+                // planID,studentID,courseID,attemptNum,failureType,status,
+                // recoveryGrade,createdDate,lastUpdated,recommendation
+                if (p.length < 9) {
+                    skipped++;
+                    System.err.println("  Skipping invalid plan row: " + line);
+                    continue;
+                }
+
+                try {
+                    String planId       = p[0].trim();
+                    String sid          = p[1].trim();
+                    String cid          = p[2].trim();
+                    int attemptNum      = Integer.parseInt(p[3].trim());
+                    // String failureType  = p[4].trim(); 
+                    String status       = p[5].trim();
+                    String recGradeText = p[6].trim();
+                    String createdDate  = p[7].trim();
+                    String lastUpdated  = p[8].trim();
+                    String recommendation = (p.length >= 10) ? p[9] : "";
+
+                    Student s = findStudent(sid);
+                    Course  c = findStudentCourse(s, cid);
+
+                    if (s == null || c == null) {
+                        skipped++;
+                        System.err.println("  Skipping plan (student/course not found): " + line);
+                        continue;
+                    }
+
+                    // keep attempt number consistent with file
+                    c.setAttemptNumber(attemptNum);
+
+                    RecoveryPlan rp = new RecoveryPlan(planId, s, c);
+                    rp.setStatus(status);
+                    if (!recGradeText.isEmpty()) {
+                        try {
+                            rp.setRecoveryGrade(Double.parseDouble(recGradeText));
+                        } catch (NumberFormatException ignore) {
+                            // ignore invalid stored value
+                        }
+                    }
+                    if (!createdDate.isEmpty()) {
+                        rp.setCreatedDateRaw(createdDate);
+                    }
+                    if (!lastUpdated.isEmpty()) {
+                        rp.setLastUpdatedRaw(lastUpdated);
+                    }
+                    if (recommendation != null && !recommendation.isEmpty()) {
+                        rp.setRecommendation(recommendation);
+                    }
+
+                    planList.add(rp);
+                    planIndex.put(planId, rp);
+                    loaded++;
+
+                } catch (Exception ex) {
+                    skipped++;
+                    System.err.println("  Error parsing plan row: " + line);
+                }
             }
-        } else {
-            System.out.println("Student is eligible to progress. No recovery needed.");
+
+        } catch (IOException ioEx) {
+            System.err.println("Failed to load recoveryPlans.txt: " + ioEx.getMessage());
+        }
+
+        System.out.println("Recovery plans loaded: " + loaded + " (Skipped: " + skipped + ")");
+    }
+
+    // FILE LOADING - MILESTONES
+    private void loadPlanMilestones() {
+        File f = new File(MILESTONE_FILE_PATH);
+        if (!f.exists()) {
+            System.out.println("No existing recoveryMilestones.txt found (first run).");
+            return;
+        }
+
+        System.out.println("Loading recoveryMilestones.txt...");
+
+        int loaded = 0;
+        int skipped = 0;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+            String header = br.readLine(); // skip header
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                if (line.trim().isEmpty()) continue;
+
+                String[] p = line.split(",", -1);
+                // planID,studyWeek,task,isCompleted,notes
+                if (p.length < 4) {
+                    skipped++;
+                    System.err.println("  Skipping invalid milestone row: " + line);
+                    continue;
+                }
+
+                String planId       = p[0].trim();
+                String studyWeek    = p[1].trim();
+                String task         = p[2].trim();
+                boolean isCompleted = Boolean.parseBoolean(p[3].trim());
+                String notes        = (p.length >= 5) ? p[4] : "";
+
+                RecoveryPlan rp = planIndex.get(planId);
+                if (rp == null) {
+                    skipped++;
+                    continue;
+                }
+
+                // *** IMPORTANT: do not use rp.addMilestone() here
+                // to avoid changing status when loading – just attach directly.
+                RecoveryMilestone ms = new RecoveryMilestone(studyWeek, task);
+                if (isCompleted) {
+                    ms.markCompleted(notes);
+                } else {
+                    ms.setNotes(notes);
+                }
+                rp.getMilestones().add(ms);
+
+                loaded++;
+            }
+
+        } catch (IOException ioEx) {
+            System.err.println("Failed to load recoveryMilestones.txt: " + ioEx.getMessage());
+        }
+
+        System.out.println("Milestones loaded: " + loaded + " (Skipped: " + skipped + ")");
+    }
+
+    // FILE SAVING
+    public void saveRecoveryPlans() {
+        try (PrintWriter out = new PrintWriter(new FileWriter(PLAN_FILE_PATH))) {
+
+            out.println("planID,studentID,courseID,attemptNum,failureType,status," +
+                        "recoveryGrade,createdDate,lastUpdated,recommendation");
+
+            for (RecoveryPlan rp : planList) {
+                String line = String.join(",",
+                        rp.getPlanID(),
+                        rp.getStudent().getStudentID(),
+                        rp.getCourse().getCourseID(),
+                        String.valueOf(rp.getCourse().getAttemptNumber()),
+                        rp.getCourse().getFailedComponent(),
+                        rp.getStatus(),
+                        (rp.getRecoveryGrade() == null ? "" : rp.getRecoveryGrade().toString()),
+                        rp.getCreatedDate(),
+                        rp.getLastUpdated(),
+                        rp.getRecommendation().replace(",", " ")
+                );
+                out.println(line);
+            }
+
+        } catch (IOException ioEx) {
+            System.err.println("Error saving recoveryPlans.txt: " + ioEx.getMessage());
         }
     }
-    
-    private void autoGenerateMilestones(RecoveryPlan plan, int attempt, String requirement) {
-        Course c = plan.getFailedCourse();
-        String component = c.getFailedComponent();
-    
-        switch (attempt) {
-            case 1:
-                // Attempt 1: Component-specific recovery
-                if (component.equals("Assignment Only")) {
-                    plan.addMilestone("Week 1-2", "Review assignment feedback and requirements for " + c.getCourseID() + " " + c.getFailedComponent());
-                    plan.addMilestone("Week 3", "Submit revised assignment for " + c.getFailedComponent());
-                }
-                else if (component.equals("Exam Only")) {
-                    plan.addMilestone("Week 1-2", "Review course content");
-                    plan.addMilestone("Week 3", "See lecturer if meeded");
-                    plan.addMilestone("Week 4", "Resit examination");
-                }
-                else if (component.equals("Both Components")) {
-                    plan.addMilestone("Week 1-2", "Work on assignment");
-                    plan.addMilestone("Week 3-4", "Prepare for exam");
-                    plan.addMilestone("Week 5", "Complete resit exam");
-                }   break;
-                
-            case 2:
-                // Attempt 2: Focused recovery
-                plan.addMilestone("Week 1", "Lecturer consultation with " + c.getCourseInstructor());
-                plan.addMilestone("Week 2-4", "Intensive preparation on " + c.getFailedComponent());
-                plan.addMilestone("Week 5", "Complete assessment");
-                break;
-                
-            default:
-                // Attempt 3+: Full course retake
-                plan.addMilestone("Week 1-3", "Re-attend " + c.getCourseID() +" classes again");
-                plan.addMilestone("Week 4-6", "Complete all coursework");
-                plan.addMilestone("Week 7-8", "Study for final exam");
-                plan.addMilestone("Week 9", "Final examination");
-                break;
-        }
 
-        // Short recommendation
-        plan.setRecommendation(requirement + " (Attempt " + attempt + ")");
+    public void savePlanMilestones() {
+        try (PrintWriter out = new PrintWriter(new FileWriter(MILESTONE_FILE_PATH))) {
+
+            out.println("planID,studyWeek,task,isCompleted,notes");
+
+            for (RecoveryPlan rp : planList) {
+                for (RecoveryMilestone ms : rp.getMilestones()) {
+                    String line = String.join(",",
+                            rp.getPlanID(),
+                            ms.getStudyWeek(),
+                            ms.getTask().replace(",", " "),
+                            String.valueOf(ms.isCompleted()),
+                            ms.getNotes().replace(",", " ")
+                    );
+                    out.println(line);
+                }
+            }
+
+        } catch (IOException ioEx) {
+            System.err.println("Error saving recoveryMilestones.txt: " + ioEx.getMessage());
+        }
     }
 
-
-    
-
-    
-    // Get plan by ID
-    public RecoveryPlan getRecoveryPlan(String planID) {
-        for (RecoveryPlan plan : recoveryPlans) {
-            if(plan.getPlanID().equals(planID)) {
-                return plan;
-            }
+    // HELPERS - SEARCH
+    private Student findStudent(String id) {
+        if (id == null) return null;
+        for (Student s : studentPool) {
+            if (id.equals(s.getStudentID())) return s;
         }
         return null;
     }
-    
-    //Get all plans for a specific student
-    public List<RecoveryPlan> getRecoveryPansByStudent(String studentID) {
-        List<RecoveryPlan> studentPlans = new ArrayList<>();
-        for (RecoveryPlan plan : recoveryPlans) {
-            if(plan.getStudent().getStudentID().equals(studentID)) {
-                studentPlans.add(plan);
-            }
+
+    private Course findStudentCourse(Student s, String courseId) {
+        if (s == null || courseId == null) return null;
+        for (Course c : s.getCourses()) {
+            if (courseId.equals(c.getCourseID())) return c;
         }
-        return studentPlans;
+        return null;
     }
-    
-    //Get all recovery plans
-    public List<RecoveryPlan> getAllRecoveryPlans() {
-        return new ArrayList<>(recoveryPlans);
+
+    // PLAN CREATION (AUTO)
+    public RecoveryPlan createRecoveryPlan(Student stu, Course course) {
+        if (stu == null || course == null) return null;
+
+        // Double-guard to ensure only truly failed components get a plan.
+        // Even if something upstream is wrong, S018 (all passes) will never get a plan.
+        if (!course.isFailed() || "None".equals(course.getFailedComponent())) {
+            return null;
+        }
+
+        String id = generatePlanID();
+        RecoveryPlan rp = new RecoveryPlan(id, stu, course);
+
+        // milestones will be auto-generated by CRP (not here)
+
+        planList.add(rp);
+        planIndex.put(id, rp);
+
+        // auto-generate default milestones
+        autoGenerateMilestones(rp);
+
+        saveRecoveryPlans();
+        savePlanMilestones();
+
+        sendRecoveryPlanEmail(rp);
+        
+        return rp;
     }
-    
-    //Display all recovery plans
+
+    /**
+     * Automatically create recommended milestones based on attempt + failed component.
+     */
+    private void autoGenerateMilestones(RecoveryPlan rp) {
+        Course c = rp.getCourse();
+        String failedComponent = c.getFailedComponent();
+        int attempt = c.getAttemptNumber();
+        String cid = c.getCourseID();
+        String clect = c.getCourseInstructor();
+
+        // Basic intro step
+        rp.addMilestone("Week 1", "Discuss recovery plan for " + cid +
+                " with lecturer " + clect + " and confirm required components.");
+
+        // Attempt >= 3 → treat as full retake
+        if (attempt >= 3) {
+            rp.addMilestone("Week 2-4", "Re-attend classes / revision sessions for " + cid);
+            rp.addMilestone("Week 5-6", "Complete all recovery coursework and continuous assessment.");
+            rp.addMilestone("Week 7-8", "Intensive exam preparation for full retake of " + cid);
+            rp.addMilestone("Week 9",   "Sit for final examination or final assessment for " + cid);
+            return;
+        }
+
+        // Targeted recovery
+        switch (failedComponent) {
+            case "Assignment Only":
+                rp.addMilestone("Week 2-3", "Revise assignment requirements and correct previous mistakes.");
+                rp.addMilestone("Week 4",   "Submit improved assignment / project for " + cid);
+                break;
+
+            case "Exam Only":
+                rp.addMilestone("Week 2-3", "Study weak topics using notes and past-year questions.");
+                rp.addMilestone("Week 4",   "Sit for recovery exam for " + cid);
+                break;
+
+            case "Both Components":
+                rp.addMilestone("Week 2-3", "Revise coursework and clarify doubts with lecturer.");
+                rp.addMilestone("Week 4-5", "Prepare for recovery exam while working on assignment.");
+                rp.addMilestone("Week 6",   "Complete both coursework submission and exam.");
+                break;
+
+            case "None":
+            default:
+                // should not really happen because createRecoveryPlan guards "None"
+                break;
+        }
+    }
+
+    // RECOMMENDATION MANAGEMENT
+    public boolean updateRecommendation(String planId, String newText) {
+        RecoveryPlan rp = planIndex.get(planId);
+        if (rp == null) {
+            System.out.println("Plan not found.");
+            return false;
+        }
+        rp.setRecommendation(newText != null ? newText : "");
+        saveRecoveryPlans();
+        return true;
+    }
+
+    public boolean clearRecommendation(String planId) {
+        return updateRecommendation(planId, "");
+    }
+
+    // MILESTONE MANAGEMENT
+    public boolean addCustomMilestone(String planId, String week, String task) {
+        RecoveryPlan rp = planIndex.get(planId);
+        if (rp == null) {
+            System.out.println("Plan not found.");
+            return false;
+        }
+        rp.addMilestone(week, task);
+        savePlanMilestones();
+        saveRecoveryPlans();
+        return true;
+    }
+
+    public boolean modifyMilestone(String planId, int index,
+                                   String newWeek, String newTask) {
+        RecoveryPlan rp = planIndex.get(planId);
+        if (rp == null) {
+            System.out.println("Plan not found.");
+            return false;
+        }
+        boolean ok = rp.updateMilestone(index, newWeek, newTask);
+        if (ok) {
+            savePlanMilestones();
+            saveRecoveryPlans();
+        }
+        return ok;
+    }
+
+    public boolean removeMilestone(String planId, int index) {
+        RecoveryPlan rp = planIndex.get(planId);
+        if (rp == null) {
+            System.out.println("Plan not found.");
+            return false;
+        }
+        boolean ok = rp.removeMilestone(index);
+        if (ok) {
+            savePlanMilestones();
+            saveRecoveryPlans();
+        }
+        return ok;
+    }
+
+    public void displayPlanMilestones(String planId) {
+        RecoveryPlan rp = planIndex.get(planId);
+        if (rp == null) {
+            System.out.println("Plan not found.");
+            return;
+        }
+
+        System.out.println("\n════════════════════════════════════════");
+        System.out.println("MILESTONES for Plan " + planId);
+        System.out.println("Student: " + rp.getStudent().getFullName());
+        System.out.println("Course : " + rp.getCourse().getCourseID());
+        System.out.println("════════════════════════════════════════");
+
+        List<RecoveryMilestone> list = rp.getMilestones();
+        if (list.isEmpty()) {
+            System.out.println("No milestones defined yet.");
+        } else {
+            for (int i = 0; i < list.size(); i++) {
+                System.out.println(i + ". " + list.get(i));
+            }
+            System.out.println("Progress: " +
+                    String.format("%.1f", rp.getProgressPercentage()) + "%");
+        }
+        System.out.println("════════════════════════════════════════");
+    }
+
+    public boolean markMilestoneCompleted(String planId, int index, String notes) {
+        RecoveryPlan rp = planIndex.get(planId);
+        if (rp == null) {
+            System.out.println("Plan not found.");
+            return false;
+        }
+
+        boolean ok = rp.markMilestoneCompleted(index, notes);
+        if (ok) {
+            savePlanMilestones();
+            saveRecoveryPlans();
+            System.out.println("Milestone " + index + " marked as completed.");
+        }
+        sendRecoveryPlanEmail(rp);
+        return ok;
+    }
+
+    // ENTER RECOVERY GRADE (NEW ATTEMPT)
+    /**
+     * Enter recovery grade (0-100) for a plan.
+     *
+     * Rules:
+     * - We DO NOT delete old attempts from grades.txt
+     * - We append a NEW row with attemptNum = currentAttempt + 1
+     * - For any recovered component (ass or exam), score is capped at 50
+     * - RecoveryPlan.recoveryGrade keeps the *raw* mark entered by staff
+     * - Then we recalc CGPA and update result.txt
+     */
+    public boolean enterRecoveryGrade(String planId, double rawScore) {
+        if (rawScore < 0 || rawScore > 100) {
+            System.out.println("Error: Recovery mark must be between 0 and 100.");
+            return false;
+        }
+
+        RecoveryPlan rp = planIndex.get(planId);
+        if (rp == null) {
+            System.out.println("Error: Plan ID not found.");
+            return false;
+        }
+
+        Student stu  = rp.getStudent();
+        Course  c    = rp.getCourse();
+
+        // Original scores
+        int oldAss  = c.getAssignmentScore();
+        int oldExam = c.getExamScore();
+
+        boolean assFailed  = (c.getAssignmentWeight() > 0 && oldAss  < 50);
+        boolean examFailed = (c.getExamWeight()      > 0 && oldExam < 50);
+
+        // New scores (with cap 50 for recovered components)
+        int newAss  = oldAss;
+        int newExam = oldExam;
+
+        if (assFailed)  newAss  = 50;  // **** CRITICAL: recovery component capped at 50
+        if (examFailed) newExam = 50;  // **** CRITICAL: recovery component capped at 50
+
+        // Weighted final mark
+        double finalMark =
+                (newAss  * c.getAssignmentWeight() / 100.0) +
+                (newExam * c.getExamWeight()      / 100.0);
+
+        // Map to grade + GPA
+        String newGrade = GradeScaleHelper.getAlphabetFromMark((int)Math.round(finalMark));
+        double newGpa   = Student.getGradePoint(newGrade);
+
+        int newAttempt = c.getAttemptNumber() + 1;
+
+        // Update in-memory course object
+        c.setScores(newAss, newExam);
+        c.setGrade(newGrade);
+        c.setAttemptNumber(newAttempt);
+
+        // Update plan (store rawScore, but grade in file is capped)
+        rp.setRecoveryGrade(rawScore);
+
+        if (!c.isFailed() && newGpa >= 2.0) {
+            rp.setStatus("COMPLETED-PASSED");
+        } else {
+            rp.setStatus("COMPLETED-FAILED");
+        }
+
+        // Append NEW attempt record into grades.txt
+        String newRow = stu.getStudentID() + "," +
+                        c.getCourseID()    + "," +
+                        c.getSemester()    + "," +
+                        newAss             + "," +
+                        newExam            + "," +
+                        newGrade           + "," +
+                        String.format("%.2f", newGpa) + "," +
+                        newAttempt;
+
+        appendSingleLine(GRADES_FILE_PATH, newRow);
+
+        // Recalculate CGPA + update result.txt
+        recalculateCgpaAndResult(stu);
+
+        // Persist CRP files (status, recoveryGrade, timestamps, etc.)
+        saveRecoveryPlans();
+        savePlanMilestones();
+
+        System.out.println("Recovery mark successfully recorded and grade updated.");
+        return true;
+    }
+
+    // CGPA & RESULT.TXT UPDATE
+    private void recalculateCgpaAndResult(Student stu) {
+        double totalPoints = 0.0;
+        int totalCredits   = 0;
+
+        for (Course c : stu.getCourses()) {
+            String g = c.getGrade();
+            if (g == null || g.isEmpty()) continue;
+
+            double gp = Student.getGradePoint(g);
+            totalPoints += gp * c.getCreditHours();
+            totalCredits += c.getCreditHours();
+        }
+
+        double newCgpa = (totalCredits > 0) ? (totalPoints / totalCredits) : 0.0;
+        stu.setCgpa(newCgpa);
+
+        String eligibility = (newCgpa >= 2.0 && stu.getFailedCourses().isEmpty())
+                ? "YES" : "NO";
+
+        List<String> newLines = new ArrayList<>();
+        boolean replaced = false;
+
+        File f = new File(RESULT_FILE_PATH);
+
+        if (f.exists()) {
+            try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+                String header = br.readLine();
+                if (header != null && !header.trim().isEmpty()) {
+                    newLines.add(header);
+                } else {
+                    newLines.add("studentID,semester,CGPA,eligibility");
+                }
+
+                String line;
+                while ((line = br.readLine()) != null) {
+                    if (line.trim().isEmpty()) continue;
+
+                    String[] p = line.split(",", -1);
+                    if (p.length < 4) {
+                        newLines.add(line);
+                        continue;
+                    }
+
+                    String sid = p[0].trim();
+                    String sem = p[1].trim();
+
+                    if (sid.equals(stu.getStudentID()) &&
+                        sem.equals(stu.getCurrentSemester())) {
+
+                        String updated = sid + "," + sem + "," +
+                                String.format("%.2f", newCgpa) + "," +
+                                eligibility;
+                        newLines.add(updated);
+                        replaced = true;
+                    } else {
+                        newLines.add(line);
+                    }
+                }
+
+            } catch (IOException ioEx) {
+                System.err.println("Error reading result.txt: " + ioEx.getMessage());
+            }
+        } else {
+            // Initial header if file did not exist
+            newLines.add("studentID,semester,CGPA,eligibility");
+        }
+
+        if (!replaced) {
+            String row = stu.getStudentID() + "," +
+                         stu.getCurrentSemester() + "," +
+                         String.format("%.2f", newCgpa) + "," +
+                         eligibility;
+            newLines.add(row);
+        }
+
+        rewriteWholeFile(RESULT_FILE_PATH, newLines);
+    }
+
+    // FILE HELPERS
+    private void appendSingleLine(String filePath, String line) {
+        try (PrintWriter out = new PrintWriter(new FileWriter(filePath, true))) {
+            out.println(line);
+        } catch (IOException ioEx) {
+            System.err.println("Failed to append to " + filePath + ": " + ioEx.getMessage());
+        }
+    }
+
+    private void rewriteWholeFile(String filePath, List<String> lines) {
+        try (PrintWriter out = new PrintWriter(new FileWriter(filePath))) {
+            for (String l : lines) {
+                out.println(l);
+            }
+        } catch (IOException ioEx) {
+            System.err.println("Failed to write file " + filePath + ": " + ioEx.getMessage());
+        }
+    }
+
+    // DISPLAY / ACCESSORS
     public void displayAllRecoveryPlans() {
-        System.out.println("\n#######################################");
-        System.out.println("             ALL RECOVERY PLANS");
-        System.out.println("#######################################");
-        
-        if (recoveryPlans.isEmpty()) {
-            System.out.println("No recovery plans created yet.");
-            System.out.println("═══════════════════════════════════════");
-            return;
-        }
-        
-        System.out.println("Total Plans: " + recoveryPlans.size());
-        System.out.println();
-        
-        for (RecoveryPlan plan : recoveryPlans) {
-            System.out.println(plan.toString());
-        }
-        
-        System.out.println("-----------------------------------#");
-    }
-    
-    //------------2. Recommendation--------------
-    public boolean addRecommendation(String planID, String recommendation) {
-        RecoveryPlan plan = getRecoveryPlan(planID);
-        
-        if (plan == null) {
-            System.out.println("Error: Recovery plan " + planID + "not found.");
-            return false;
-        }
-        
-        plan.setRecommendation(recommendation);
-        System.out.println("Recommendation added to plan " + planID);
-        return true;
-    }
-    
-    //Update recommendation (overwrites)
-    public boolean updateRecommendation(String planID, String newRecommendation) {
-        RecoveryPlan plan = getRecoveryPlan(planID);
-        
-        if (plan == null) {
-            System.out.println("Error: Recovery plan " + planID + "not found.");
-            return false;
-        }
-        String oldRec = plan.getRecommendation();
-        plan.setRecommendation(newRecommendation);
-        
-        System.out.println("Recommendation updated for plan " + planID);
-        System.out.println("Old: " + (oldRec.isEmpty() ? "(empty)" : oldRec.substring(0, Math.min(50, oldRec.length())) + "..."));
-        System.out.println("New: " + newRecommendation.substring(0, Math.min(50, newRecommendation.length())) + "...");
-        return true;
-    }
-    
-    //remove recommendation
-    public boolean removeRecommendation(String planID) {
-        RecoveryPlan plan = getRecoveryPlan(planID);
-        
-        if (plan == null) {
-            System.out.println("Error: Recovery plan " + planID + " not found.");
-            return false;
-        }
-        
-        plan.setRecommendation("");
-        System.out.println("Recommendation removed from plan " + planID);
-        return true;
-    } 
-    
-    //------------3. Milestone--------------
-    public boolean addMilestone(String planID, String studyWeek, String task) {
-        RecoveryPlan plan = getRecoveryPlan(planID);
-        if (plan == null) {
-            System.out.println("Error: Recovery plan " + planID + " not found.");
-            return false;
-        }
-        
-        plan.addMilestone(studyWeek, task);
-        System.out.println("Milestone added to plan " + planID);
-        System.out.println("Week: " + studyWeek);
-        System.out.println("Task: " + task);
-        return true;
-    }
-    
-    public boolean updateMilestone(String planID, int milestoneIndex, String newStudyWeek, String newTask) {
-        RecoveryPlan plan = getRecoveryPlan(planID);
-        
-        if (plan == null) {
-            System.out.println("Error: Recovery plan " + planID + " not found.");
-            return false;
-        }
-        
-        if (plan.updateMilestone(milestoneIndex, newStudyWeek, newTask)) {
-            System.out.println("Milestone " + milestoneIndex + " updated in plan " + planID);
-            return true;
+        System.out.println("\n========== ALL RECOVERY PLANS ==========");
+        if (planList.isEmpty()) {
+            System.out.println("No recovery plans available.");
         } else {
-            System.out.println("Error: Invalid milestone index " + milestoneIndex);
-            return false;
-        }
-    }
-    
-    public boolean removeMilestone(String planID, int milestoneIndex) {
-        RecoveryPlan plan = getRecoveryPlan(planID);
-        
-        if (plan == null) {
-            System.out.println("Error: Recovery plan " + planID + " not found.");
-            return false;
-        }
-        if (plan.removeMilestone(milestoneIndex)) {
-            System.out.println("Milestone " + milestoneIndex + " removed from plan " + planID);
-            return true;
-        } else {
-            System.out.println("Error: Invalid milestone index " + milestoneIndex);
-            return false;
-        }
-    }
-    
-    public void displayMilestones(String planId) {
-        RecoveryPlan plan = getRecoveryPlan(planId);
-        
-        if (plan == null) {
-            System.out.println("Error: Recovery plan " + planId + " not found.");
-            return;
-        }
-        
-        System.out.println("\n═══════════════════════════════════════");
-        System.out.println("MILESTONES FOR PLAN: " + planId);
-        System.out.println("Student: " + plan.getStudent().getFullName());
-        System.out.println("Course: " + plan.getFailedCourse().getCourseID());
-        System.out.println("═══════════════════════════════════════");
-        
-        List<RecoveryMilestone> milestones = plan.getMilestones();
-        
-        if (milestones.isEmpty()) {
-            System.out.println("No milestones set yet.");
-        } else {
-            System.out.println();
-            for (int i = 0; i < milestones.size(); i++) {
-                System.out.println(i + ". " + milestones.get(i));
-            }
-            System.out.println();
-            System.out.println("Progress: " + String.format("%.1f", plan.getProgressPercentage()) + "%");
-        }
-        
-        System.out.println("═══════════════════════════════════════");
-    }
-    
-    //------------4. Progress Tracking--------------
-    public boolean markMilestoneCompleted(String planID, int milestoneIndex, String notes) {
-        RecoveryPlan plan = getRecoveryPlan(planID);
-        
-        if (plan == null) {
-            System.out.println("Error: Recovery plan " + planID + " not found.");
-            return false;
-        }
-        
-        if (plan.markMilestoneCompleted(milestoneIndex, notes)) {
-            System.out.println("Milestone " + milestoneIndex + "marked as completed.");
-            System.out.println("Progress " + String.format("%.1f", plan.getProgressPercentage()) + "%");
-            return true;
-        } else {
-            System.out.println("Error: Invalid milestone index " + milestoneIndex);
-            return false;
-        }
-    }
-    
-    //Enter recovery grade for a plan
-    public boolean enterRecoveryGrade(String planID, double grade) {
-        RecoveryPlan plan = getRecoveryPlan(planID);
-
-        if (plan == null) {
-            System.out.println("Error: Recovery plan " + planID + " not found.");
-            return false;
-        }
-        
-        if (grade < 0 || grade > 100) {
-            System.out.println("Error: Grade must be between 0 and 100.");
-            return false;
-        }
-        
-        plan.setRecoveryGrade(grade);
-        
-        if (grade >= 50) {
-            plan.setStatus("COMPLETED - PASSED");
-            System.out.println("Recovery grade entered: " + grade);
-            System.out.println("Status: PASSED");
-        } else {
-            plan.setStatus("COMPLETED - FAILED");
-            System.out.println("Recovery grade entered: " + grade);
-            System.out.println("Status: FAILED");
-        }
-        return false;
-    }
-    
-    //Track and Display progress for a recovery plan
-    public void trackProgress(String planID) {
-        RecoveryPlan plan = getRecoveryPlan(planID);
-
-        if (plan == null) {
-            System.out.println("Error: Recovery plan " + planID + " not found.");
-            return;
-        }
-        
-        System.out.println("\n#######################################");
-        System.out.println("RECOVERY PROGRESS REPORT");
-        System.out.println("#######################################");
-        System.out.println("Plan ID: " + plan.getPlanID());
-        System.out.println("Student: " + plan.getStudent().getFullName() + 
-                          " (" + plan.getStudent().getStudentID() + ")");
-        System.out.println("Course: " + plan.getFailedCourse().getCourseID() + 
-                          " - " + plan.getFailedCourse().getCourseName());
-        System.out.println("Failed Component: " + plan.getFailedCourse().getFailedComponent());
-        System.out.println("Status: " + plan.getStatus());
-        System.out.println();
-        
-        // Progress bar
-        double progress = plan.getProgressPercentage();
-        int bars = (int)(progress / 10);
-        System.out.print("Progress: [");
-        for (int i = 0; i < 10; i++) {
-            System.out.print(i < bars ? "█" : "░");
-        }
-        System.out.println("] " + String.format("%.1f", progress) + "%");
-        System.out.println();
-        
-        // Milestone breakdown
-        System.out.println("Milestones: " + plan.getCompletedMilestoneCount() + 
-                          "/" + plan.getMilestoneCount() + " completed");
-        
-        List<RecoveryMilestone> milestones = plan.getMilestones();
-        for (int i = 0; i < milestones.size(); i++) {
-            RecoveryMilestone m = milestones.get(i);
-            System.out.println("  " + i + ". " + m);
-        }
-        
-        System.out.println();
-        
-         // Recovery grade
-        if (plan.getRecoveryGrade() != null) {
-            System.out.println("Recovery Grade: " + String.format("%.2f", plan.getRecoveryGrade()));
-        } else {
-            System.out.println("Recovery Grade: Not yet entered");
-        }
-        
-        System.out.println("═══════════════════════════════════════");
-    }
-    
-    //Display complete recovery plan details
-     public void displayRecoveryPlan(String planID) {
-        RecoveryPlan plan = getRecoveryPlan(planID);
-        
-        if (plan == null) {
-            System.out.println("Error: Recovery plan " + planID + " not found.");
-            return;
-        }
-        
-        System.out.println(plan.getDetailedInfo());
-    }
-     
-     //Get total num of recovery plans
-     public int getTotalPlans() {
-         return recoveryPlans.size();
-     }
-     
-     //Get plans by status
-     public List<RecoveryPlan> getPlansByStatus(String status) {
-        List<RecoveryPlan> filtered = new ArrayList<>();
-        
-        for (RecoveryPlan plan : recoveryPlans) {
-            if (plan.getStatus().equals(status)) {
-                filtered.add(plan);
+            for (RecoveryPlan rp : planList) {
+                System.out.println(rp.getSummary());
             }
         }
-        return filtered;
+        System.out.println("========================================");
     }
-}       
+
+    public RecoveryPlan getPlanById(String id) {
+        return planIndex.get(id);
+    }
+
+    public List<RecoveryPlan> getAllPlans() {
+        return new ArrayList<>(planList);
+    }
+
+    // =========================
+    // GRADE SCALE HELPER
+    // =========================
+    /**
+     * Uses your mapping:
+     * 80-100 : A+ (4.0)
+     * 75-79  : A  (3.7)
+     * 70-74  : B+ (3.3)
+     * 65-69  : B  (3.0)
+     * 60-64  : C+ (2.7)
+     * 55-59  : C  (2.3)
+     * 50-54  : C- (2.0)
+     * 40-49  : D  (1.7)
+     * 30-39  : F+ (1.3)
+     * 20-29  : F  (1.0)
+     * 0-19   : F- (0.0)
+     */
+    private static class GradeScaleHelper {
+        public static String getAlphabetFromMark(int mark) {
+            if (mark >= 80) return "A+";
+            else if (mark >= 75) return "A";
+            else if (mark >= 70) return "B+";
+            else if (mark >= 65) return "B";
+            else if (mark >= 60) return "C+";
+            else if (mark >= 55) return "C";
+            else if (mark >= 50) return "C-";
+            else if (mark >= 40) return "D";
+            else if (mark >= 30) return "F+";
+            else if (mark >= 20) return "F";
+            else return "F-";
+        }
+    }
+
+
+    private void sendRecoveryPlanEmail(RecoveryPlan rp) {
+
+        String to   = rp.getStudent().getEmail();       // student email address
+        String name = rp.getStudent().getFullName();
+        String cid  = rp.getCourse().getCourseID();
+
+        String subject = "Your Course Recovery Plan for " + cid;
+
+        StringBuilder body = new StringBuilder();
+        body.append("Hello ").append(name).append(",\n\n");
+        body.append("Your recovery plan for the course ").append(cid)
+            .append(" has been created.\n\n");
+        body.append("Milestones:\n");
+
+        for (RecoveryMilestone m : rp.getMilestones()) {
+            body.append("- ").append(m.getStudyWeek())
+                .append(": ").append(m.getTask())
+                .append(" [").append(m.isCompleted() ? "Completed" : "Pending")
+                .append("]\n");
+        }
+
+        body.append("\nPlease follow your recovery plan to stay on track.\n");
+        body.append("\nRegards,\nCourse Recovery System");
+
+        mailer.sendEmail(to, subject, body.toString());
+    }
+}
+

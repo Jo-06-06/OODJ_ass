@@ -2,11 +2,18 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
+package oodj_ass;
 
 /**
  *
  * @author User
  */
+
+import java.util.ArrayList;
+import java.io.*;
+
+
+
 public class ECE_UI extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ECE_UI.class.getName());
@@ -14,8 +21,108 @@ public class ECE_UI extends javax.swing.JFrame {
     /**
      * Creates new form ECE_UI
      */
+   
+    // Load CSV file
+    public ArrayList<String[]> loadFile(String filename) {
+        ArrayList<String[]> list = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader("data/" + filename))) {
+            String line;
+            br.readLine(); // skip header
+            while ((line = br.readLine()) != null) {
+                list.add(line.split(","));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    
+    private void updateTable(ArrayList<String[]> data) {
+        javax.swing.table.DefaultTableModel model =
+            (javax.swing.table.DefaultTableModel) jTable1.getModel();
+
+        model.setRowCount(0); // clear table
+
+        for (String[] row : data) {
+            model.addRow(new Object[]{
+                row[0],   // Student ID
+                row[1],   // Semester
+                row[2],   // CGPA
+                row[3],   // Eligibility
+                "View"    // Button label
+            });
+        }
+    }
+    
+    
+    private void showDetails(String studentID, String semester) {
+        ArrayList<String[]> grades = loadFile("grades.txt");
+        ArrayList<String[]> courses = loadFile("courses.txt");
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("===== Student: ").append(studentID)
+          .append(" (").append(semester).append(") =====\n");
+
+        double totalGP = 0;
+        int totalCH = 0;
+        int failCount = 0;
+
+        for (String[] g : grades) {
+            if (!g[0].equals(studentID)) continue;
+            if (!g[2].equals(semester)) continue;
+
+            String courseID = g[1];
+            String grade = g[5];
+            double gpa = Double.parseDouble(g[6]);
+
+            String[] c = null;
+            for (String[] x : courses) {
+                if (x[0].equals(courseID)) c = x;
+            }
+
+            int credit = Integer.parseInt(c[2]);
+            double gp = gpa * credit;
+
+            totalGP += gp;
+            totalCH += credit;
+            if (gpa < 2.0) failCount++;
+
+            sb.append(courseID)
+              .append(" | Grade: ").append(grade)
+              .append(" (").append(String.format("%.2f", gpa))
+              .append(") * ").append(credit)
+              .append(" credits = ").append(String.format("%.2f", gp))
+              .append("\n");
+        }
+
+        double cgpa = totalGP / totalCH;
+        sb.append("Total Grade Points = ").append(totalGP).append("\n");
+        sb.append("Total Credit Hours = ").append(totalCH).append("\n");
+        sb.append("Total Fails = ").append(failCount).append("\n");
+        sb.append("CGPA = ").append(String.format("%.2f", cgpa)).append("\n");
+        sb.append("Eligible Next Year: ").append(cgpa >= 2.0 && failCount <= 3 ? "YES" : "NO");
+
+        javax.swing.JOptionPane.showMessageDialog(this, sb.toString());
+    }
+
+
     public ECE_UI() {
         initComponents();
+        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                int row = jTable1.rowAtPoint(evt.getPoint());
+                int col = jTable1.columnAtPoint(evt.getPoint());
+
+                if (col == 4) { // Details column
+                    String sid = jTable1.getValueAt(row, 0).toString();
+                    String sem = jTable1.getValueAt(row, 1).toString();
+                    showDetails(sid, sem);
+                }
+            }
+        });
+
     }
 
     /**
@@ -27,21 +134,177 @@ public class ECE_UI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel1 = new javax.swing.JPanel();
+        jTextField1 = new javax.swing.JTextField();
+        jComboBox1 = new javax.swing.JComboBox<>();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
+        jPanel3 = new javax.swing.JPanel();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Eligibility Check and Enrolment");
+        setMaximumSize(new java.awt.Dimension(1160, 700));
+        setMinimumSize(new java.awt.Dimension(1160, 700));
+        setPreferredSize(new java.awt.Dimension(1160, 700));
+        setResizable(false);
+
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel1.setMaximumSize(new java.awt.Dimension(1160, 700));
+        jPanel1.setMinimumSize(new java.awt.Dimension(1160, 700));
+        jPanel1.setPreferredSize(new java.awt.Dimension(1160, 700));
+        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jTextField1.setFont(new java.awt.Font("Times New Roman", 0, 18)); // NOI18N
+        jTextField1.setPreferredSize(new java.awt.Dimension(150, 30));
+        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField1ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 160, -1, -1));
+
+        jComboBox1.setFont(new java.awt.Font("Times New Roman", 0, 18)); // NOI18N
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "All", "Eligible", "No Eligible" }));
+        jComboBox1.setPreferredSize(new java.awt.Dimension(180, 30));
+        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox1ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 160, -1, -1));
+
+        jTable1.setFont(new java.awt.Font("Times New Roman", 0, 18)); // NOI18N
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Student ID", "Semester", "CGPA", "Eligibility", "Details"
+            }
+        ));
+        jTable1.setRowHeight(35);
+        jScrollPane1.setViewportView(jTable1);
+
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 230, 900, -1));
+
+        jPanel2.setPreferredSize(new java.awt.Dimension(950, 100));
+
+        jLabel1.setFont(new java.awt.Font("Times New Roman", 0, 36)); // NOI18N
+        jLabel1.setText("Eligibility Check and Enrolment");
+        jLabel1.setToolTipText("");
+        jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(239, 239, 239)
+                .addComponent(jLabel1)
+                .addContainerGap(253, Short.MAX_VALUE))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(27, 27, 27)
+                .addComponent(jLabel1)
+                .addContainerGap(30, Short.MAX_VALUE))
+        );
+
+        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 0, -1, -1));
+
+        jButton1.setText("🔍 ");
+        jButton1.setPreferredSize(new java.awt.Dimension(30, 30));
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 160, -1, -1));
+
+        jPanel3.setBackground(new java.awt.Color(242, 242, 255));
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 210, Short.MAX_VALUE)
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 700, Short.MAX_VALUE)
+        );
+
+        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 210, 700));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+        jButton1ActionPerformed(evt);
+    }//GEN-LAST:event_jTextField1ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        String searchID = jTextField1.getText().trim();
+
+        if (searchID.isEmpty() || searchID.equals("Enter Student ID")) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Please enter a Student ID!");
+            return;
+        }
+
+        ArrayList<String[]> resultList = loadFile("result.txt");
+        ArrayList<String[]> matched = new ArrayList<>();
+
+        for (String[] r : resultList) {
+            if (r[0].equalsIgnoreCase(searchID)) {   // Match Student ID
+                matched.add(r);
+            }
+        }
+
+        if (matched.isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Student not found!");
+        }
+
+        updateTable(matched); 
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+        String selected = jComboBox1.getSelectedItem().toString();
+        ArrayList<String[]> resultList = loadFile("result.txt");
+        ArrayList<String[]> filtered = new ArrayList<>();
+
+        for (String[] r : resultList) {
+            if (selected.equals("All")) {
+                filtered.add(r);
+            } 
+            else if (selected.equals("Eligible") && r[3].equalsIgnoreCase("YES")) {
+                filtered.add(r);
+            } 
+            else if (selected.equals("No Eligible") && r[3].equalsIgnoreCase("NO")) {
+                filtered.add(r);
+            }
+        }
+
+        updateTable(filtered);
+    }//GEN-LAST:event_jComboBox1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -69,5 +332,14 @@ public class ECE_UI extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
+    private javax.swing.JComboBox<String> jComboBox1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable jTable1;
+    private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
 }
