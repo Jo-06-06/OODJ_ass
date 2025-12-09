@@ -17,7 +17,6 @@ public class ARP_UI extends javax.swing.JFrame {
      */
     public ARP_UI() {
         initComponents();
-        
         // Set header font
         arp_tabel1.getTableHeader().setFont(new java.awt.Font("Serif", java.awt.Font.BOLD, 20));
 
