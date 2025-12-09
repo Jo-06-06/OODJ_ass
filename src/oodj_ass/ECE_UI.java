@@ -4,7 +4,7 @@ package oodj_ass;
  *
  * @author User
  */
-
+//9/12 10.10
 import java.util.ArrayList;
 import java.io.*;
 import java.awt.Color;
@@ -92,8 +92,7 @@ public class ECE_UI extends javax.swing.JFrame {
             }
         });
     }
-
-
+    
     public ECE_UI() {
         initComponents();
         jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -112,8 +111,13 @@ public class ECE_UI extends javax.swing.JFrame {
             }
         });
 
-        jTable1.getTableHeader().setFont(new java.awt.Font("Serif", java.awt.Font.BOLD,20) {
-        });
+        // Set header font
+        jTable1.getTableHeader().setFont(new java.awt.Font("Serif", java.awt.Font.BOLD, 20));
+
+        // Center header text
+        javax.swing.table.DefaultTableCellRenderer headerRenderer = 
+                (javax.swing.table.DefaultTableCellRenderer) jTable1.getTableHeader().getDefaultRenderer();
+        headerRenderer.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         
         addSidebarHover(jButtonUserManagement);
         addSidebarHover(jButtonEligibility);
@@ -151,13 +155,14 @@ public class ECE_UI extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         search2 = new javax.swing.JButton();
+        title = new javax.swing.JLabel();
         dashboard = new javax.swing.JPanel();
         jButtonUserManagement = new javax.swing.JButton();
         jButtonEligibility = new javax.swing.JButton();
         jButtonRecovery = new javax.swing.JButton();
         jButtonAPR = new javax.swing.JButton();
         logout = new javax.swing.JButton();
-        title = new javax.swing.JLabel();
+        ece_sid = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Eligibility Check and Enrolment");
@@ -173,13 +178,15 @@ public class ECE_UI extends javax.swing.JFrame {
         backgroud.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         search1.setFont(new java.awt.Font("Serif", 0, 18)); // NOI18N
-        search1.setPreferredSize(new java.awt.Dimension(150, 30));
+        search1.setMaximumSize(new java.awt.Dimension(100, 30));
+        search1.setMinimumSize(new java.awt.Dimension(100, 30));
+        search1.setPreferredSize(new java.awt.Dimension(100, 30));
         search1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 search1ActionPerformed(evt);
             }
         });
-        backgroud.add(search1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 160, -1, -1));
+        backgroud.add(search1, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 120, -1, -1));
 
         dropdown.setFont(new java.awt.Font("Serif", 0, 18)); // NOI18N
         dropdown.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "All", "Eligible", "No Eligible" }));
@@ -189,7 +196,7 @@ public class ECE_UI extends javax.swing.JFrame {
                 dropdownActionPerformed(evt);
             }
         });
-        backgroud.add(dropdown, new org.netbeans.lib.awtextra.AbsoluteConstraints(930, 160, -1, -1));
+        backgroud.add(dropdown, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 120, -1, -1));
 
         jTable1.setFont(new java.awt.Font("Serif", 0, 18)); // NOI18N
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
@@ -204,16 +211,27 @@ public class ECE_UI extends javax.swing.JFrame {
         jTable1.setShowGrid(false);
         jScrollPane1.setViewportView(jTable1);
 
-        backgroud.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 230, 870, -1));
+        backgroud.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 170, 870, -1));
 
-        search2.setText("🔍 ");
-        search2.setPreferredSize(new java.awt.Dimension(30, 30));
+        search2.setFont(new java.awt.Font("Serif", 0, 14)); // NOI18N
+        search2.setBorderPainted(false);
+        search2.setFocusPainted(false);
+        search2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        search2.setLabel("Search");
+        search2.setPreferredSize(new java.awt.Dimension(70, 30));
         search2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 search2ActionPerformed(evt);
             }
         });
-        backgroud.add(search2, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 160, -1, -1));
+        backgroud.add(search2, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 120, -1, -1));
+
+        title.setBackground(new java.awt.Color(157, 208, 153));
+        title.setFont(new java.awt.Font("Serif", 1, 36)); // NOI18N
+        title.setText("Eligibility Check and Enrolment");
+        title.setToolTipText("");
+        title.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        backgroud.add(title, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 40, -1, -1));
 
         dashboard.setBackground(new java.awt.Color(95, 106, 105));
 
@@ -324,12 +342,9 @@ public class ECE_UI extends javax.swing.JFrame {
 
         backgroud.add(dashboard, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 210, 700));
 
-        title.setBackground(new java.awt.Color(157, 208, 153));
-        title.setFont(new java.awt.Font("Serif", 1, 36)); // NOI18N
-        title.setText("Eligibility Check and Enrolment");
-        title.setToolTipText("");
-        title.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        backgroud.add(title, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 40, -1, -1));
+        ece_sid.setFont(new java.awt.Font("Serif", 0, 18)); // NOI18N
+        ece_sid.setText("Student ID:");
+        backgroud.add(ece_sid, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 120, -1, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -409,33 +424,18 @@ public class ECE_UI extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jButtonRecoveryActionPerformed
 
-    private void logoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logoutActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_logoutActionPerformed
-
     private void jButtonAPRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAPRActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jButtonAPRActionPerformed
 
+    private void logoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logoutActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_logoutActionPerformed
+
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
-        String selected = jComboBox1.getSelectedItem().toString();
-        ArrayList<String[]> resultList = loadFile("result.txt");
-        ArrayList<String[]> filtered = new ArrayList<>();
 
-        for (String[] r : resultList) {
-            if (selected.equals("All")) {
-                filtered.add(r);
-            } 
-            else if (selected.equals("Eligible") && r[3].equalsIgnoreCase("YES")) {
-                filtered.add(r);
-            } 
-            else if (selected.equals("No Eligible") && r[3].equalsIgnoreCase("NO")) {
-                filtered.add(r);
-            }
-        }
-
-        updateTable(filtered);
     }//GEN-LAST:event_jComboBox1ActionPerformed
+
 
     /**
      * @param args the command line arguments
@@ -466,6 +466,7 @@ public class ECE_UI extends javax.swing.JFrame {
     private javax.swing.JPanel backgroud;
     private javax.swing.JPanel dashboard;
     private javax.swing.JComboBox<String> dropdown;
+    private javax.swing.JLabel ece_sid;
     private javax.swing.JButton jButtonAPR;
     private javax.swing.JButton jButtonEligibility;
     private javax.swing.JButton jButtonRecovery;
