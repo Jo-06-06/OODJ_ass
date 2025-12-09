@@ -4,34 +4,43 @@
  */
 package oodj_ass;
 
-import javax.swing.*;
-import javax.swing.table.*;
-import java.awt.*;    
+//9/12 11.50
+
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Document;    
+import com.itextpdf.text.Element;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.StringTokenizer;
 import java.util.Collections;
-import java.util.HashMap;   
-import java.util.Map;       
-
-import com.itextpdf.text.Document;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.Phrase;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Chunk;
-import com.itextpdf.text.PageSize;     
-import com.itextpdf.text.Element;  
-
-import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.PdfPCell;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.StringTokenizer;
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+import javax.swing.*;
+import javax.swing.table.*;
 
 /**
  *
  * @author jolin
  */
-public class APR {
+public class APR extends JFrame {
     //GUI
     static DefaultTableModel tableModel;
     static JTable tblCourses;
@@ -44,6 +53,8 @@ public class APR {
     static String currentStudentName = "";
     static String currentProgram = "";
     static String currentIntake = "All";
+    static String currentStudentEmail = ""; 
+    
     static Map<String, StringBuilder> achievementsMap = new HashMap<>();  // Key Achievements of each sem
     static Map<String, StringBuilder> weaknessesMap  = new HashMap<>();   // Areas to Improve
     static Map<String, StringBuilder> improveMap     = new HashMap<>();   // Recommendations
@@ -170,6 +181,8 @@ public class APR {
                     currentStudentId = studentID;
                     currentStudentName = info[0];
                     currentProgram = info[1];
+                    
+                    currentStudentEmail = loadStudentEmail(studentID);
 
                     ArrayList<String> semList = loadAllSemesters(studentID);
                     if (semList.isEmpty()) {
@@ -238,14 +251,20 @@ public class APR {
                     return;
                 }
                 try {
-                    exportToPDF();
-                    JOptionPane.showMessageDialog(frame, "PDF exported successfully.");
+                    String pdfFile = exportToPDF();   
+                    if (pdfFile != null) {
+                        
+                        sendReportEmail(currentStudentEmail, pdfFile);
+                    }
+                    JOptionPane.showMessageDialog(frame,
+                            "PDF exported successfully.\nEmail has been sent to: " + currentStudentEmail);
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(frame, "PDF export failed.");
+                    JOptionPane.showMessageDialog(frame, "PDF export failed or email not sent.");
                 }
             }
         });
+
 
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
@@ -509,6 +528,27 @@ public class APR {
             br.close();
             return null;
         }
+        
+        //Load Student Email
+        public static String loadStudentEmail(String id) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader("data/students.txt"));
+        br.readLine(); 
+
+        String line;
+        while ((line = br.readLine()) != null) {
+            String[] parts = line.split(",");
+            if (parts.length >= 5) {
+                String sid = parts[0];
+                String email = parts[4];
+                if (sid.equals(id)) {
+                    br.close();
+                    return email;
+                }
+            }
+        }
+        br.close();
+        return null;
+    }
 
         //Read all semester in studentInfo.txt file + result + archive + gradeArchive
         public static ArrayList<String> loadAllSemesters(String id) throws IOException {
@@ -719,10 +759,10 @@ public class APR {
 
       
         //PDF Export
-        public static void exportToPDF() throws Exception {
+        public static String exportToPDF() throws Exception {
 
             if (currentStudentId == null) {
-                return;
+                return null;
             }
 
             Document doc = new Document(PageSize.A4, 40, 40, 40, 40);
@@ -757,6 +797,7 @@ public class APR {
                             11,
                             com.itextpdf.text.Font.BOLD
                     );
+            
 
             // Report Title
             Paragraph title = new Paragraph("Academic Performance Report", titleFont);
@@ -885,312 +926,6 @@ public class APR {
                 if (ach != null && ach.length() > 0) {
                     p.add("Key Achievements:\n");
                     p  .add(ach.toString());
-                StringTokenizer st = new StringTokenizer(line, ",");
-                String c = st.nextToken();
-                String title = st.nextToken();
-                String credit = st.nextToken();
-                st.nextToken(); 
-
-                if (c.equals(code)) {
-                    br.close();
-                    return new String[]{c, title, credit};
-                }
-            }
-            br.close();
-            return new String[]{code, "Unknown Course", "0"};
-        }
-
-        // Student Courses in studentCourse.txt
-        public static ArrayList<String[]> loadStudentCourses(String id, String sem) throws IOException {
-            ArrayList<String[]> list = new ArrayList<>();
-            BufferedReader br = new BufferedReader(new FileReader("data/studentCourse.txt"));
-            br.readLine();
-            String line;
-
-            while ((line = br.readLine()) != null) {
-                StringTokenizer st = new StringTokenizer(line, ",");
-                String sid = st.nextToken();
-                String s = st.nextToken();
-                String code = st.nextToken();
-
-                if (sid.equals(id) && s.equals(sem)) {
-                    list.add(loadCourseInfo(code));
-                }
-            }
-            br.close();
-            return list;
-        }
-
-        //Read Grade from file 
-        private static String[] loadGradeFromFile(String id, String code, String sem,
-                                                  String filename, boolean hasSemesterColumn) throws IOException {
-            File f = new File(filename);
-            if (!f.exists()) return null;
-
-            BufferedReader br = new BufferedReader(new FileReader(f));
-            br.readLine();
-            String line;
-
-            while ((line = br.readLine()) != null) {
-                StringTokenizer st = new StringTokenizer(line, ",");
-
-                if (!st.hasMoreTokens()) 
-                    continue;
-                String sid = st.nextToken();
-                if (!st.hasMoreTokens()) 
-                    continue;
-                String courseID = st.nextToken();
-
-                String semFromFile = null;
-                if (hasSemesterColumn) {
-                    if (!st.hasMoreTokens()) continue;
-                    semFromFile = st.nextToken(); 
-                }
-
-                if (!sid.equals(id) || !courseID.equals(code)) {
-                    continue;
-                }
-                if (hasSemesterColumn && semFromFile != null && !semFromFile.equals(sem)) {
-                    continue;
-                }
-
-                // ass, exam, grade, gpa
-                if (!st.hasMoreTokens()) continue;
-                String ass = st.nextToken();
-                if (!st.hasMoreTokens()) continue;
-                String exam = st.nextToken();
-                if (!st.hasMoreTokens()) continue;
-                String grade = st.nextToken();
-                if (!st.hasMoreTokens()) continue;
-                String gpa = st.nextToken();
-
-                br.close();
-                return new String[]{grade, gpa, ass, exam};
-            }
-
-            br.close();
-            return null;
-        }
-
-        //Grades + gradeArchive
-        public static String[] loadGrade(String id, String code, String sem) throws IOException {
-
-            String[] data = loadGradeFromFile(id, code, sem, "data/grades.txt", false);
-            if (data != null) return data;
-
-            data = loadGradeFromFile(id, code, sem, "data/gradeArchive.txt", true);
-            if (data != null) return data;
-
-            return new String[]{"-", "0.00", "0", "0"};
-        }
-
-        //Read CGPA
-        private static Double loadCGPAFromFile(String id, String sem, String filename) throws IOException {
-            File f = new File(filename);
-            if (!f.exists()) return null;
-
-            BufferedReader br = new BufferedReader(new FileReader(f));
-            br.readLine();
-            String line;
-
-            while ((line = br.readLine()) != null) {
-                StringTokenizer st = new StringTokenizer(line, ",");
-                String sid = st.nextToken();
-                String s = st.nextToken();
-                String cgpaStr = st.nextToken();
-
-                if (sid.equals(id) && s.equals(sem)) {
-                    br.close();
-                    try {
-                        return Double.valueOf(Double.parseDouble(cgpaStr));
-                    } catch (Exception ex) {
-                        return 0.0;
-                    }
-                }
-            }
-            br.close();
-            return null;
-        }
-
-        //Result + resultArchive
-        public static double loadCGPA(String id, String sem) throws IOException {
-            Double v = loadCGPAFromFile(id, sem, "data/result.txt");
-            if (v != null) return v.doubleValue();
-
-            v = loadCGPAFromFile(id, sem, "data/resultArchive.txt");
-            if (v != null) return v.doubleValue();
-
-            return 0.0;
-        }
-
-      
-        //PDF Export
-        public static void exportToPDF() throws Exception {
-
-            if (currentStudentId == null) {
-                return;
-            }
-
-            Document doc = new Document(PageSize.A4, 40, 40, 40, 40);
-            String fileName = "AcademicReport_" + currentStudentId + ".pdf";
-            PdfWriter.getInstance(doc, new FileOutputStream(fileName));
-            doc.open();
-
-            com.itextpdf.text.Font titleFont =
-                    new com.itextpdf.text.Font(
-                            com.itextpdf.text.Font.FontFamily.HELVETICA,
-                            16,
-                            com.itextpdf.text.Font.BOLD
-                    );
-
-            com.itextpdf.text.Font infoFont =
-                    new com.itextpdf.text.Font(
-                            com.itextpdf.text.Font.FontFamily.HELVETICA,
-                            11,
-                            com.itextpdf.text.Font.NORMAL
-                    );
-
-            com.itextpdf.text.Font semTitleFont =
-                    new com.itextpdf.text.Font(
-                            com.itextpdf.text.Font.FontFamily.HELVETICA,
-                            12,
-                            com.itextpdf.text.Font.BOLD
-                    );
-
-            com.itextpdf.text.Font headerFont =
-                    new com.itextpdf.text.Font(
-                            com.itextpdf.text.Font.FontFamily.HELVETICA,
-                            11,
-                            com.itextpdf.text.Font.BOLD
-                    );
-
-            // Report Title
-            Paragraph title = new Paragraph("Academic Performance Report", titleFont);
-            title.setAlignment(Element.ALIGN_CENTER);
-            title.setSpacingAfter(15f);
-            doc.add(title);
-
-            // Student Info
-            doc.add(new Paragraph("Student Name : " + currentStudentName, infoFont));
-            doc.add(new Paragraph("Student ID   : " + currentStudentId, infoFont));
-            doc.add(new Paragraph("Program      : " + currentProgram, infoFont));
-            doc.add(Chunk.NEWLINE);
-
-            //Generate tables by sem
-            ArrayList<String> semesters = loadAllSemesters(currentStudentId);
-            ArrayList<String> filtered = new ArrayList<>();
-
-            if (currentIntake == null || "All".equalsIgnoreCase(currentIntake)) {
-                filtered.addAll(semesters);
-            } else if (currentIntake.startsWith("Year")) {
-                String yearNum = currentIntake.substring(5).trim();
-                for (String s : semesters) {
-                    if (s.startsWith("Y" + yearNum)) filtered.add(s);
-                }
-            } else {
-                for (String s : semesters) {
-                    if (s.equals(currentIntake)) filtered.add(s);
-                }
-            }
-            if (filtered.isEmpty()) filtered.addAll(semesters);
-
-            for (String sem : filtered) {
-
-                //Sem Title
-                Paragraph semTitle = new Paragraph("Semester: " + sem, semTitleFont);
-                semTitle.setSpacingBefore(8f);
-                semTitle.setSpacingAfter(4f);
-                doc.add(semTitle);
-
-                //Course Table
-                PdfPTable pdfTable = new PdfPTable(5);
-                pdfTable.setWidthPercentage(100);
-                pdfTable.setWidths(new float[]{15f, 45f, 8f, 10f, 10f});
-
-                String[] headers = {"Course Code", "Course Title", "Credit", "Grade", "GPA"};
-                for (String h : headers) {
-                    PdfPCell cell = new PdfPCell(new Phrase(h, headerFont));
-                    cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
-                    cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-                    pdfTable.addCell(cell);
-                }
-
-                //Course by Sem
-                ArrayList<String[]> courseList = loadStudentCourses(currentStudentId, sem);
-                int totalCreditHours = 0;
-
-                for (String[] c : courseList) {
-                    String code = c[0];
-                    String titleTxt = c[1];
-                    String credit = c[2];
-
-                    String[] gradeData = loadGrade(currentStudentId, code, sem);
-                    String grade = gradeData[0];
-                    String gpa = gradeData[1];
-
-                    //Accumulate credit
-                    try {
-                        totalCreditHours += Integer.parseInt(credit.trim());
-                    } catch (Exception ignore) {}
-
-                    pdfTable.addCell(new Phrase(code, infoFont));
-                    pdfTable.addCell(new Phrase(titleTxt, infoFont));
-                    pdfTable.addCell(new Phrase(credit, infoFont));
-                    pdfTable.addCell(new Phrase(grade, infoFont));
-                    pdfTable.addCell(new Phrase(gpa, infoFont));
-                }
-
-                doc.add(pdfTable);
-
-                // Summary rows under table: Total Credit Hours + CGPA
-                double semCGPA = loadCGPA(currentStudentId, sem);
-
-                PdfPTable summaryTable = new PdfPTable(2);
-                summaryTable.setWidthPercentage(40);
-                summaryTable.setHorizontalAlignment(Element.ALIGN_RIGHT);
-                summaryTable.setSpacingBefore(4f);
-
-                PdfPCell c1 = new PdfPCell(new Phrase("Total Credit Hours", headerFont));
-                PdfPCell c2 = new PdfPCell(new Phrase(String.valueOf(totalCreditHours), infoFont));
-                c1.setHorizontalAlignment(Element.ALIGN_RIGHT);
-                c2.setHorizontalAlignment(Element.ALIGN_RIGHT);
-                summaryTable.addCell(c1);
-                summaryTable.addCell(c2);
-
-                PdfPCell c3 = new PdfPCell(new Phrase("CGPA", headerFont));
-                PdfPCell c4 = new PdfPCell(new Phrase(String.format("%.2f", semCGPA), infoFont));
-                c3.setHorizontalAlignment(Element.ALIGN_RIGHT);
-                c4.setHorizontalAlignment(Element.ALIGN_RIGHT);
-                summaryTable.addCell(c3);
-                summaryTable.addCell(c4);
-
-                doc.add(summaryTable);
-
-                //Summary below All Table
-                Paragraph semSummaryTitle = new Paragraph("Summary for " + sem, semTitleFont);
-                semSummaryTitle.setSpacingBefore(5f);
-                semSummaryTitle.setSpacingAfter(2f);
-                doc.add(semSummaryTitle);
-
-                Paragraph p = new Paragraph();
-                p.setFont(infoFont);
-
-                // Summary of Progress
-                p.add("Summary of Progress:\n");
-                if (semCGPA >= 3.50)
-                    p.add("- The student demonstrates excellent academic performance.\n\n");
-                else if (semCGPA >= 3.00)
-                    p.add("- The student shows good consistent progress.\n\n");
-                else if (semCGPA >= 2.00)
-                    p.add("- The student achieved satisfactory performance, improvement needed.\n\n");
-                else
-                    p.add("- The student requires significant academic improvement.\n\n");
-
-                // Key Achievements
-                StringBuilder ach = (achievementsMap != null) ? achievementsMap.get(sem) : null;
-                if (ach != null && ach.length() > 0) {
-                    p.add("Key Achievements:\n");
-                    p.add(ach.toString());
                     p.add("\n");
                 }
 
@@ -1208,6 +943,68 @@ public class APR {
                 doc.add(Chunk.NEWLINE);
             }
             doc.close();
+            
+            return fileName;
         }
         
-}
+        //Email function
+        public static void sendReportEmail(String toEmail, String pdfPath) {
+            if (toEmail == null || toEmail.isEmpty()) {
+                System.out.println("No email address, skip sending.");
+                return;
+            }
+
+            final String fromEmail = "wongjolin0217@gmail.com";
+            final String password  = "ptzvabojtjzppndv";
+
+            // SMTP（Gmail）
+            Properties props = new Properties();
+            props.put("mail.smtp.auth", "true");
+            props.put("mail.smtp.starttls.enable", "true");
+            props.put("mail.smtp.host", "smtp.gmail.com");
+            props.put("mail.smtp.port", "587");
+
+            Session session = Session.getInstance(props, new javax.mail.Authenticator() {
+                @Override
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication(fromEmail, password);
+                }
+            });
+
+            try {
+                Message message = new MimeMessage(session);
+                //From
+                message.setFrom(new InternetAddress(fromEmail, "Academic System"));
+                //To
+                message.setRecipients(Message.RecipientType.TO,
+                        InternetAddress.parse(toEmail));
+                //Title
+                message.setSubject("Your Academic Performance Report");
+
+                MimeBodyPart textPart = new MimeBodyPart();
+                textPart.setText(
+                        "Dear " + currentStudentName + ",\n\n"
+                      + "Attached is your Academic Performance Report.\n\n"
+                      + "Regards,\nUniversity");
+
+                MimeBodyPart attachmentPart = new MimeBodyPart();
+                DataSource source = new FileDataSource(pdfPath);
+                attachmentPart.setDataHandler(new DataHandler(source));
+                attachmentPart.setFileName(new File(pdfPath).getName());
+
+                Multipart multipart = new MimeMultipart();
+                multipart.addBodyPart(textPart);
+                multipart.addBodyPart(attachmentPart);
+
+                message.setContent(multipart);
+
+                //Send
+                Transport.send(message);
+                System.out.println("Email sent to " + toEmail);
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
