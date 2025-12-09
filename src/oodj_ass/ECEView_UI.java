@@ -120,7 +120,6 @@ public class ECEView_UI extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Result Details");
-        setMaximumSize(new java.awt.Dimension(520, 620));
         setMinimumSize(new java.awt.Dimension(520, 620));
         setResizable(false);
 

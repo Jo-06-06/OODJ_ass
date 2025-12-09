@@ -51,7 +51,9 @@ public class ARP_UI extends javax.swing.JFrame {
         jComboBox1 = new javax.swing.JComboBox<>();
         jScrollPane1 = new javax.swing.JScrollPane();
         arp_tabel1 = new javax.swing.JTable();
-        title = new javax.swing.JLabel();
+        arp_pdfButton = new javax.swing.JButton();
+        arp_jScrollPane = new javax.swing.JScrollPane();
+        jTextArea_summary = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Academic Performance Report");
@@ -61,6 +63,7 @@ public class ARP_UI extends javax.swing.JFrame {
         setResizable(false);
 
         jPanel1.setBackground(new java.awt.Color(183, 201, 197));
+        jPanel1.setFocusable(false);
         jPanel1.setMaximumSize(new java.awt.Dimension(1160, 700));
         jPanel1.setMinimumSize(new java.awt.Dimension(1160, 700));
         jPanel1.setPreferredSize(new java.awt.Dimension(1160, 700));
@@ -196,8 +199,10 @@ public class ARP_UI extends javax.swing.JFrame {
         jPanel1.add(arp_sid, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 120, -1, -1));
 
         arp_search.setFont(new java.awt.Font("Serif", 0, 14)); // NOI18N
+        arp_search.setBorderPainted(false);
+        arp_search.setFocusPainted(false);
+        arp_search.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         arp_search.setLabel("Search");
-        arp_search.setOpaque(true);
         arp_search.setPreferredSize(new java.awt.Dimension(70, 30));
         arp_search.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -233,38 +238,37 @@ public class ARP_UI extends javax.swing.JFrame {
         arp_tabel1.setShowGrid(false);
         jScrollPane1.setViewportView(arp_tabel1);
 
-        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 180, 870, 230));
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 170, 870, 230));
 
-        title.setBackground(new java.awt.Color(157, 208, 153));
-        title.setFont(new java.awt.Font("Serif", 1, 36)); // NOI18N
-        title.setText("Eligibility Check and Enrolment");
-        title.setToolTipText("");
-        title.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        arp_pdfButton.setFont(new java.awt.Font("Serif", 0, 14)); // NOI18N
+        arp_pdfButton.setText("Export PDF");
+        arp_pdfButton.setToolTipText("");
+        jPanel1.add(arp_pdfButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(1020, 650, -1, -1));
+
+        arp_jScrollPane.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Academic Summary & Recommedations", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Serif", 0, 14))); // NOI18N
+
+        jTextArea_summary.setEditable(false);
+        jTextArea_summary.setBackground(new java.awt.Color(255, 255, 255));
+        jTextArea_summary.setColumns(20);
+        jTextArea_summary.setFont(new java.awt.Font("Serif", 0, 14)); // NOI18N
+        jTextArea_summary.setLineWrap(true);
+        jTextArea_summary.setRows(5);
+        arp_jScrollPane.setViewportView(jTextArea_summary);
+
+        jPanel1.add(arp_jScrollPane, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 410, 870, 210));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addGap(0, 0, Short.MAX_VALUE)
-                    .addComponent(title)
-                    .addGap(0, 0, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addGap(0, 0, Short.MAX_VALUE)
-                    .addComponent(title)
-                    .addGap(0, 0, Short.MAX_VALUE)))
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        pack();
+        setBounds(0, 0, 1174, 708);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonUserManagementActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonUserManagementActionPerformed
@@ -322,6 +326,8 @@ public class ARP_UI extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel apr_titile;
+    private javax.swing.JScrollPane arp_jScrollPane;
+    private javax.swing.JButton arp_pdfButton;
     private javax.swing.JButton arp_search;
     private javax.swing.JLabel arp_sid;
     private javax.swing.JLabel arp_sid1;
@@ -334,8 +340,8 @@ public class ARP_UI extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextArea jTextArea_summary;
     private javax.swing.JButton logout;
     private javax.swing.JTextField sid_search;
-    private javax.swing.JLabel title;
     // End of variables declaration//GEN-END:variables
 }

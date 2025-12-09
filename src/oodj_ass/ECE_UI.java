@@ -222,11 +222,13 @@ public class ECE_UI extends javax.swing.JFrame {
         jTable1.setShowGrid(false);
         jScrollPane1.setViewportView(jTable1);
 
-        backgroud.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 180, 870, -1));
+        backgroud.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 170, 870, -1));
 
         search2.setFont(new java.awt.Font("Serif", 0, 14)); // NOI18N
+        search2.setBorderPainted(false);
+        search2.setFocusPainted(false);
+        search2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         search2.setLabel("Search");
-        search2.setOpaque(true);
         search2.setPreferredSize(new java.awt.Dimension(70, 30));
         search2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
