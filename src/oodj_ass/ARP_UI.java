@@ -56,16 +56,16 @@ public class ARP_UI extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Academic Performance Report");
-        setMaximumSize(new java.awt.Dimension(1160, 700));
-        setMinimumSize(new java.awt.Dimension(1160, 700));
-        setPreferredSize(new java.awt.Dimension(1160, 700));
+        setMaximumSize(new java.awt.Dimension(1160, 730));
+        setMinimumSize(new java.awt.Dimension(1160, 730));
+        setPreferredSize(new java.awt.Dimension(1160, 730));
         setResizable(false);
 
         jPanel1.setBackground(new java.awt.Color(183, 201, 197));
         jPanel1.setFocusable(false);
-        jPanel1.setMaximumSize(new java.awt.Dimension(1160, 700));
-        jPanel1.setMinimumSize(new java.awt.Dimension(1160, 700));
-        jPanel1.setPreferredSize(new java.awt.Dimension(1160, 700));
+        jPanel1.setMaximumSize(new java.awt.Dimension(1160, 730));
+        jPanel1.setMinimumSize(new java.awt.Dimension(1160, 730));
+        jPanel1.setPreferredSize(new java.awt.Dimension(1160, 730));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         dashboard.setBackground(new java.awt.Color(95, 106, 105));
@@ -267,7 +267,7 @@ public class ARP_UI extends javax.swing.JFrame {
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        setBounds(0, 0, 1174, 708);
+        pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonUserManagementActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonUserManagementActionPerformed

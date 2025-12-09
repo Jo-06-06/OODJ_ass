@@ -9,6 +9,7 @@ import java.util.*;
  *
  * @author User
  */
+//9/12 9.00
 public class ECEView_UI extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ECEView_UI.class.getName());
