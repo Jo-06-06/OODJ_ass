@@ -16,31 +16,28 @@ public class ECEView_UI extends javax.swing.JFrame {
     /**
      * Creates new form ECEView_UI
      */
+    public ECEView_UI(String sid, String sem, String eligibility,
+                      ArrayList<String[]> grades,
+                      ArrayList<String[]> courses) {
 
+        initComponents();
+        setLocationRelativeTo(null);
+        displayDetails(sid, sem, eligibility, grades, courses);
 
+        close.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                close.setBackground(new java.awt.Color(150,170,170));
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                close.setBackground(new java.awt.Color(120,140,140));
+            }
+        });
+    }
     
-    public ECEView_UI(String sid, String sem, 
-                  ArrayList<String[]> grades, 
-                  ArrayList<String[]> courses) 
-{
-    initComponents();
-    setLocationRelativeTo(null);
-    displayDetails(sid, sem, grades, courses);
-    close.addMouseListener(new java.awt.event.MouseAdapter() {
-        @Override
-        public void mouseEntered(java.awt.event.MouseEvent evt) {
-            close.setBackground(new java.awt.Color(150,170,170)); // hover
-        }
-
-        @Override
-        public void mouseExited(java.awt.event.MouseEvent evt) {
-            close.setBackground(new java.awt.Color(120,140,140)); // normal
-        }
-    });
-}
-
-
-    private void displayDetails(String studentID, String semester,
+        private void displayDetails(String studentID, String semester, String eligibility,
                                 ArrayList<String[]> grades, ArrayList<String[]> courses) {
 
         StringBuilder sb = new StringBuilder();
@@ -48,8 +45,8 @@ public class ECEView_UI extends javax.swing.JFrame {
         int totalCH = 0;
         int failCount = 0;
 
-        sb.append("===== Student: ").append(studentID)
-          .append(" (").append(semester).append(") =====\n\n");
+        sb.append("=========== Student: ").append(studentID)
+          .append(" (").append(semester).append(") ===========\n\n");
 
         for (String[] g : grades) {
             if (!g[0].equals(studentID)) continue;
@@ -77,15 +74,33 @@ public class ECEView_UI extends javax.swing.JFrame {
 
         double cgpa = totalGP / totalCH;
 
-        sb.append("\n------------------------------------\n");
+        sb.append("\n-------------------------------------------------------------\n");
         sb.append(String.format("Total Grade Points = %.2f\n", totalGP));
         sb.append("Total Credit Hours = " + totalCH + "\n");
         sb.append("Total Fails = " + failCount + "\n");
         sb.append(String.format("CGPA = %.2f\n", cgpa));
-        sb.append("Eligible Next Year: ").append(cgpa >= 2.0 && failCount <= 3 ? "YES" : "NO");
+        sb.append("Eligible Next Year: ").append(eligibility).append("\n");
+        
+         if (eligibility.equalsIgnoreCase("NO")) {
+            sb.append("\nReason:\n");
 
-        text.setText(sb.toString());
-    }
+            if (cgpa < 2.0) {
+                sb.append("Student does NOT meet the CGPA requirements:\n");
+                sb.append("- CGPA below 2.0\n");
+            }
+            if (failCount > 3) {
+                sb.append("Student does NOT meet the fail requirement:\n");
+                sb.append("- More than 3 failed courses\n");
+            }
+            else if (cgpa < 2.0 && failCount > 3) {
+                sb.append("Student does NOT meet multiple requirements:\n");
+                sb.append("- CGPA below 2.0\n");
+                sb.append("- More than 3 failed courses\n");
+            }
+        }
+
+    text.setText(sb.toString());
+}
 
     
     /**
@@ -105,21 +120,22 @@ public class ECEView_UI extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Result Details");
-        setMaximumSize(new java.awt.Dimension(540, 620));
-        setMinimumSize(new java.awt.Dimension(540, 620));
-        setPreferredSize(new java.awt.Dimension(540, 620));
+        setMaximumSize(new java.awt.Dimension(520, 620));
+        setMinimumSize(new java.awt.Dimension(520, 620));
+        setPreferredSize(new java.awt.Dimension(520, 620));
         setResizable(false);
 
         backgroud.setBackground(new java.awt.Color(182, 201, 197));
         backgroud.setAutoscrolls(true);
-        backgroud.setMaximumSize(new java.awt.Dimension(540, 620));
-        backgroud.setMinimumSize(new java.awt.Dimension(540, 620));
-        backgroud.setPreferredSize(new java.awt.Dimension(540, 620));
+        backgroud.setMaximumSize(new java.awt.Dimension(520, 620));
+        backgroud.setMinimumSize(new java.awt.Dimension(520, 620));
+        backgroud.setPreferredSize(new java.awt.Dimension(520, 620));
+        backgroud.setVerifyInputWhenFocusTarget(false);
         backgroud.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         title.setFont(new java.awt.Font("Serif", 1, 36)); // NOI18N
         title.setText("Result Details");
-        backgroud.add(title, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 10, -1, -1));
+        backgroud.add(title, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 10, -1, -1));
 
         jScrollPane2.setMaximumSize(new java.awt.Dimension(450, 470));
         jScrollPane2.setMinimumSize(new java.awt.Dimension(450, 470));
@@ -135,7 +151,7 @@ public class ECEView_UI extends javax.swing.JFrame {
         text.setPreferredSize(new java.awt.Dimension(520, 550));
         jScrollPane2.setViewportView(text);
 
-        backgroud.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 60, -1, -1));
+        backgroud.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 60, 440, -1));
 
         close.setFont(new java.awt.Font("Serif", 0, 18)); // NOI18N
         close.setText("close");
@@ -146,20 +162,18 @@ public class ECEView_UI extends javax.swing.JFrame {
                 closeActionPerformed(evt);
             }
         });
-        backgroud.add(close, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 540, -1, -1));
+        backgroud.add(close, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 540, -1, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(backgroud, javax.swing.GroupLayout.PREFERRED_SIZE, 540, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(backgroud, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(backgroud, javax.swing.GroupLayout.PREFERRED_SIZE, 620, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(backgroud, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 

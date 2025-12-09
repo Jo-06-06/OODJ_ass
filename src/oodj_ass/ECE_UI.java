@@ -55,14 +55,14 @@ public class ECE_UI extends javax.swing.JFrame {
         }
     }
     
-    private void showDetails(String studentID, String semester) {
+    private void showDetails(String studentID, String semester, String eligibility) {
         ArrayList<String[]> grades = loadFile("grades.txt");
         ArrayList<String[]> courses = loadFile("courses.txt");
 
-        // Open the ECEView_UI window
-        ECEView_UI view = new ECEView_UI(studentID, semester, grades, courses);
+        ECEView_UI view = new ECEView_UI(studentID, semester, eligibility, grades, courses);
         view.setVisible(true);
     }
+
 
     
     
@@ -104,12 +104,15 @@ public class ECE_UI extends javax.swing.JFrame {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 int row = jTable1.rowAtPoint(evt.getPoint());
                 int col = jTable1.columnAtPoint(evt.getPoint());
+                
+                
+        if (col == 4) { 
+            String sid = jTable1.getValueAt(row, 0).toString();
+            String sem = jTable1.getValueAt(row, 1).toString();
+            String eligibility = jTable1.getValueAt(row, 3).toString();
 
-                if (col == 4) { // Details column
-                    String sid = jTable1.getValueAt(row, 0).toString();
-                    String sem = jTable1.getValueAt(row, 1).toString();
-                    showDetails(sid, sem);
-                }
+            showDetails(sid, sem, eligibility);
+        }
             }
         });
 
@@ -120,6 +123,18 @@ public class ECE_UI extends javax.swing.JFrame {
         addSidebarHover(jButtonEligibility);
         addSidebarHover(jButtonRecovery);
         addSidebarHover(jButtonAPR);
+        
+        logout.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                logout.setBackground(new java.awt.Color(150,170,170)); // hover
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                logout.setBackground(new java.awt.Color(120,140,140)); // normal
+            }
+        });
 
     }
 
@@ -207,15 +222,15 @@ public class ECE_UI extends javax.swing.JFrame {
         dashboard.setBackground(new java.awt.Color(95, 106, 105));
 
         jButtonUserManagement.setBackground(new java.awt.Color(95, 106, 105));
-        jButtonUserManagement.setFont(new java.awt.Font("Serif", 0, 24)); // NOI18N
+        jButtonUserManagement.setFont(new java.awt.Font("Serif", 0, 20)); // NOI18N
         jButtonUserManagement.setForeground(new java.awt.Color(255, 255, 255));
-        jButtonUserManagement.setText("<html><center>User<br>Management</center></html> ");
+        jButtonUserManagement.setText("User Management");
         jButtonUserManagement.setToolTipText("");
         jButtonUserManagement.setBorderPainted(false);
         jButtonUserManagement.setContentAreaFilled(false);
         jButtonUserManagement.setFocusPainted(false);
         jButtonUserManagement.setOpaque(true);
-        jButtonUserManagement.setPreferredSize(new java.awt.Dimension(210, 100));
+        jButtonUserManagement.setPreferredSize(new java.awt.Dimension(210, 70));
         jButtonUserManagement.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonUserManagementActionPerformed(evt);
@@ -223,7 +238,7 @@ public class ECE_UI extends javax.swing.JFrame {
         });
 
         jButtonEligibility.setBackground(new java.awt.Color(95, 106, 105));
-        jButtonEligibility.setFont(new java.awt.Font("Serif", 0, 24)); // NOI18N
+        jButtonEligibility.setFont(new java.awt.Font("Serif", 0, 20)); // NOI18N
         jButtonEligibility.setForeground(new java.awt.Color(255, 255, 255));
         jButtonEligibility.setText("<html><center>Eligibility Check<br>and Enrolment</center></html> ");
         jButtonEligibility.setToolTipText("");
@@ -231,7 +246,7 @@ public class ECE_UI extends javax.swing.JFrame {
         jButtonEligibility.setContentAreaFilled(false);
         jButtonEligibility.setFocusPainted(false);
         jButtonEligibility.setOpaque(true);
-        jButtonEligibility.setPreferredSize(new java.awt.Dimension(210, 100));
+        jButtonEligibility.setPreferredSize(new java.awt.Dimension(210, 70));
         jButtonEligibility.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonEligibilityActionPerformed(evt);
@@ -239,15 +254,15 @@ public class ECE_UI extends javax.swing.JFrame {
         });
 
         jButtonRecovery.setBackground(new java.awt.Color(95, 106, 105));
-        jButtonRecovery.setFont(new java.awt.Font("Serif", 0, 24)); // NOI18N
+        jButtonRecovery.setFont(new java.awt.Font("Serif", 0, 20)); // NOI18N
         jButtonRecovery.setForeground(new java.awt.Color(255, 255, 255));
-        jButtonRecovery.setText("<html><center>Course Recovery<br>Plan</center></html> ");
+        jButtonRecovery.setText("Course Recovery Plan");
         jButtonRecovery.setToolTipText("");
         jButtonRecovery.setBorderPainted(false);
         jButtonRecovery.setContentAreaFilled(false);
         jButtonRecovery.setFocusPainted(false);
         jButtonRecovery.setOpaque(true);
-        jButtonRecovery.setPreferredSize(new java.awt.Dimension(210, 100));
+        jButtonRecovery.setPreferredSize(new java.awt.Dimension(210, 70));
         jButtonRecovery.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonRecoveryActionPerformed(evt);
@@ -255,14 +270,14 @@ public class ECE_UI extends javax.swing.JFrame {
         });
 
         jButtonAPR.setBackground(new java.awt.Color(95, 106, 105));
-        jButtonAPR.setFont(new java.awt.Font("Serif", 0, 24)); // NOI18N
+        jButtonAPR.setFont(new java.awt.Font("Serif", 0, 20)); // NOI18N
         jButtonAPR.setForeground(new java.awt.Color(255, 255, 255));
-        jButtonAPR.setText("<html><center>Academic Performance<br>Report</center></html> ");
+        jButtonAPR.setText("<html><center>Academic<br>Performance Report</center></html> ");
         jButtonAPR.setBorderPainted(false);
         jButtonAPR.setContentAreaFilled(false);
         jButtonAPR.setFocusPainted(false);
         jButtonAPR.setOpaque(true);
-        jButtonAPR.setPreferredSize(new java.awt.Dimension(210, 100));
+        jButtonAPR.setPreferredSize(new java.awt.Dimension(210, 70));
         jButtonAPR.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonAPRActionPerformed(evt);
@@ -271,6 +286,8 @@ public class ECE_UI extends javax.swing.JFrame {
 
         logout.setFont(new java.awt.Font("Serif", 0, 20)); // NOI18N
         logout.setText("Log Out");
+        logout.setBorderPainted(false);
+        logout.setFocusPainted(false);
         logout.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 logoutActionPerformed(evt);
@@ -296,7 +313,7 @@ public class ECE_UI extends javax.swing.JFrame {
         dashboardLayout.setVerticalGroup(
             dashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(dashboardLayout.createSequentialGroup()
-                .addGap(86, 86, 86)
+                .addGap(132, 132, 132)
                 .addComponent(jButtonUserManagement, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButtonEligibility, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -304,7 +321,7 @@ public class ECE_UI extends javax.swing.JFrame {
                 .addComponent(jButtonRecovery, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButtonAPR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 100, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 174, Short.MAX_VALUE)
                 .addComponent(logout)
                 .addGap(62, 62, 62))
         );
