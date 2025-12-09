@@ -56,16 +56,15 @@ public class ARP_UI extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Academic Performance Report");
-        setMaximumSize(new java.awt.Dimension(1160, 730));
-        setMinimumSize(new java.awt.Dimension(1160, 730));
-        setPreferredSize(new java.awt.Dimension(1160, 730));
+        setMaximumSize(new java.awt.Dimension(1160, 700));
+        setMinimumSize(new java.awt.Dimension(1160, 700));
         setResizable(false);
 
         jPanel1.setBackground(new java.awt.Color(183, 201, 197));
         jPanel1.setFocusable(false);
-        jPanel1.setMaximumSize(new java.awt.Dimension(1160, 730));
-        jPanel1.setMinimumSize(new java.awt.Dimension(1160, 730));
-        jPanel1.setPreferredSize(new java.awt.Dimension(1160, 730));
+        jPanel1.setMaximumSize(new java.awt.Dimension(1160, 700));
+        jPanel1.setMinimumSize(new java.awt.Dimension(1160, 700));
+        jPanel1.setPreferredSize(new java.awt.Dimension(1160, 700));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         dashboard.setBackground(new java.awt.Color(95, 106, 105));
