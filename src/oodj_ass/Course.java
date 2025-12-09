@@ -11,7 +11,7 @@ public class Course {
     private int examWeight;
 
     // from grades.txt
-    private int assignmentScore;
+    private int assScore;
     private int examScore;
     private String grade;
     private int attemptNumber;
@@ -28,7 +28,7 @@ public class Course {
         this.assignmentWeight = assignmentWeight;
         this.examWeight = examWeight;
 
-        this.assignmentScore = 0;
+        this.assScore = 0;
         this.examScore = 0;
         this.grade = "";
         this.attemptNumber = 1;
@@ -44,14 +44,14 @@ public class Course {
     public int getExamWeight() { return examWeight; }
 
     // Student-specific
-    public int getAssignmentScore() { return assignmentScore; }
+    public int getAssScore() { return assScore; }
     public int getExamScore() { return examScore; }
     public String getGrade() { return grade; }
     public int getAttemptNumber() { return attemptNumber; }
 
     // ===== SETTERS =====
     public void setScores(int assignment, int exam) {
-        this.assignmentScore = assignment;
+        this.assScore = assignment;
         this.examScore = exam;
     }
 
@@ -66,33 +66,22 @@ public class Course {
     // Check failed
     public boolean isFailed() {
 
-        boolean assignmentFailed = (assignmentWeight > 0 && assignmentScore < 50);
+        boolean assignmentFailed = (assignmentWeight > 0 && assScore < 50);
         boolean examFailed       = (examWeight > 0 && examScore < 50);
 
-        // Pure FYP/Industrial Training cases: examWeight = 0
-        if (assignmentWeight == 100 && examWeight == 0) {
-            return assignmentScore < 50;
-        }
-
-        // Return TRUE if any component required for passing is failed
+        // If NONE of the weighted components fail → course is passed
         return assignmentFailed || examFailed;
     }
 
     // FAILED COMPONENT DETECTION
     public String getFailedComponent() {
 
-        boolean assignmentFailed = (assignmentWeight > 0 && assignmentScore < 50);
-        boolean examFailed       = (examWeight > 0 && examScore < 50);
+        boolean failAss = (assignmentWeight > 0 && assScore < 50);
+        boolean failExam = (examWeight > 0 && examScore < 50);
 
-        if (!assignmentFailed && !examFailed)
-            return "None";
-
-        if (assignmentFailed && examFailed)
-            return "Both Components";
-
-        if (assignmentFailed)
-            return "Assignment Only";
-
+        if (!failAss && !failExam) return "None";
+        if (failAss && failExam) return "Both Components";
+        if (failAss) return "Assignment Only";
         return "Exam Only";
     }
 
@@ -109,6 +98,7 @@ public class Course {
     // For UI
     public String getDetailedInfo() {
         StringBuilder info = new StringBuilder();
+
         info.append("#######################################\n");
         info.append("COURSE: ").append(courseID).append(" - ").append(courseName).append("\n");
         info.append("Credit Hours: ").append(creditHours).append("\n");
@@ -116,12 +106,15 @@ public class Course {
         info.append("Semester Offered: ").append(semester).append("\n");
         info.append("---------------------------------------\n");
         info.append("Scores:\n");
-        info.append("  Assignment: ").append(assignmentScore).append("/100");
-        if (assignmentScore < 50) info.append("  (FAILED)");
+
+        // Assignment
+        info.append("  Assignment: ").append(assScore).append("/100");
+        if (assignmentWeight > 0 && assScore < 50) info.append("  (FAILED)");
         info.append("\n");
 
+        // Exam (only mark failed if weighted)
         info.append("  Exam:       ").append(examScore).append("/100");
-        if (examScore < 50) info.append("  (FAILED)");
+        if (examWeight > 0 && examScore < 50) info.append("  (FAILED)");
         info.append("\n");
 
         if (!grade.isEmpty()) {
@@ -135,5 +128,5 @@ public class Course {
         info.append("---------------------------------------\n");
 
         return info.toString();
-    }
+        }
 }

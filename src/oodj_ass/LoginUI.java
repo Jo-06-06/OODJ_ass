@@ -90,7 +90,7 @@ public class LoginUI extends javax.swing.JFrame {
                         .addComponent(btnLogin)
                         .addGap(56, 56, 56)
                         .addComponent(forgotPassw)))
-                .addContainerGap(106, Short.MAX_VALUE))
+                .addContainerGap(101, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

@@ -32,5 +32,9 @@ public class main {
         } else {
             System.out.println("No failed course found for this student.");
         }*/
+        FileLoader fl = new FileLoader();
+        fl.loadAll();
+
+        new CRP_UI(loader).setVisible(true);
     }
 }

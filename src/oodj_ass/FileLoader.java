@@ -238,7 +238,7 @@ public class FileLoader {
 
         File gradeFile = new File(GRADES_FILE);
         if (!gradeFile.exists()) {
-            System.out.println("  ⚠ grades.txt not found, skipping.");
+            System.out.println("grades.txt not found, skipping.");
             return;
         }
 
@@ -413,6 +413,22 @@ public class FileLoader {
         return null;
     }
 
+    public Student getStudentByID(String id) {
+        for (Student s : students) {
+            if (s.getStudentID().equals(id)) {
+                return s;
+            }
+        }
+        return null;
+    }
+    
+    public Course getCourseByID(String id) {
+        for (Course c : courseInfoList) {
+            if (c.getCourseID().equals(id)) return c;
+        }
+        return null;
+    }
+    
     public List<Student> getStudents() {
         return students;
     }
