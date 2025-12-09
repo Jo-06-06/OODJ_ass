@@ -709,7 +709,6 @@ public class CRP {
         body.append("\nPlease follow your recovery plan to stay on track.\n");
         body.append("\nRegards,\nCourse Recovery System");
 
-        mailer.sendEmail(to, subject, body.toString());
     }
 }
 

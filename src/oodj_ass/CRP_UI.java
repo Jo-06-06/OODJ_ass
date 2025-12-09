@@ -25,7 +25,7 @@ public class CRP_UI extends javax.swing.JFrame {
     // key = planID
     private Map<String, RecoveryPlan> planByID = new HashMap<>();
 
-    private int lastPlanNumber = 0; // for RP0001, RP0002, ...
+    private int lastPlanNumber = 0; 
     private String recommendation;
     
     
@@ -36,31 +36,37 @@ public class CRP_UI extends javax.swing.JFrame {
         this.fileLoader = loader;
         initComponents();
         
-        jTabbedPane1.setUI(new BasicTabbedPaneUI() {
-        @Override
-        protected int calculateTabAreaHeight(int tabPlacement, int runCount, int maxTabHeight) {
-            }
-        });
+        jTabbedPane1.setSelectedIndex(0); 
         
         loadAllFailedStudents();
         loadRecoveryPlansFromFile();
         
-        jTableFailedComponents.addMouseListener(new MouseAdapter() {
+       jTableFailedComponents.addMouseListener(new MouseAdapter() {
+            @Override
             public void mouseClicked(MouseEvent evt) {
-                int row = jTableFailedComponents.getSelectedRow();
-                if (row == -1) return;
 
-                String sid = jTableFailedComponents.getValueAt(row, 0).toString();
-                String cid = jTableFailedComponents.getValueAt(row, 1).toString();
+                Course c = getSelectedFailedCourse();
+                if (c == null) return;
 
-                Student s = fileLoader.getStudentByID(sid);
-                Course c = fileLoader.getCourseByID(cid); 
+                Student s = fileLoader.getStudentByID(
+                    jTableFailedComponents.getValueAt(
+                        jTableFailedComponents.getSelectedRow(), 0
+                    ).toString()
+                );
 
                 updateStudentInfo(s);
                 updateCourseInfo(c);
-                txtRecommendation.setText(""); // clear previous
+
+                // Optional: load existing plan’s recommendation
+                String key = buildPlanKey(s.getStudentID(), c.getCourseID(), c.getAttemptNumber());
+                RecoveryPlan plan = planByKey.get(key);
+
+                txtRecommendation.setText(
+                    plan != null ? plan.getRecommendation() : ""
+                );
             }
         });
+
 
 
     }
@@ -328,6 +334,8 @@ public class CRP_UI extends javax.swing.JFrame {
 
         // Failure badge
         String type = c.getFailedComponent(); 
+        lblInfoFailure.setText(type);
+        lblInfoAttempt.setText(String.valueOf(c.getAttemptNumber()));
         switch (type) {
             case "Assignment Only":
                 panelFailureBadge.setBackground(new Color(255, 204, 204)); // pale red  
@@ -358,25 +366,9 @@ public class CRP_UI extends javax.swing.JFrame {
         jFrame1 = new javax.swing.JFrame();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
-        jButton7 = new javax.swing.JButton();
-        jButton8 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
-        MilestonesTab = new javax.swing.JPanel();
-        jLabel7 = new javax.swing.JLabel();
-        jScrollPane5 = new javax.swing.JScrollPane();
-        jScrollPane4 = new javax.swing.JScrollPane();
-        jTable2 = new javax.swing.JTable();
-        jProgressBar1 = new javax.swing.JProgressBar();
-        jLabel8 = new javax.swing.JLabel();
-        jButton11 = new javax.swing.JButton();
-        jButton13 = new javax.swing.JButton();
-        jButton14 = new javax.swing.JButton();
-        jButton12 = new javax.swing.JButton();
-        btnBack = new javax.swing.JButton();
         panelOverview = new javax.swing.JPanel();
         txtStudentID = new javax.swing.JTextField();
         jButton3 = new javax.swing.JButton();
@@ -423,6 +415,18 @@ public class CRP_UI extends javax.swing.JFrame {
         lblInfoStudentID = new javax.swing.JLabel();
         lblInfoStudentName = new javax.swing.JLabel();
         lblInfoCGPA = new javax.swing.JLabel();
+        MilestonesTab = new javax.swing.JPanel();
+        jLabel7 = new javax.swing.JLabel();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        jTable2 = new javax.swing.JTable();
+        jProgressBar1 = new javax.swing.JProgressBar();
+        jLabel8 = new javax.swing.JLabel();
+        jButton11 = new javax.swing.JButton();
+        jButton13 = new javax.swing.JButton();
+        jButton14 = new javax.swing.JButton();
+        jButton12 = new javax.swing.JButton();
+        btnBack = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
 
         javax.swing.GroupLayout jFrame1Layout = new javax.swing.GroupLayout(jFrame1.getContentPane());
@@ -449,71 +453,15 @@ public class CRP_UI extends javax.swing.JFrame {
         jPanel2.setBackground(new java.awt.Color(86, 96, 95));
         jPanel2.setPreferredSize(new java.awt.Dimension(210, 700));
 
-        jButton1.setBackground(new java.awt.Color(95, 106, 106));
-        jButton1.setFont(new java.awt.Font("Serif", 0, 17)); // NOI18N
-        jButton1.setForeground(new java.awt.Color(255, 255, 255));
-        jButton1.setText("User Management");
-        jButton1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-
-        jButton7.setBackground(new java.awt.Color(95, 106, 106));
-        jButton7.setFont(new java.awt.Font("Serif", 0, 17)); // NOI18N
-        jButton7.setForeground(new java.awt.Color(255, 255, 255));
-        jButton7.setText("Course Recovery Plan");
-        jButton7.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        jButton7.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton7ActionPerformed(evt);
-            }
-        });
-
-        jButton8.setBackground(new java.awt.Color(95, 106, 106));
-        jButton8.setFont(new java.awt.Font("Serif", 0, 16)); // NOI18N
-        jButton8.setForeground(new java.awt.Color(255, 255, 255));
-        jButton8.setText("Academic Performance Report");
-        jButton8.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        jButton8.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton8ActionPerformed(evt);
-            }
-        });
-
-        jButton2.setBackground(new java.awt.Color(95, 106, 106));
-        jButton2.setFont(new java.awt.Font("Serif", 0, 16)); // NOI18N
-        jButton2.setForeground(new java.awt.Color(255, 255, 255));
-        jButton2.setText("Eligibility Check & Enrolment");
-        jButton2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jButton7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jButton8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGap(0, 210, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(76, 76, 76)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton8, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(378, Short.MAX_VALUE))
+            .addGap(0, 600, Short.MAX_VALUE)
         );
 
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 100, -1, 600));
@@ -545,74 +493,6 @@ public class CRP_UI extends javax.swing.JFrame {
         jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(-1, 0, 1170, 100));
 
         jTabbedPane1.setPreferredSize(new java.awt.Dimension(870, 945));
-
-        MilestonesTab.setPreferredSize(new java.awt.Dimension(870, 945));
-        MilestonesTab.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        jLabel7.setFont(new java.awt.Font("Helvetica Neue", 0, 24)); // NOI18N
-        jLabel7.setText("Milestone Tracking");
-        MilestonesTab.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 43, -1, -1));
-
-        jTable2.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Week", "Task", "Completed", "Notes"
-            }
-        ));
-        jScrollPane4.setViewportView(jTable2);
-
-        jScrollPane5.setViewportView(jScrollPane4);
-
-        MilestonesTab.add(jScrollPane5, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 84, 626, 320));
-        MilestonesTab.add(jProgressBar1, new org.netbeans.lib.awtextra.AbsoluteConstraints(257, 432, 470, 20));
-
-        jLabel8.setFont(new java.awt.Font("Helvetica Neue", 0, 22)); // NOI18N
-        jLabel8.setText("Progress:");
-        MilestonesTab.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 425, -1, 30));
-
-        jButton11.setFont(new java.awt.Font("Helvetica Neue", 0, 18)); // NOI18N
-        jButton11.setText("Update");
-        jButton11.setPreferredSize(new java.awt.Dimension(72, 29));
-        jButton11.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton11ActionPerformed(evt);
-            }
-        });
-        MilestonesTab.add(jButton11, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 490, 110, 30));
-
-        jButton13.setFont(new java.awt.Font("Helvetica Neue", 0, 18)); // NOI18N
-        jButton13.setText("Remove");
-        jButton13.setPreferredSize(new java.awt.Dimension(72, 29));
-        MilestonesTab.add(jButton13, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 490, 110, 30));
-
-        jButton14.setFont(new java.awt.Font("Helvetica Neue", 0, 18)); // NOI18N
-        jButton14.setText("Mark Completed");
-        MilestonesTab.add(jButton14, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 490, 170, 30));
-
-        jButton12.setFont(new java.awt.Font("Helvetica Neue", 0, 18)); // NOI18N
-        jButton12.setText("Add");
-        jButton12.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton12ActionPerformed(evt);
-            }
-        });
-        MilestonesTab.add(jButton12, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 490, 110, 30));
-
-        btnBack.setFont(new java.awt.Font("Helvetica Neue", 0, 16)); // NOI18N
-        btnBack.setText("Back");
-        btnBack.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnBackActionPerformed(evt);
-            }
-        });
-        MilestonesTab.add(btnBack, new org.netbeans.lib.awtextra.AbsoluteConstraints(815, 540, 100, 30));
-
-        jTabbedPane1.addTab("Milestone", MilestonesTab);
 
         panelOverview.setBackground(new java.awt.Color(183, 201, 197));
         panelOverview.setPreferredSize(new java.awt.Dimension(944, 589));
@@ -860,20 +740,10 @@ public class CRP_UI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panelFBLayout.createSequentialGroup()
-                        .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(panelFBLayout.createSequentialGroup()
-                                .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel10)
-                                    .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(18, 18, 18)
-                                .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(lblInfoCourseID, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(lblInfoCourseName, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addGroup(panelFBLayout.createSequentialGroup()
-                                .addComponent(jLabel16)
-                                .addGap(47, 47, 47)
-                                .addComponent(lblInfoExamScore, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel16)
+                        .addGap(47, 47, 47)
+                        .addComponent(lblInfoExamScore, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(61, 61, 61)
                         .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelFBLayout.createSequentialGroup()
                                 .addComponent(jLabel13)
@@ -900,7 +770,15 @@ public class CRP_UI extends javax.swing.JFrame {
                                 .addComponent(jLabel15)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(lblInfoAssScore, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(panelFBLayout.createSequentialGroup()
+                        .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel10)
+                            .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblInfoCourseID, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblInfoCourseName, javax.swing.GroupLayout.PREFERRED_SIZE, 251, javax.swing.GroupLayout.PREFERRED_SIZE)))))
             .addGroup(panelFBLayout.createSequentialGroup()
                 .addGap(86, 86, 86)
                 .addComponent(jLabel4)
@@ -1082,12 +960,81 @@ public class CRP_UI extends javax.swing.JFrame {
                         .addComponent(panelFB, javax.swing.GroupLayout.PREFERRED_SIZE, 204, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(OverviewTab, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(62, Short.MAX_VALUE))
+                .addContainerGap(52, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Overview", panelOverview);
 
-        jPanel1.add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 60, 950, 640));
+        MilestonesTab.setBackground(new java.awt.Color(183, 201, 197));
+        MilestonesTab.setPreferredSize(new java.awt.Dimension(870, 945));
+        MilestonesTab.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel7.setFont(new java.awt.Font("Helvetica Neue", 0, 24)); // NOI18N
+        jLabel7.setText("Milestone Tracking");
+        MilestonesTab.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 43, -1, -1));
+
+        jTable2.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Week", "Task", "Completed", "Notes"
+            }
+        ));
+        jScrollPane4.setViewportView(jTable2);
+
+        jScrollPane5.setViewportView(jScrollPane4);
+
+        MilestonesTab.add(jScrollPane5, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 84, 626, 320));
+        MilestonesTab.add(jProgressBar1, new org.netbeans.lib.awtextra.AbsoluteConstraints(257, 432, 470, 20));
+
+        jLabel8.setFont(new java.awt.Font("Helvetica Neue", 0, 22)); // NOI18N
+        jLabel8.setText("Progress:");
+        MilestonesTab.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 425, -1, 30));
+
+        jButton11.setFont(new java.awt.Font("Helvetica Neue", 0, 18)); // NOI18N
+        jButton11.setText("Update");
+        jButton11.setPreferredSize(new java.awt.Dimension(72, 29));
+        jButton11.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton11ActionPerformed(evt);
+            }
+        });
+        MilestonesTab.add(jButton11, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 490, 110, 30));
+
+        jButton13.setFont(new java.awt.Font("Helvetica Neue", 0, 18)); // NOI18N
+        jButton13.setText("Remove");
+        jButton13.setPreferredSize(new java.awt.Dimension(72, 29));
+        MilestonesTab.add(jButton13, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 490, 110, 30));
+
+        jButton14.setFont(new java.awt.Font("Helvetica Neue", 0, 18)); // NOI18N
+        jButton14.setText("Mark Completed");
+        MilestonesTab.add(jButton14, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 490, 170, 30));
+
+        jButton12.setFont(new java.awt.Font("Helvetica Neue", 0, 18)); // NOI18N
+        jButton12.setText("Add");
+        jButton12.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton12ActionPerformed(evt);
+            }
+        });
+        MilestonesTab.add(jButton12, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 490, 110, 30));
+
+        btnBack.setFont(new java.awt.Font("Helvetica Neue", 0, 16)); // NOI18N
+        btnBack.setText("Back");
+        btnBack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBackActionPerformed(evt);
+            }
+        });
+        MilestonesTab.add(btnBack, new org.netbeans.lib.awtextra.AbsoluteConstraints(815, 540, 100, 30));
+
+        jTabbedPane1.addTab("Milestone", MilestonesTab);
+
+        jPanel1.add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 60, 950, 630));
 
         jButton4.setText("Course Recovery Plan");
         jButton4.addActionListener(new java.awt.event.ActionListener() {
@@ -1115,25 +1062,9 @@ public class CRP_UI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
     
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
-
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton4ActionPerformed
-
-    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton7ActionPerformed
-
-    private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton8ActionPerformed
-
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // TODO add your handling code here:
@@ -1276,17 +1207,13 @@ public class CRP_UI extends javax.swing.JFrame {
     private javax.swing.JButton btnCreatePlan;
     private javax.swing.JButton btnMilestoneTab;
     private javax.swing.JButton btnSavePlan;
-    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton10;
     private javax.swing.JButton jButton11;
     private javax.swing.JButton jButton12;
     private javax.swing.JButton jButton13;
     private javax.swing.JButton jButton14;
-    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton7;
-    private javax.swing.JButton jButton8;
     private javax.swing.JFrame jFrame1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;

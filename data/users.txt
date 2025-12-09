@@ -1,2 +1,12 @@
-admin,admin123,Admin,active
-john,john234,Student,active
+ADM001,admin,admin123,Super Admin,admin@crs.edu,ADMIN,true
+ADM005,test1,123,mrjack,test1@gmail.com,ADMIN,false
+ADM007,test2,Reset9310,test2,test2@gmail.com,ADMIN,false
+ADM006,muthu,123,muthuduplicate,muthudupe@gmail.com,ADMIN,false
+U1764851681785,muthu,123,muthuduplicate,muthudupe@gmail.com,ACADEMIC_OFFICER,true
+ADM004,zeus,111,zeuser,zeus@gmail.com,ADMIN,true
+ADM003,kannan,Reset8041,appa,appa@gmai.com,ADMIN,false
+AO004,mrjack,123,jack,jack@gmail.com,ACADEMIC_OFFICER,true
+AO003,mrlim,Reset3577,lim,lim@gmail.com,ACADEMIC_OFFICER,true
+ADM002,priya,PrIyA,priyanka,priyankakannan929@gmail.com,ACADEMIC_OFFICER,true
+AO002,tharini,Reset7346,tharu,tharini@gmail.com,ACADEMIC_OFFICER,true
+ADM008,marcusisthecoolestmosthandsomeguyaround,marcusissoawesome123,Priya Kannan,priyakannan@marcusiscool.com,ADMIN,true

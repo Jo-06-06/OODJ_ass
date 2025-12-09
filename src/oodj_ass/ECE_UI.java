@@ -7,8 +7,7 @@ package oodj_ass;
 
 import java.util.ArrayList;
 import java.io.*;
-
-
+import java.awt.Color;
 
 public class ECE_UI extends javax.swing.JFrame {
     
@@ -52,55 +51,46 @@ public class ECE_UI extends javax.swing.JFrame {
         }
     }
     
-    
-    private void showDetails(String studentID, String semester) {
+    private void showDetails(String studentID, String semester, String eligibility) {
         ArrayList<String[]> grades = loadFile("grades.txt");
         ArrayList<String[]> courses = loadFile("courses.txt");
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("===== Student: ").append(studentID)
-          .append(" (").append(semester).append(") =====\n");
+        ECEView_UI view = new ECEView_UI(studentID, semester, eligibility, grades, courses);
+        view.setVisible(true);
+    }
 
-        double totalGP = 0;
-        int totalCH = 0;
-        int failCount = 0;
 
-        for (String[] g : grades) {
-            if (!g[0].equals(studentID)) continue;
-            if (!g[2].equals(semester)) continue;
+    
+    
+    private void addSidebarHover(javax.swing.JButton btn) {
 
-            String courseID = g[1];
-            String grade = g[5];
-            double gpa = Double.parseDouble(g[6]);
+        Color normal = new Color(95,106,105);        // sidebar color (invisible)
+        Color hover  = new Color(130,140,140);       // reveal color
+        Color click  = new Color(160,170,170);       // click color
 
-            String[] c = null;
-            for (String[] x : courses) {
-                if (x[0].equals(courseID)) c = x;
+        btn.setBackground(normal);
+
+        btn.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                btn.setBackground(hover);
             }
 
-            int credit = Integer.parseInt(c[2]);
-            double gp = gpa * credit;
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                btn.setBackground(normal);
+            }
 
-            totalGP += gp;
-            totalCH += credit;
-            if (gpa < 2.0) failCount++;
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent e) {
+                btn.setBackground(click);
+            }
 
-            sb.append(courseID)
-              .append(" | Grade: ").append(grade)
-              .append(" (").append(String.format("%.2f", gpa))
-              .append(") * ").append(credit)
-              .append(" credits = ").append(String.format("%.2f", gp))
-              .append("\n");
-        }
-
-        double cgpa = totalGP / totalCH;
-        sb.append("Total Grade Points = ").append(totalGP).append("\n");
-        sb.append("Total Credit Hours = ").append(totalCH).append("\n");
-        sb.append("Total Fails = ").append(failCount).append("\n");
-        sb.append("CGPA = ").append(String.format("%.2f", cgpa)).append("\n");
-        sb.append("Eligible Next Year: ").append(cgpa >= 2.0 && failCount <= 3 ? "YES" : "NO");
-
-        javax.swing.JOptionPane.showMessageDialog(this, sb.toString());
+            @Override
+            public void mouseReleased(java.awt.event.MouseEvent e) {
+                btn.setBackground(hover);
+            }
+        });
     }
 
 
@@ -110,17 +100,42 @@ public class ECE_UI extends javax.swing.JFrame {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 int row = jTable1.rowAtPoint(evt.getPoint());
                 int col = jTable1.columnAtPoint(evt.getPoint());
+                
+                
+        if (col == 4) { 
+            String sid = jTable1.getValueAt(row, 0).toString();
+            String sem = jTable1.getValueAt(row, 1).toString();
+            String eligibility = jTable1.getValueAt(row, 3).toString();
 
-                if (col == 4) { // Details column
-                    String sid = jTable1.getValueAt(row, 0).toString();
-                    String sem = jTable1.getValueAt(row, 1).toString();
-                    showDetails(sid, sem);
-                }
+            showDetails(sid, sem, eligibility);
+        }
+            }
+        });
+
+        jTable1.getTableHeader().setFont(new java.awt.Font("Serif", java.awt.Font.BOLD,20) {
+        });
+        
+        addSidebarHover(jButtonUserManagement);
+        addSidebarHover(jButtonEligibility);
+        addSidebarHover(jButtonRecovery);
+        addSidebarHover(jButtonAPR);
+        
+        logout.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                logout.setBackground(new java.awt.Color(150,170,170)); // hover
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                logout.setBackground(new java.awt.Color(120,140,140)); // normal
             }
         });
 
     }
 
+
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -130,15 +145,19 @@ public class ECE_UI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
-        jTextField1 = new javax.swing.JTextField();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        backgroud = new javax.swing.JPanel();
+        search1 = new javax.swing.JTextField();
+        dropdown = new javax.swing.JComboBox<>();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
-        jPanel2 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
-        jPanel3 = new javax.swing.JPanel();
+        search2 = new javax.swing.JButton();
+        dashboard = new javax.swing.JPanel();
+        jButtonUserManagement = new javax.swing.JButton();
+        jButtonEligibility = new javax.swing.JButton();
+        jButtonRecovery = new javax.swing.JButton();
+        jButtonAPR = new javax.swing.JButton();
+        logout = new javax.swing.JButton();
+        title = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Eligibility Check and Enrolment");
@@ -146,32 +165,33 @@ public class ECE_UI extends javax.swing.JFrame {
         setMinimumSize(new java.awt.Dimension(1160, 700));
         setResizable(false);
 
-        jPanel1.setBackground(new java.awt.Color(183, 201, 197));
-        jPanel1.setMaximumSize(new java.awt.Dimension(1160, 700));
-        jPanel1.setMinimumSize(new java.awt.Dimension(1160, 700));
-        jPanel1.setPreferredSize(new java.awt.Dimension(1160, 700));
-        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        backgroud.setBackground(new java.awt.Color(183, 201, 197));
+        backgroud.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        backgroud.setMaximumSize(new java.awt.Dimension(1160, 700));
+        backgroud.setMinimumSize(new java.awt.Dimension(1160, 700));
+        backgroud.setPreferredSize(new java.awt.Dimension(1160, 700));
+        backgroud.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jTextField1.setFont(new java.awt.Font("Times New Roman", 0, 18)); // NOI18N
-        jTextField1.setPreferredSize(new java.awt.Dimension(150, 30));
-        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+        search1.setFont(new java.awt.Font("Serif", 0, 18)); // NOI18N
+        search1.setPreferredSize(new java.awt.Dimension(150, 30));
+        search1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
+                search1ActionPerformed(evt);
             }
         });
-        jPanel1.add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 160, -1, -1));
+        backgroud.add(search1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 160, -1, -1));
 
-        jComboBox1.setFont(new java.awt.Font("Noto Serif SC", 0, 18)); // NOI18N
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "All", "Eligible", "No Eligible" }));
-        jComboBox1.setPreferredSize(new java.awt.Dimension(180, 30));
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+        dropdown.setFont(new java.awt.Font("Serif", 0, 18)); // NOI18N
+        dropdown.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "All", "Eligible", "No Eligible" }));
+        dropdown.setPreferredSize(new java.awt.Dimension(180, 30));
+        dropdown.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox1ActionPerformed(evt);
+                dropdownActionPerformed(evt);
             }
         });
-        jPanel1.add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(930, 160, -1, -1));
+        backgroud.add(dropdown, new org.netbeans.lib.awtextra.AbsoluteConstraints(930, 160, -1, -1));
 
-        jTable1.setFont(new java.awt.Font("Noto Serif SC", 0, 18)); // NOI18N
+        jTable1.setFont(new java.awt.Font("Serif", 0, 18)); // NOI18N
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -181,86 +201,160 @@ public class ECE_UI extends javax.swing.JFrame {
             }
         ));
         jTable1.setRowHeight(35);
+        jTable1.setShowGrid(false);
         jScrollPane1.setViewportView(jTable1);
 
-        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 230, 870, -1));
+        backgroud.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 230, 870, -1));
 
-        jPanel2.setBackground(new java.awt.Color(95, 106, 105));
-        jPanel2.setPreferredSize(new java.awt.Dimension(950, 100));
-
-        jLabel1.setFont(new java.awt.Font("Noto Serif SC", 1, 36)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel1.setText("Eligibility Check and Enrolment");
-        jLabel1.setToolTipText("");
-        jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(239, 239, 239)
-                .addComponent(jLabel1)
-                .addContainerGap(123, Short.MAX_VALUE))
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(27, 27, 27)
-                .addComponent(jLabel1)
-                .addContainerGap(20, Short.MAX_VALUE))
-        );
-
-        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 0, -1, -1));
-
-        jButton1.setText("🔍 ");
-        jButton1.setPreferredSize(new java.awt.Dimension(30, 30));
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        search2.setText("🔍 ");
+        search2.setPreferredSize(new java.awt.Dimension(30, 30));
+        search2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                search2ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 160, -1, -1));
+        backgroud.add(search2, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 160, -1, -1));
 
-        jPanel3.setBackground(new java.awt.Color(0, 0, 0));
+        dashboard.setBackground(new java.awt.Color(95, 106, 105));
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 210, Short.MAX_VALUE)
+        jButtonUserManagement.setBackground(new java.awt.Color(95, 106, 105));
+        jButtonUserManagement.setFont(new java.awt.Font("Serif", 0, 20)); // NOI18N
+        jButtonUserManagement.setForeground(new java.awt.Color(255, 255, 255));
+        jButtonUserManagement.setText("User Management");
+        jButtonUserManagement.setToolTipText("");
+        jButtonUserManagement.setBorderPainted(false);
+        jButtonUserManagement.setContentAreaFilled(false);
+        jButtonUserManagement.setFocusPainted(false);
+        jButtonUserManagement.setOpaque(true);
+        jButtonUserManagement.setPreferredSize(new java.awt.Dimension(210, 70));
+        jButtonUserManagement.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonUserManagementActionPerformed(evt);
+            }
+        });
+
+        jButtonEligibility.setBackground(new java.awt.Color(95, 106, 105));
+        jButtonEligibility.setFont(new java.awt.Font("Serif", 0, 20)); // NOI18N
+        jButtonEligibility.setForeground(new java.awt.Color(255, 255, 255));
+        jButtonEligibility.setText("<html><center>Eligibility Check<br>and Enrolment</center></html> ");
+        jButtonEligibility.setToolTipText("");
+        jButtonEligibility.setBorderPainted(false);
+        jButtonEligibility.setContentAreaFilled(false);
+        jButtonEligibility.setFocusPainted(false);
+        jButtonEligibility.setOpaque(true);
+        jButtonEligibility.setPreferredSize(new java.awt.Dimension(210, 70));
+        jButtonEligibility.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonEligibilityActionPerformed(evt);
+            }
+        });
+
+        jButtonRecovery.setBackground(new java.awt.Color(95, 106, 105));
+        jButtonRecovery.setFont(new java.awt.Font("Serif", 0, 20)); // NOI18N
+        jButtonRecovery.setForeground(new java.awt.Color(255, 255, 255));
+        jButtonRecovery.setText("Course Recovery Plan");
+        jButtonRecovery.setToolTipText("");
+        jButtonRecovery.setBorderPainted(false);
+        jButtonRecovery.setContentAreaFilled(false);
+        jButtonRecovery.setFocusPainted(false);
+        jButtonRecovery.setOpaque(true);
+        jButtonRecovery.setPreferredSize(new java.awt.Dimension(210, 70));
+        jButtonRecovery.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonRecoveryActionPerformed(evt);
+            }
+        });
+
+        jButtonAPR.setBackground(new java.awt.Color(95, 106, 105));
+        jButtonAPR.setFont(new java.awt.Font("Serif", 0, 20)); // NOI18N
+        jButtonAPR.setForeground(new java.awt.Color(255, 255, 255));
+        jButtonAPR.setText("<html><center>Academic<br>Performance Report</center></html> ");
+        jButtonAPR.setBorderPainted(false);
+        jButtonAPR.setContentAreaFilled(false);
+        jButtonAPR.setFocusPainted(false);
+        jButtonAPR.setOpaque(true);
+        jButtonAPR.setPreferredSize(new java.awt.Dimension(210, 70));
+        jButtonAPR.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonAPRActionPerformed(evt);
+            }
+        });
+
+        logout.setFont(new java.awt.Font("Serif", 0, 20)); // NOI18N
+        logout.setText("Log Out");
+        logout.setBorderPainted(false);
+        logout.setFocusPainted(false);
+        logout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                logoutActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout dashboardLayout = new javax.swing.GroupLayout(dashboard);
+        dashboard.setLayout(dashboardLayout);
+        dashboardLayout.setHorizontalGroup(
+            dashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(dashboardLayout.createSequentialGroup()
+                .addGroup(dashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButtonRecovery, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonUserManagement, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonAPR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonEligibility, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(dashboardLayout.createSequentialGroup()
+                .addGap(53, 53, 53)
+                .addComponent(logout)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 700, Short.MAX_VALUE)
+        dashboardLayout.setVerticalGroup(
+            dashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(dashboardLayout.createSequentialGroup()
+                .addGap(132, 132, 132)
+                .addComponent(jButtonUserManagement, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButtonEligibility, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButtonRecovery, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButtonAPR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 174, Short.MAX_VALUE)
+                .addComponent(logout)
+                .addGap(62, 62, 62))
         );
 
-        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 210, 700));
+        backgroud.add(dashboard, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 210, 700));
+
+        title.setBackground(new java.awt.Color(157, 208, 153));
+        title.setFont(new java.awt.Font("Serif", 1, 36)); // NOI18N
+        title.setText("Eligibility Check and Enrolment");
+        title.setToolTipText("");
+        title.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        backgroud.add(title, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 40, -1, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(backgroud, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(backgroud, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
-        jButton1ActionPerformed(evt);
-    }//GEN-LAST:event_jTextField1ActionPerformed
+    private void search1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_search1ActionPerformed
+        search1ActionPerformed(evt);
+    }//GEN-LAST:event_search1ActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        String searchID = jTextField1.getText().trim();
+    private void search2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_search2ActionPerformed
+        String searchID = search1.getText().trim();
 
         if (searchID.isEmpty() || searchID.equals("Enter Student ID")) {
             javax.swing.JOptionPane.showMessageDialog(this, "Please enter a Student ID!");
@@ -281,7 +375,47 @@ public class ECE_UI extends javax.swing.JFrame {
         }
 
         updateTable(matched); 
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_search2ActionPerformed
+
+    private void dropdownActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dropdownActionPerformed
+        String selected = dropdown.getSelectedItem().toString();
+        ArrayList<String[]> resultList = loadFile("result.txt");
+        ArrayList<String[]> filtered = new ArrayList<>();
+
+        for (String[] r : resultList) {
+            if (selected.equals("All")) {
+                filtered.add(r);
+            } 
+            else if (selected.equals("Eligible") && r[3].equalsIgnoreCase("YES")) {
+                filtered.add(r);
+            } 
+            else if (selected.equals("No Eligible") && r[3].equalsIgnoreCase("NO")) {
+                filtered.add(r);
+            }
+        }
+
+        updateTable(filtered);
+    }//GEN-LAST:event_dropdownActionPerformed
+
+    private void jButtonUserManagementActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonUserManagementActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButtonUserManagementActionPerformed
+
+    private void jButtonEligibilityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEligibilityActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButtonEligibilityActionPerformed
+
+    private void jButtonRecoveryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRecoveryActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButtonRecoveryActionPerformed
+
+    private void logoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logoutActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_logoutActionPerformed
+
+    private void jButtonAPRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAPRActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButtonAPRActionPerformed
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
         String selected = jComboBox1.getSelectedItem().toString();
@@ -329,14 +463,18 @@ public class ECE_UI extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JComboBox<String> jComboBox1;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel backgroud;
+    private javax.swing.JPanel dashboard;
+    private javax.swing.JComboBox<String> dropdown;
+    private javax.swing.JButton jButtonAPR;
+    private javax.swing.JButton jButtonEligibility;
+    private javax.swing.JButton jButtonRecovery;
+    private javax.swing.JButton jButtonUserManagement;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JButton logout;
+    private javax.swing.JTextField search1;
+    private javax.swing.JButton search2;
+    private javax.swing.JLabel title;
     // End of variables declaration//GEN-END:variables
 }
