@@ -132,79 +132,49 @@ public class ECE_UI extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         jTextField1 = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
         jComboBox1 = new javax.swing.JComboBox<>();
-        jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         jPanel2 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
+        jPanel3 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Eligibility Checker");
-        setMaximumSize(new java.awt.Dimension(950, 700));
-        setMinimumSize(new java.awt.Dimension(950, 700));
-        setPreferredSize(new java.awt.Dimension(950, 700));
+        setTitle("Eligibility Check and Enrolment");
+        setMaximumSize(new java.awt.Dimension(1160, 700));
+        setMinimumSize(new java.awt.Dimension(1160, 700));
         setResizable(false);
 
-        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel1.setMaximumSize(new java.awt.Dimension(950, 700));
-        jPanel1.setMinimumSize(new java.awt.Dimension(950, 700));
-        jPanel1.setPreferredSize(new java.awt.Dimension(950, 700));
+        jPanel1.setBackground(new java.awt.Color(183, 201, 197));
+        jPanel1.setMaximumSize(new java.awt.Dimension(1160, 700));
+        jPanel1.setMinimumSize(new java.awt.Dimension(1160, 700));
+        jPanel1.setPreferredSize(new java.awt.Dimension(1160, 700));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jTextField1.setFont(new java.awt.Font("Times New Roman", 0, 18)); // NOI18N
-        jTextField1.setText("Enter Student ID");
         jTextField1.setPreferredSize(new java.awt.Dimension(150, 30));
-        jTextField1.setRequestFocusEnabled(false);
         jTextField1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextField1ActionPerformed(evt);
             }
         });
-        jPanel1.add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 110, -1, -1));
+        jPanel1.add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 160, -1, -1));
 
-        jButton1.setText("🔍 ");
-        jButton1.setPreferredSize(new java.awt.Dimension(30, 30));
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(810, 110, -1, -1));
-
-        jComboBox1.setFont(new java.awt.Font("Times New Roman", 0, 18)); // NOI18N
+        jComboBox1.setFont(new java.awt.Font("Noto Serif SC", 0, 18)); // NOI18N
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "All", "Eligible", "No Eligible" }));
         jComboBox1.setPreferredSize(new java.awt.Dimension(180, 30));
-        jPanel1.add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 160, -1, -1));
+        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox1ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(930, 160, -1, -1));
 
-        jLabel1.setFont(new java.awt.Font("Times New Roman", 0, 36)); // NOI18N
-        jLabel1.setText("Eligibility Checker");
-        jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 30, -1, -1));
-
-        jTable1.setFont(new java.awt.Font("Times New Roman", 0, 18)); // NOI18N
+        jTable1.setFont(new java.awt.Font("Noto Serif SC", 0, 18)); // NOI18N
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null}
+
             },
             new String [] {
                 "Student ID", "Semester", "CGPA", "Eligibility", "Details"
@@ -213,22 +183,59 @@ public class ECE_UI extends javax.swing.JFrame {
         jTable1.setRowHeight(35);
         jScrollPane1.setViewportView(jTable1);
 
-        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 210, 900, -1));
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 230, 870, -1));
 
+        jPanel2.setBackground(new java.awt.Color(95, 106, 105));
         jPanel2.setPreferredSize(new java.awt.Dimension(950, 100));
+
+        jLabel1.setFont(new java.awt.Font("Noto Serif SC", 1, 36)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel1.setText("Eligibility Check and Enrolment");
+        jLabel1.setToolTipText("");
+        jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 950, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(239, 239, 239)
+                .addComponent(jLabel1)
+                .addContainerGap(123, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(27, 27, 27)
+                .addComponent(jLabel1)
+                .addContainerGap(20, Short.MAX_VALUE))
         );
 
-        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
+        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 0, -1, -1));
+
+        jButton1.setText("🔍 ");
+        jButton1.setPreferredSize(new java.awt.Dimension(30, 30));
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 160, -1, -1));
+
+        jPanel3.setBackground(new java.awt.Color(0, 0, 0));
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 210, Short.MAX_VALUE)
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 700, Short.MAX_VALUE)
+        );
+
+        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 210, 700));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -249,29 +256,14 @@ public class ECE_UI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
-        String selected = jComboBox1.getSelectedItem().toString();
-        ArrayList<String[]> resultList = loadFile("result.txt");
-        ArrayList<String[]> filtered = new ArrayList<>();
-
-        for (String[] r : resultList) {
-            if (selected.equals("All")) {
-                filtered.add(r);
-            } 
-            else if (selected.equals("Eligible") && r[3].equals("YES")) {
-                filtered.add(r);
-            } 
-            else if (selected.equals("No Eligible") && r[3].equals("NO")) {
-                filtered.add(r);
-            }
-        }
-
-        updateTable(filtered);
+        jButton1ActionPerformed(evt);
     }//GEN-LAST:event_jTextField1ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         String searchID = jTextField1.getText().trim();
-        if (searchID.equals("")) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Enter a Student ID!");
+
+        if (searchID.isEmpty() || searchID.equals("Enter Student ID")) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Please enter a Student ID!");
             return;
         }
 
@@ -279,7 +271,7 @@ public class ECE_UI extends javax.swing.JFrame {
         ArrayList<String[]> matched = new ArrayList<>();
 
         for (String[] r : resultList) {
-            if (r[0].equalsIgnoreCase(searchID)) {
+            if (r[0].equalsIgnoreCase(searchID)) {   // Match Student ID
                 matched.add(r);
             }
         }
@@ -288,8 +280,28 @@ public class ECE_UI extends javax.swing.JFrame {
             javax.swing.JOptionPane.showMessageDialog(this, "Student not found!");
         }
 
-        updateTable(matched);
+        updateTable(matched); 
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+        String selected = jComboBox1.getSelectedItem().toString();
+        ArrayList<String[]> resultList = loadFile("result.txt");
+        ArrayList<String[]> filtered = new ArrayList<>();
+
+        for (String[] r : resultList) {
+            if (selected.equals("All")) {
+                filtered.add(r);
+            } 
+            else if (selected.equals("Eligible") && r[3].equalsIgnoreCase("YES")) {
+                filtered.add(r);
+            } 
+            else if (selected.equals("No Eligible") && r[3].equalsIgnoreCase("NO")) {
+                filtered.add(r);
+            }
+        }
+
+        updateTable(filtered);
+    }//GEN-LAST:event_jComboBox1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -322,6 +334,7 @@ public class ECE_UI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     private javax.swing.JTextField jTextField1;

@@ -272,8 +272,6 @@ public class CRP {
     public RecoveryPlan createRecoveryPlan(Student stu, Course course) {
         if (stu == null || course == null) return null;
 
-        // Double-guard to ensure only truly failed components get a plan.
-        // Even if something upstream is wrong, S018 (all passes) will never get a plan.
         if (!course.isFailed() || "None".equals(course.getFailedComponent())) {
             return null;
         }
@@ -473,7 +471,7 @@ public class CRP {
         Course  c    = rp.getCourse();
 
         // Original scores
-        int oldAss  = c.getAssignmentScore();
+        int oldAss  = c.getAssScore();
         int oldExam = c.getExamScore();
 
         boolean assFailed  = (c.getAssignmentWeight() > 0 && oldAss  < 50);
@@ -489,7 +487,7 @@ public class CRP {
         // Weighted final mark
         double finalMark =
                 (newAss  * c.getAssignmentWeight() / 100.0) +
-                (newExam * c.getExamWeight()      / 100.0);
+                (newExam * c.getExamWeight() / 100.0);
 
         // Map to grade + GPA
         String newGrade = GradeScaleHelper.getAlphabetFromMark((int)Math.round(finalMark));

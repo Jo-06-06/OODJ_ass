@@ -44,7 +44,7 @@ public class Course {
     public int getExamWeight() { return examWeight; }
 
     // Student-specific
-    public int getAssignmentScore() { return assignmentScore; }
+    public int getAssScore() { return assignmentScore; }
     public int getExamScore() { return examScore; }
     public String getGrade() { return grade; }
     public int getAttemptNumber() { return attemptNumber; }
