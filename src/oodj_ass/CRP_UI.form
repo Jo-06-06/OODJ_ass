@@ -463,6 +463,9 @@
                         </Property>
                         <Property name="text" type="java.lang.String" value="Edit Plan"/>
                       </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnEditPlanActionPerformed"/>
+                      </Events>
                     </Component>
                     <Container class="javax.swing.JScrollPane" name="jScrollPane6">
                       <AuxValues>
@@ -523,29 +526,22 @@
                                               </Group>
                                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                               <Group type="103" groupAlignment="0" attributes="0">
-                                                  <Group type="102" attributes="0">
-                                                      <Component id="lblInfoStudentID" min="-2" pref="74" max="-2" attributes="0"/>
-                                                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                                                  </Group>
+                                                  <Component id="lblInfoStudentID" min="-2" pref="74" max="-2" attributes="0"/>
                                                   <Component id="lblInfoStudentName" min="-2" pref="99" max="-2" attributes="0"/>
                                               </Group>
+                                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                                           </Group>
                                           <Group type="102" attributes="0">
-                                              <Group type="103" groupAlignment="0" attributes="0">
-                                                  <Group type="102" attributes="0">
-                                                      <Component id="lblSemester" min="-2" pref="100" max="-2" attributes="0"/>
-                                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                                      <Component id="lblInfoSemester" min="-2" pref="80" max="-2" attributes="0"/>
-                                                  </Group>
-                                                  <Group type="102" alignment="0" attributes="0">
-                                                      <Component id="lblCourseID" min="-2" pref="100" max="-2" attributes="0"/>
-                                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                                      <Component id="lblInfoCourseID" min="-2" pref="80" max="-2" attributes="0"/>
-                                                  </Group>
-                                                  <Component id="lblAttempt" alignment="0" min="-2" pref="61" max="-2" attributes="0"/>
-                                              </Group>
-                                              <EmptySpace max="32767" attributes="0"/>
+                                              <Component id="lblSemester" min="-2" pref="100" max="-2" attributes="0"/>
+                                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                              <Component id="lblInfoSemester" min="-2" pref="80" max="-2" attributes="0"/>
                                           </Group>
+                                          <Group type="102" alignment="0" attributes="0">
+                                              <Component id="lblCourseID" min="-2" pref="100" max="-2" attributes="0"/>
+                                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                              <Component id="lblInfoCourseID" min="-2" pref="80" max="-2" attributes="0"/>
+                                          </Group>
+                                          <Component id="lblAttempt" alignment="0" min="-2" pref="61" max="-2" attributes="0"/>
                                       </Group>
                                       <Group type="103" groupAlignment="0" attributes="0">
                                           <Group type="102" attributes="0">
@@ -619,11 +615,13 @@
                                   <Component id="lblInfoExamScore" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="lblSemester" alignment="3" min="-2" pref="18" max="-2" attributes="0"/>
-                                  <Component id="lblInfoSemester" alignment="3" min="-2" pref="24" max="-2" attributes="0"/>
-                                  <Component id="lblStudentID2" alignment="1" pref="24" max="32767" attributes="0"/>
-                                  <Component id="lblInfoCGPA" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="lblStudentID2" alignment="1" max="32767" attributes="0"/>
+                                  <Group type="103" groupAlignment="3" attributes="0">
+                                      <Component id="lblSemester" alignment="3" min="-2" pref="18" max="-2" attributes="0"/>
+                                      <Component id="lblInfoSemester" alignment="3" min="-2" pref="24" max="-2" attributes="0"/>
+                                      <Component id="lblInfoCGPA" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  </Group>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">

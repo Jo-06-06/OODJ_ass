@@ -43,33 +43,31 @@ public class CRP_UI extends javax.swing.JFrame {
         
        jTableFailedComponents.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent evt) {
+            public void mouseReleased(MouseEvent evt) {
 
-                Course c = getSelectedFailedCourse();
-                if (c == null) return;
+                // Delay selection handling by 1 event cycle
+                SwingUtilities.invokeLater(() -> {
+                    int row = jTableFailedComponents.getSelectedRow();
+                    if (row == -1) return;
 
-                Student s = fileLoader.getStudentByID(
-                    jTableFailedComponents.getValueAt(
-                        jTableFailedComponents.getSelectedRow(), 0
-                    ).toString()
-                );
+                    Course c = getSelectedFailedCourse();
+                    if (c == null) return;
 
-                updateStudentInfo(s);
-                updateCourseInfo(c);
+                    String sid = jTableFailedComponents.getValueAt(row, 0).toString();
+                    Student s = fileLoader.getStudentByID(sid);
 
-                // Optional: load existing plan’s recommendation
-                String key = buildPlanKey(s.getStudentID(), c.getCourseID(), c.getAttemptNumber());
-                RecoveryPlan plan = planByKey.get(key);
+                    updateStudentInfo(s);
+                    updateCourseInfo(c);
 
-                txtRecommendation.setText(
-                    plan != null ? plan.getRecommendation() : ""
-                );
+                    // load plan text if exists
+                    String key = buildPlanKey(s.getStudentID(), c.getCourseID(), c.getAttemptNumber());
+                    RecoveryPlan plan = planByKey.get(key);
+
+                    txtRecommendation.setText(plan != null ? plan.getRecommendation() : "");
+                });
             }
-        });
-
-
-
-    }
+    });
+}
     
     private void loadFailedComponents(String studentID) {
         DefaultTableModel model = (DefaultTableModel) jTableFailedComponents.getModel();
@@ -382,14 +380,7 @@ public class CRP_UI extends javax.swing.JFrame {
 
     private void updateCourseInfo(Course c) {
         if (c == null) {
-            lblInfoCourseID.setText("");
-            lblInfoCourseName.setText("");
-            lblInfoLecturer.setText("");
-            lblInfoSemester.setText("");
-            lblInfoAttempt.setText("");
-            lblInfoAssScore.setText("");
-            lblInfoExamScore.setText("");
-            panelFailureBadge.setBackground(new Color(230,230,230));
+            clearDetails();
             return;
         }
 
@@ -405,7 +396,7 @@ public class CRP_UI extends javax.swing.JFrame {
         // Failure badge
         String type = c.getFailedComponent(); 
         lblInfoFailure.setText(type);
-        lblInfoAttempt.setText(String.valueOf(c.getAttemptNumber()));
+
         switch (type) {
             case "Assignment Only":
                 panelFailureBadge.setBackground(new Color(176, 223, 232)); // blue 
@@ -417,11 +408,39 @@ public class CRP_UI extends javax.swing.JFrame {
                 panelFailureBadge.setBackground(new Color(255, 165, 156)); // stronger pale red
                 break;
             default:
-                panelFailureBadge.setBackground(new Color(200, 230, 200)); // pale green (passed)
+                panelFailureBadge.setBackground(new Color(200, 230, 200)); 
+                lblInfoFailure.setText("PASSED");
                 break;
         }
     }
+    private void showPassedBadge() {
+        lblInfoFailure.setText("PASSED");
+        panelFailureBadge.setBackground(new Color(180, 220, 180)); // pale green
+    }
 
+    private void clearDetails() {
+        lblInfoStudentID.setText("");
+        lblInfoStudentName.setText("");
+        lblInfoCGPA.setText("");
+
+        lblInfoCourseID.setText("");
+        lblInfoCourseName.setText("");
+        lblInfoLecturer.setText("");
+        lblInfoSemester.setText("");
+        lblInfoAttempt.setText("");
+        lblInfoAssScore.setText("");
+        lblInfoExamScore.setText("");
+        lblInfoFailure.setText("");
+
+        panelFailureBadge.setBackground(new Color(230,230,230)); 
+        txtRecommendation.setText("");
+        lblPlanID.setText("");
+    }
+    //Validation input
+    private boolean isValidStudentID(String sid) {
+        // Accepts S001–S999 pattern
+        return sid.matches("^S\\d{3}$");
+    }
 
 
     /**
@@ -615,6 +634,11 @@ public class CRP_UI extends javax.swing.JFrame {
 
         btnEditPlan.setFont(new java.awt.Font("Helvetica Neue", 0, 14)); // NOI18N
         btnEditPlan.setText("Edit Plan");
+        btnEditPlan.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditPlanActionPerformed(evt);
+            }
+        });
 
         txtRecommendation.setEditable(false);
         txtRecommendation.setColumns(20);
@@ -817,22 +841,18 @@ public class CRP_UI extends javax.swing.JFrame {
                                     .addComponent(lblStudentName))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(panelFBLayout.createSequentialGroup()
-                                        .addComponent(lblInfoStudentID, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(0, 0, Short.MAX_VALUE))
-                                    .addComponent(lblInfoStudentName, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addComponent(lblInfoStudentID, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblInfoStudentName, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(0, 0, Short.MAX_VALUE))
                             .addGroup(panelFBLayout.createSequentialGroup()
-                                .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(panelFBLayout.createSequentialGroup()
-                                        .addComponent(lblSemester, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(lblInfoSemester, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(panelFBLayout.createSequentialGroup()
-                                        .addComponent(lblCourseID, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(lblInfoCourseID, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addComponent(lblAttempt, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                .addComponent(lblSemester, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(lblInfoSemester, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(panelFBLayout.createSequentialGroup()
+                                .addComponent(lblCourseID, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(lblInfoCourseID, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(lblAttempt, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(panelFBLayout.createSequentialGroup()
                                 .addGap(34, 34, 34)
@@ -887,11 +907,12 @@ public class CRP_UI extends javax.swing.JFrame {
                     .addComponent(lblExamScore, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblInfoExamScore))
                 .addGap(8, 8, 8)
-                .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblSemester, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblInfoSemester, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblStudentID2, javax.swing.GroupLayout.DEFAULT_SIZE, 24, Short.MAX_VALUE)
-                    .addComponent(lblInfoCGPA))
+                .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblStudentID2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(lblSemester, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblInfoSemester, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblInfoCGPA)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panelFBLayout.createSequentialGroup()
@@ -1076,9 +1097,79 @@ public class CRP_UI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
     
     private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
-        String studentID = txtStudentID.getText().trim();
-        loadFailedComponents(studentID);
-        //searchStudent();
+        String sid = txtStudentID.getText().trim();
+        
+        // === VALIDATION 1: Empty ===
+        if (sid.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter a Student ID.");
+            return;
+        }
+
+        // === VALIDATION 2: Incorrect Format ===
+        if (!isValidStudentID(sid)) {
+            JOptionPane.showMessageDialog(this,
+                "Invalid Student ID format.\n\nCorrect format: S + 3 digits (Example: S018)",
+                "Invalid Input", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // === VALIDATION 3: Student does NOT exist ===
+        Student s = fileLoader.getStudentByID(sid);
+        if (s == null) {
+            JOptionPane.showMessageDialog(this,
+                "Student ID does not exist in the system.",
+                "Not Found", JOptionPane.ERROR_MESSAGE);
+            clearDetails();
+
+            DefaultTableModel model = (DefaultTableModel) jTableFailedComponents.getModel();
+            model.setRowCount(0);
+            return;
+        }
+        
+        // === CASE A: STUDENT NOT FOUND ===
+        if (s == null) {
+            JOptionPane.showMessageDialog(this, "Student not found.");
+            clearDetails();
+            DefaultTableModel model = (DefaultTableModel) jTableFailedComponents.getModel();
+            model.setRowCount(0);
+            return;
+        }
+
+        // Clear previous info
+        clearDetails();
+        updateStudentInfo(s);
+
+        // Load failed components into table
+        DefaultTableModel model = (DefaultTableModel) jTableFailedComponents.getModel();
+        model.setRowCount(0);
+
+        for (Course c : s.getCourses()) {
+            String failed = c.getFailedComponent();
+            if (!failed.equals("None")) {
+                model.addRow(new Object[]{s.getStudentID(), c.getCourseID(), failed});
+            }
+        }
+
+        // === CASE B: STUDENT EXISTS BUT PASSED ALL COURSES ===
+        if (model.getRowCount() == 0) {
+            txtRecommendation.setText(
+                "Student has successfully passed all enrolled modules.\n" +
+                "No recovery plan is required for this semester."
+            );
+            showPassedBadge();
+            return;
+        }
+
+        // === CASE C: STUDENT FAILS AT LEAST ONE COURSE ===
+        jTableFailedComponents.setRowSelectionInterval(0, 0);
+
+        Course first = getSelectedFailedCourse();
+        updateCourseInfo(first);
+
+        // Load existing plan if exists
+        String key = buildPlanKey(s.getStudentID(), first.getCourseID(), first.getAttemptNumber());
+        RecoveryPlan plan = planByKey.get(key);
+        txtRecommendation.setText(plan != null ? plan.getRecommendation() : "");
     }//GEN-LAST:event_btnSearchActionPerformed
 
     private void txtStudentIDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtStudentIDActionPerformed
@@ -1154,21 +1245,35 @@ public class CRP_UI extends javax.swing.JFrame {
 
     private void btnSavePlanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSavePlanActionPerformed
         if (currentPlan == null) {
-            JOptionPane.showMessageDialog(this, "No recovery plan to save.");
+            JOptionPane.showMessageDialog(this, "No active recovery plan to save.");
             return;
         }
 
-        // update recommendation from UI
-        String recText = txtRecommendation.getText().trim();
-        currentPlan.setRecommendation(recText);
+        currentPlan.setRecommendation(txtRecommendation.getText());
+        currentPlan.setPriority(priorityCombo.getSelectedItem().toString());
+        currentPlan.updateLastUpdated();
 
         savePlansToFile();
-        JOptionPane.showMessageDialog(this, "Recovery plan saved.");
+
+        JOptionPane.showMessageDialog(this, "Plan updated successfully.");
+
+        txtRecommendation.setEditable(false);
+        priorityCombo.setEnabled(false);
     }//GEN-LAST:event_btnSavePlanActionPerformed
 
     private void priorityComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_priorityComboActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_priorityComboActionPerformed
+
+    private void btnEditPlanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditPlanActionPerformed
+        if (currentPlan == null) {
+            JOptionPane.showMessageDialog(this, "No plan selected.");
+            return;
+        }
+
+        txtRecommendation.setEditable(true);
+        priorityCombo.setEnabled(true);
+    }//GEN-LAST:event_btnEditPlanActionPerformed
     
     private void populatePlanUI(RecoveryPlan plan) {
         lblPlanID.setText(plan.getPlanID());
