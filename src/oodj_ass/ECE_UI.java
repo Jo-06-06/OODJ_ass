@@ -162,6 +162,12 @@ public class ECE_UI extends javax.swing.JFrame {
         jButtonAPR = new javax.swing.JButton();
         logout = new javax.swing.JButton();
         title = new javax.swing.JLabel();
+        dashboard1 = new javax.swing.JPanel();
+        jButtonUserManagement1 = new javax.swing.JButton();
+        jButtonEligibility1 = new javax.swing.JButton();
+        jButtonRecovery1 = new javax.swing.JButton();
+        jButtonAPR1 = new javax.swing.JButton();
+        logout1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Eligibility Check and Enrolment");
@@ -335,6 +341,115 @@ public class ECE_UI extends javax.swing.JFrame {
         title.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         backgroud.add(title, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 40, -1, -1));
 
+        dashboard1.setBackground(new java.awt.Color(95, 106, 105));
+
+        jButtonUserManagement1.setBackground(new java.awt.Color(95, 106, 105));
+        jButtonUserManagement1.setFont(new java.awt.Font("Serif", 0, 20)); // NOI18N
+        jButtonUserManagement1.setForeground(new java.awt.Color(255, 255, 255));
+        jButtonUserManagement1.setText("User Management");
+        jButtonUserManagement1.setToolTipText("");
+        jButtonUserManagement1.setBorderPainted(false);
+        jButtonUserManagement1.setContentAreaFilled(false);
+        jButtonUserManagement1.setFocusPainted(false);
+        jButtonUserManagement1.setOpaque(true);
+        jButtonUserManagement1.setPreferredSize(new java.awt.Dimension(210, 70));
+        jButtonUserManagement1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonUserManagement1ActionPerformed(evt);
+            }
+        });
+
+        jButtonEligibility1.setBackground(new java.awt.Color(95, 106, 105));
+        jButtonEligibility1.setFont(new java.awt.Font("Serif", 0, 20)); // NOI18N
+        jButtonEligibility1.setForeground(new java.awt.Color(255, 255, 255));
+        jButtonEligibility1.setText("<html><center>Eligibility Check<br>and Enrolment</center></html> ");
+        jButtonEligibility1.setToolTipText("");
+        jButtonEligibility1.setBorderPainted(false);
+        jButtonEligibility1.setContentAreaFilled(false);
+        jButtonEligibility1.setFocusPainted(false);
+        jButtonEligibility1.setOpaque(true);
+        jButtonEligibility1.setPreferredSize(new java.awt.Dimension(210, 70));
+        jButtonEligibility1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonEligibility1ActionPerformed(evt);
+            }
+        });
+
+        jButtonRecovery1.setBackground(new java.awt.Color(95, 106, 105));
+        jButtonRecovery1.setFont(new java.awt.Font("Serif", 0, 20)); // NOI18N
+        jButtonRecovery1.setForeground(new java.awt.Color(255, 255, 255));
+        jButtonRecovery1.setText("Course Recovery Plan");
+        jButtonRecovery1.setToolTipText("");
+        jButtonRecovery1.setBorderPainted(false);
+        jButtonRecovery1.setContentAreaFilled(false);
+        jButtonRecovery1.setFocusPainted(false);
+        jButtonRecovery1.setOpaque(true);
+        jButtonRecovery1.setPreferredSize(new java.awt.Dimension(210, 70));
+        jButtonRecovery1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonRecovery1ActionPerformed(evt);
+            }
+        });
+
+        jButtonAPR1.setBackground(new java.awt.Color(95, 106, 105));
+        jButtonAPR1.setFont(new java.awt.Font("Serif", 0, 20)); // NOI18N
+        jButtonAPR1.setForeground(new java.awt.Color(255, 255, 255));
+        jButtonAPR1.setText("<html><center>Academic<br>Performance Report</center></html> ");
+        jButtonAPR1.setBorderPainted(false);
+        jButtonAPR1.setContentAreaFilled(false);
+        jButtonAPR1.setFocusPainted(false);
+        jButtonAPR1.setOpaque(true);
+        jButtonAPR1.setPreferredSize(new java.awt.Dimension(210, 70));
+        jButtonAPR1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonAPR1ActionPerformed(evt);
+            }
+        });
+
+        logout1.setFont(new java.awt.Font("Serif", 0, 20)); // NOI18N
+        logout1.setText("Log Out");
+        logout1.setBorderPainted(false);
+        logout1.setFocusPainted(false);
+        logout1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                logout1ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout dashboard1Layout = new javax.swing.GroupLayout(dashboard1);
+        dashboard1.setLayout(dashboard1Layout);
+        dashboard1Layout.setHorizontalGroup(
+            dashboard1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(dashboard1Layout.createSequentialGroup()
+                .addGroup(dashboard1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButtonRecovery1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonUserManagement1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonAPR1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonEligibility1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(dashboard1Layout.createSequentialGroup()
+                .addGap(53, 53, 53)
+                .addComponent(logout1)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        dashboard1Layout.setVerticalGroup(
+            dashboard1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(dashboard1Layout.createSequentialGroup()
+                .addGap(132, 132, 132)
+                .addComponent(jButtonUserManagement1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButtonEligibility1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButtonRecovery1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButtonAPR1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 174, Short.MAX_VALUE)
+                .addComponent(logout1)
+                .addGap(62, 62, 62))
+        );
+
+        backgroud.add(dashboard1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 210, 700));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -421,6 +536,26 @@ public class ECE_UI extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jButtonAPRActionPerformed
 
+    private void jButtonUserManagement1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonUserManagement1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButtonUserManagement1ActionPerformed
+
+    private void jButtonEligibility1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEligibility1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButtonEligibility1ActionPerformed
+
+    private void jButtonRecovery1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRecovery1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButtonRecovery1ActionPerformed
+
+    private void jButtonAPR1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAPR1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButtonAPR1ActionPerformed
+
+    private void logout1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logout1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_logout1ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -449,14 +584,20 @@ public class ECE_UI extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel backgroud;
     private javax.swing.JPanel dashboard;
+    private javax.swing.JPanel dashboard1;
     private javax.swing.JComboBox<String> dropdown;
     private javax.swing.JButton jButtonAPR;
+    private javax.swing.JButton jButtonAPR1;
     private javax.swing.JButton jButtonEligibility;
+    private javax.swing.JButton jButtonEligibility1;
     private javax.swing.JButton jButtonRecovery;
+    private javax.swing.JButton jButtonRecovery1;
     private javax.swing.JButton jButtonUserManagement;
+    private javax.swing.JButton jButtonUserManagement1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     private javax.swing.JButton logout;
+    private javax.swing.JButton logout1;
     private javax.swing.JTextField search1;
     private javax.swing.JButton search2;
     private javax.swing.JLabel title;
