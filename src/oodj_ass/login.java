@@ -1,6 +1,5 @@
 package oodj_ass;
 
-
 public class login {
     
     private final UserManager userManager;
@@ -17,7 +16,7 @@ public class login {
 
         User user = userManager.findByUsername(username.trim());
 
-        if (user == null) return null; 
+        //if (user == null) return null; 
         if (!user.isActive()) return null; 
         if (!user.getPassword().equals(password)) return null; 
         String expectedRole;

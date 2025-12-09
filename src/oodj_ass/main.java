@@ -1,17 +1,36 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
- */
 package oodj_ass;
 
-/**
- *
- * @author jolin
- */
+import java.util.List;
+//import java.util.ArrayList;
+
 public class main {
+    private static FileLoader loader;
 
     public static void main(String[] args) {
-        FileHandler.createFiles();
+        //FileHandler.createFiles();
+        /*Email mailer = new Email();
+
+        FileLoader fl = new FileLoader();
+        fl.loadAll();
+        List<Student> students = fl.getStudents();
+        
+        CRP crp = new CRP(students, mailer); 
+        
+        Student s = students.get(0);
+        Course failed = null;
+
+        for (Student stu : students) {
+            for (Course c : stu.getCourses()) {
+                if (c.isFailed()) {
+                    crp.createRecoveryPlan(stu, c);
+                }
+            }
+        }
+
+        if (failed != null) {
+            crp.createRecoveryPlan(s, failed); 
+        } else {
+            System.out.println("No failed course found for this student.");
+        }*/
     }
-    
 }
