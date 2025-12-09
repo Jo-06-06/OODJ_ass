@@ -17,6 +17,14 @@ public class ARP_UI extends javax.swing.JFrame {
      */
     public ARP_UI() {
         initComponents();
+        
+        // Set header font
+        arp_tabel1.getTableHeader().setFont(new java.awt.Font("Serif", java.awt.Font.BOLD, 20));
+
+        // Center header text
+        javax.swing.table.DefaultTableCellRenderer headerRenderer = 
+                (javax.swing.table.DefaultTableCellRenderer) arp_tabel1.getTableHeader().getDefaultRenderer();
+        headerRenderer.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     }
 
     /**
@@ -36,9 +44,17 @@ public class ARP_UI extends javax.swing.JFrame {
         jButtonAPR = new javax.swing.JButton();
         logout = new javax.swing.JButton();
         apr_titile = new javax.swing.JLabel();
+        sid_search = new javax.swing.JTextField();
+        arp_sid = new javax.swing.JLabel();
+        arp_search = new javax.swing.JButton();
+        arp_sid1 = new javax.swing.JLabel();
+        jComboBox1 = new javax.swing.JComboBox<>();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        arp_tabel1 = new javax.swing.JTable();
         title = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Academic Performance Report");
         setMaximumSize(new java.awt.Dimension(1160, 700));
         setMinimumSize(new java.awt.Dimension(1160, 700));
         setPreferredSize(new java.awt.Dimension(1160, 700));
@@ -164,6 +180,61 @@ public class ARP_UI extends javax.swing.JFrame {
         apr_titile.setToolTipText("");
         jPanel1.add(apr_titile, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 40, -1, -1));
 
+        sid_search.setFont(new java.awt.Font("Serif", 0, 18)); // NOI18N
+        sid_search.setMaximumSize(new java.awt.Dimension(100, 30));
+        sid_search.setMinimumSize(new java.awt.Dimension(100, 30));
+        sid_search.setPreferredSize(new java.awt.Dimension(100, 30));
+        sid_search.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sid_searchActionPerformed(evt);
+            }
+        });
+        jPanel1.add(sid_search, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 120, -1, -1));
+
+        arp_sid.setFont(new java.awt.Font("Serif", 0, 18)); // NOI18N
+        arp_sid.setText("Intake:");
+        jPanel1.add(arp_sid, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 120, -1, -1));
+
+        arp_search.setFont(new java.awt.Font("Serif", 0, 14)); // NOI18N
+        arp_search.setLabel("Search");
+        arp_search.setOpaque(true);
+        arp_search.setPreferredSize(new java.awt.Dimension(70, 30));
+        arp_search.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                arp_searchActionPerformed(evt);
+            }
+        });
+        jPanel1.add(arp_search, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 120, -1, -1));
+
+        arp_sid1.setFont(new java.awt.Font("Serif", 0, 18)); // NOI18N
+        arp_sid1.setText("Student ID:");
+        arp_sid1.setMaximumSize(new java.awt.Dimension(86, 30));
+        arp_sid1.setMinimumSize(new java.awt.Dimension(86, 30));
+        arp_sid1.setPreferredSize(new java.awt.Dimension(86, 30));
+        jPanel1.add(arp_sid1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 120, -1, -1));
+
+        jComboBox1.setFont(new java.awt.Font("Segoe UI Variable", 0, 18)); // NOI18N
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jComboBox1.setMaximumSize(new java.awt.Dimension(100, 30));
+        jComboBox1.setMinimumSize(new java.awt.Dimension(100, 30));
+        jComboBox1.setPreferredSize(new java.awt.Dimension(100, 30));
+        jPanel1.add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 120, -1, -1));
+
+        arp_tabel1.setFont(new java.awt.Font("Serif", 0, 18)); // NOI18N
+        arp_tabel1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Semester", "Course ID", "Course Name", "Credit Hours", "Grade", "GPA"
+            }
+        ));
+        arp_tabel1.setRowHeight(35);
+        arp_tabel1.setShowGrid(false);
+        jScrollPane1.setViewportView(arp_tabel1);
+
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 180, 870, 230));
+
         title.setBackground(new java.awt.Color(157, 208, 153));
         title.setFont(new java.awt.Font("Serif", 1, 36)); // NOI18N
         title.setText("Eligibility Check and Enrolment");
@@ -174,7 +245,7 @@ public class ARP_UI extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
                     .addGap(0, 0, Short.MAX_VALUE)
@@ -216,6 +287,14 @@ public class ARP_UI extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_logoutActionPerformed
 
+    private void arp_searchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_arp_searchActionPerformed
+
+    }//GEN-LAST:event_arp_searchActionPerformed
+
+    private void sid_searchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sid_searchActionPerformed
+        sid_searchActionPerformed(evt); //when keyin the sid and press enter also can search
+    }//GEN-LAST:event_sid_searchActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -243,13 +322,20 @@ public class ARP_UI extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel apr_titile;
+    private javax.swing.JButton arp_search;
+    private javax.swing.JLabel arp_sid;
+    private javax.swing.JLabel arp_sid1;
+    private javax.swing.JTable arp_tabel1;
     private javax.swing.JPanel dashboard;
     private javax.swing.JButton jButtonAPR;
     private javax.swing.JButton jButtonEligibility;
     private javax.swing.JButton jButtonRecovery;
     private javax.swing.JButton jButtonUserManagement;
+    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JButton logout;
+    private javax.swing.JTextField sid_search;
     private javax.swing.JLabel title;
     // End of variables declaration//GEN-END:variables
 }

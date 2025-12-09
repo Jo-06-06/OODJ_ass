@@ -122,7 +122,6 @@ public class ECEView_UI extends javax.swing.JFrame {
         setTitle("Result Details");
         setMaximumSize(new java.awt.Dimension(520, 620));
         setMinimumSize(new java.awt.Dimension(520, 620));
-        setPreferredSize(new java.awt.Dimension(520, 620));
         setResizable(false);
 
         backgroud.setBackground(new java.awt.Color(182, 201, 197));
