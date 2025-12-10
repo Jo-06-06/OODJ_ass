@@ -36,7 +36,7 @@ import javax.swing.JOptionPane;
  *
  * @author User
  */
-//10/12 5.05PM
+//10/12 6.00PM
 public class ARP_UI extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ARP_UI.class.getName());
@@ -358,7 +358,8 @@ public class ARP_UI extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonUserManagementActionPerformed
 
     private void jButtonEligibilityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEligibilityActionPerformed
-        // TODO add your handling code here:
+        new ECE_UI().setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_jButtonEligibilityActionPerformed
 
     private void jButtonRecoveryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRecoveryActionPerformed
@@ -366,7 +367,8 @@ public class ARP_UI extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonRecoveryActionPerformed
 
     private void jButtonAPRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAPRActionPerformed
-        // TODO add your handling code here:
+        new ARP_UI().setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_jButtonAPRActionPerformed
 
     private void logoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logoutActionPerformed
