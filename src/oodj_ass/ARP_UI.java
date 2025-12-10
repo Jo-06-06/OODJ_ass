@@ -4,14 +4,53 @@
  */
 package oodj_ass;
 
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Document;    
+import com.itextpdf.text.Element;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+import java.awt.event.*;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.StringTokenizer;
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author User
  */
-//9/12 11.50
+//10/12 5.05PM
 public class ARP_UI extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ARP_UI.class.getName());
+    
+    private String currentStudentId = null;
+    private String currentStudentName = "";
+    private String currentProgram = "";
+    private String currentIntake = "All";
+    private String currentStudentEmail = "";
+    
+    // Key Achievements / Weaknesses / Recommendations
+    private Map<String, StringBuilder> achievementsMap = new HashMap<>();
+    private Map<String, StringBuilder> weaknessesMap  = new HashMap<>();
+    private Map<String, StringBuilder> improveMap     = new HashMap<>();
 
     /**
      * Creates new form ARP_UI
@@ -25,6 +64,50 @@ public class ARP_UI extends javax.swing.JFrame {
         javax.swing.table.DefaultTableCellRenderer headerRenderer = 
                 (javax.swing.table.DefaultTableCellRenderer) arp_tabel1.getTableHeader().getDefaultRenderer();
         headerRenderer.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        
+        //Intake Drop Down Box
+        jComboBox1.removeAllItems();
+        jComboBox1.setEnabled(false);
+
+        // Intake combobox change listener
+        jComboBox1.addItemListener(new ItemListener() {
+             @Override
+             public void itemStateChanged(ItemEvent e) {
+                 if (e.getStateChange() == ItemEvent.SELECTED) {
+                     if (currentStudentId == null) return;
+                     String selected = (String) jComboBox1.getSelectedItem();
+                     if (selected == null) return;
+                     currentIntake = selected;
+                     try {
+                         loadAndDisplayReport(currentStudentId, selected);
+                     } catch (Exception ex) {
+                         ex.printStackTrace();
+                         JOptionPane.showMessageDialog(ARP_UI.this, "Error updating report.");
+                     }
+                 }
+             }
+         });
+
+        // Export PDF Button
+        arp_pdfButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                if (currentStudentId == null) {
+                    JOptionPane.showMessageDialog(ARP_UI.this, "Please search a student first.");
+                    return;
+                }
+                try {
+                    String pdfFile = exportToPDF();
+                    if (pdfFile != null) {
+                        sendReportEmail(currentStudentEmail, pdfFile);
+                    }
+                    JOptionPane.showMessageDialog(ARP_UI.this,
+                            "PDF exported successfully.\nEmail has been sent to: " + currentStudentEmail);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(ARP_UI.this, "PDF export failed or email not sent.");
+                }
+            }
+        });
     }
 
     /**
@@ -291,7 +374,60 @@ public class ARP_UI extends javax.swing.JFrame {
     }//GEN-LAST:event_logoutActionPerformed
 
     private void arp_searchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_arp_searchActionPerformed
+        String studentID = sid_search.getText().trim();
 
+        if (studentID.equals("")) {
+            JOptionPane.showMessageDialog(this, "Please enter your Student ID.");
+            return;
+        }
+
+        try {
+            String[] info = loadStudentNameProgram(studentID);
+            if (info == null) {
+                JOptionPane.showMessageDialog(this, "Student not found. Please try again.");
+                clearDisplay();
+                return;
+            }
+
+            currentStudentId = studentID;
+            currentStudentName = info[0];
+            currentProgram = info[1];
+            currentStudentEmail = loadStudentEmail(studentID);
+
+            ArrayList<String> semList = loadAllSemesters(studentID);
+            if (semList.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "No semester record found for this student.");
+                clearDisplay();
+                return;
+            }
+
+            //Combobox：sem + Year + All
+            jComboBox1.removeAllItems();
+            boolean hasY1 = false, hasY2 = false, hasY3 = false;
+
+            for (String s : semList) {
+                jComboBox1.addItem(s);
+                if (s.startsWith("Y1")) hasY1 = true;
+                else if (s.startsWith("Y2")) hasY2 = true;
+                else if (s.startsWith("Y3")) hasY3 = true;
+            }
+
+            if (hasY1) jComboBox1.addItem("Year 1");
+            if (hasY2) jComboBox1.addItem("Year 2");
+            if (hasY3) jComboBox1.addItem("Year 3");
+
+            jComboBox1.addItem("All");
+            jComboBox1.setSelectedItem("All");
+            jComboBox1.setEnabled(true);
+
+            currentIntake = "All";
+
+            loadAndDisplayReport(studentID, "All");
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error generating report.");
+        }
     }//GEN-LAST:event_arp_searchActionPerformed
 
     private void sid_searchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sid_searchActionPerformed
@@ -320,9 +456,727 @@ public class ARP_UI extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
+            logger.log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        
+        //Create and Display Form
         java.awt.EventQueue.invokeLater(() -> new ARP_UI().setVisible(true));
     }
 
+    //Table Summary ComboBox
+    private void clearDisplay() {
+        javax.swing.table.DefaultTableModel model =
+                (javax.swing.table.DefaultTableModel) arp_tabel1.getModel();
+        model.setRowCount(0);
+        jTextArea_summary.setText("");
+        jComboBox1.removeAllItems();
+        jComboBox1.setEnabled(false);
+
+        currentStudentId = null;
+        currentStudentName = "";
+        currentProgram = "";
+        currentIntake = "All";
+        currentStudentEmail = "";
+        achievementsMap.clear();
+        weaknessesMap.clear();
+        improveMap.clear();
+    }
+
+    //Table + Summary
+    private void loadAndDisplayReport(String studentID, String intakeSelection) throws Exception {
+
+        String[] stu = loadStudentNameProgram(studentID);
+        if (stu == null) throw new Exception("Student not found.");
+
+        //Load all semesters
+        ArrayList<String> semesters = loadAllSemesters(studentID);
+        if (semesters.isEmpty()) {
+            throw new Exception("No semester found.");
+        }
+
+        achievementsMap.clear();
+        weaknessesMap.clear();
+        improveMap.clear();
+
+        //Filter
+        ArrayList<String> filtered = new ArrayList<>();
+
+        if ("All".equalsIgnoreCase(intakeSelection)) {
+            filtered.addAll(semesters);
+
+        } else if (intakeSelection.startsWith("Year")) {
+
+            //Year 1 → Y1S1 Y1S2
+            String yearNum = intakeSelection.substring(5).trim();
+            for (String s : semesters) {
+                if (s.startsWith("Y" + yearNum)) {
+                    filtered.add(s);
+                }
+            }
+
+        } else {
+            //Single Semester (Y1S1)
+            for (String s : semesters) {
+                if (s.equals(intakeSelection)) {
+                    filtered.add(s);
+                }
+            }
+        }
+
+        if (filtered.isEmpty()) {
+            filtered.addAll(semesters);
+        }
+
+        javax.swing.table.DefaultTableModel model =
+                (javax.swing.table.DefaultTableModel) arp_tabel1.getModel();
+        model.setRowCount(0);  // clear table
+
+        double totalCGPA = 0;
+        int semCount = 0;
+        boolean repeatSemester = false;
+        int failTotal = 0;
+
+        for (String sem : filtered) {
+
+            ArrayList<String[]> courseList = loadStudentCourses(studentID, sem);
+            double semCGPA = loadCGPA(studentID, sem);
+
+            if (semCGPA > 0) {
+                totalCGPA += semCGPA;
+                semCount++;
+            }
+
+            int failCounter = 0;
+
+            StringBuilder achievements = new StringBuilder();
+            StringBuilder weaknesses = new StringBuilder();
+            StringBuilder improvements = new StringBuilder();
+
+            for (String[] c : courseList) {
+                String code = c[0];
+                String titleTxt = c[1];
+                String credit = c[2];
+
+                String[] gradeData = loadGrade(studentID, code, sem);
+                String grade = gradeData[0];
+                String gpa = gradeData[1];
+                double ass = Double.parseDouble(gradeData[2]);
+                double exam = Double.parseDouble(gradeData[3]);
+
+                //Add to JTable
+                model.addRow(new Object[]{sem, code, titleTxt, credit, grade, gpa});
+
+                //Achievements
+                if (grade.startsWith("A")) {
+                    achievements.append("- Strong performance in ").append(code).append(".\n");
+                }
+
+                //Weakness
+                double gpaValue = 0;
+                try {
+                    gpaValue = Double.parseDouble(gpa);
+                } catch (Exception ignore) {}
+
+                if (gpaValue < 2.00) {
+                    weaknesses.append("- Weak performance in ").append(code).append(".\n");
+                    failCounter++;
+                }
+
+                //Improvements
+                if (ass < 50) improvements.append("- Resit assignment for " + code + ".\n");
+                if (exam < 50) improvements.append("- Resit examination for " + code + ".\n");
+            }
+
+            if (semCGPA < 2.00 && semCGPA > 0) {
+                repeatSemester = true;
+            }
+            failTotal += failCounter;
+
+            achievementsMap.put(sem, achievements);
+            weaknessesMap.put(sem, weaknesses);
+            improveMap.put(sem, improvements);
+        }
+
+        //Overall CGPA
+        double finalCGPA = (semCount > 0) ? totalCGPA / semCount : 0;
+
+        //Summary
+        StringBuilder summary = new StringBuilder();
+        summary.append("Academic Performance Report\n\n");
+        summary.append("Student Name : ").append(stu[0]).append("\n");
+        summary.append("Student ID   : ").append(studentID).append("\n");
+        summary.append("Program      : ").append(stu[1]).append("\n");
+        summary.append("Intake       : ").append(intakeSelection).append("\n\n");
+
+        if ("All".equalsIgnoreCase(intakeSelection) || intakeSelection.startsWith("Year")) {
+
+            //List all sem CGPA
+            for (String sem : filtered) {
+                double semCGPA = loadCGPA(studentID, sem);
+                summary.append("Semester : ").append(sem).append("\n");
+                summary.append("CGPA     : ").append(String.format("%.2f", semCGPA)).append("\n\n");
+            }
+
+            summary.append("Summary of Progress:\n");
+            if (finalCGPA >= 3.50)
+                summary.append("- The student demonstrates excellent academic performance.\n\n");
+            else if (finalCGPA >= 3.00)
+                summary.append("- The student shows good consistent progress.\n\n");
+            else if (finalCGPA >= 2.00)
+                summary.append("- The student achieved satisfactory performance, improvement needed.\n\n");
+            else
+                summary.append("- The student requires significant academic improvement.\n\n");
+
+            //Achievements / Weakness / Recommendations for each sem
+            for (String sem : filtered) {
+                StringBuilder ach = achievementsMap.get(sem);
+                StringBuilder weak = weaknessesMap.get(sem);
+                StringBuilder impr = improveMap.get(sem);
+
+                summary.append("Semester : ").append(sem).append("\n");
+
+                if (ach != null && ach.length() > 0)
+                    summary.append("Key Achievements:\n").append(ach).append("\n");
+
+                if (weak != null && weak.length() > 0)
+                    summary.append("Areas to Improve:\n").append(weak).append("\n");
+
+                summary.append("Recommendations of Improvement:\n");
+                if (impr != null && impr.length() > 0)
+                    summary.append(impr);
+                else
+                    summary.append("- The student has shown good learning attitude and consistent effort.\n");
+
+                summary.append("\n");
+            }
+
+            if (failTotal >= 4 || repeatSemester) {
+                summary.append("Note:\n");
+                summary.append("- Repeating the semester is recommended based on overall performance.\n");
+            }
+
+        } else {
+            //summary
+            summary.append("Summary of Progress:\n");
+            if (finalCGPA >= 3.50)
+                summary.append("- The student demonstrates excellent academic performance.\n\n");
+            else if (finalCGPA >= 3.00)
+                summary.append("- The student shows good consistent progress.\n\n");
+            else if (finalCGPA >= 2.00)
+                summary.append("- The student achieved satisfactory performance, improvement needed.\n\n");
+            else
+                summary.append("- The student requires significant academic improvement.\n\n");
+
+            String sem = filtered.get(0);
+            StringBuilder ach = achievementsMap.get(sem);
+            StringBuilder weak = weaknessesMap.get(sem);
+            StringBuilder impr = improveMap.get(sem);
+
+            if (ach != null && ach.length() > 0)
+                summary.append("Key Achievements:\n").append(ach).append("\n");
+
+            if (weak != null && weak.length() > 0)
+                summary.append("Areas to Improve:\n").append(weak).append("\n");
+
+            summary.append("Recommendations of Improvement:\n");
+            if (impr != null && impr.length() > 0)
+                summary.append(impr);
+            else
+                summary.append("- The student has shown good learning attitude and consistent effort.\n");
+
+            if (failTotal >= 4 || repeatSemester)
+                summary.append("- Repeating the semester is recommended.\n");
+        }
+
+        jTextArea_summary.setText(summary.toString());
+    }
+
+    //File loading function 
+
+    public String[] loadStudentNameProgram(String id) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader("data/students.txt"));
+        br.readLine(); 
+
+        String line;
+        while ((line = br.readLine()) != null) {
+            StringTokenizer st = new StringTokenizer(line, ",");
+            String sid = st.nextToken();
+            String fname = st.nextToken();
+            String lname = st.nextToken();
+            String major = st.nextToken();
+
+            if (sid.equals(id)) {
+                br.close();
+                return new String[]{fname + " " + lname, major};
+            }
+        }
+        br.close();
+        return null;
+    }
+
+    public String loadStudentEmail(String id) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader("data/students.txt"));
+        br.readLine(); 
+
+        String line;
+        while ((line = br.readLine()) != null) {
+            String[] parts = line.split(",");
+            if (parts.length >= 5) {
+                String sid = parts[0];
+                String email = parts[4];
+                if (sid.equals(id)) {
+                    br.close();
+                    return email;
+                }
+            }
+        }
+        br.close();
+        return null;
+    }
+
+    public ArrayList<String> loadAllSemesters(String id) throws IOException {
+        ArrayList<String> list = new ArrayList<>();
+
+        //studentInfo.txt
+        BufferedReader br = new BufferedReader(new FileReader("data/studentInfo.txt"));
+        br.readLine();
+        String line;
+        while ((line = br.readLine()) != null) {
+            StringTokenizer st = new StringTokenizer(line, ",");
+            String sid = st.nextToken();
+            String sem = st.nextToken();
+            if (sid.equals(id) && !list.contains(sem)) {
+                list.add(sem);
+            }
+        }
+        br.close();
+
+        addSemestersFromResultFile(list, id, "data/result.txt");
+        addSemestersFromResultFile(list, id, "data/resultArchive.txt");
+
+        //gradeArchive.txt
+        File gArch = new File("data/gradeArchive.txt");
+        if (gArch.exists()) {
+            br = new BufferedReader(new FileReader(gArch));
+            br.readLine(); 
+            while ((line = br.readLine()) != null) {
+                StringTokenizer st = new StringTokenizer(line, ",");
+                if (!st.hasMoreTokens()) continue;
+                String sid = st.nextToken();     // studentID
+                if (!st.hasMoreTokens()) continue;
+                st.nextToken();                  // courseID
+                if (!st.hasMoreTokens()) continue;
+                String sem = st.nextToken();     // semester
+                if (sid.equals(id) && !list.contains(sem)) {
+                    list.add(sem);
+                }
+            }
+            br.close();
+        }
+
+        Collections.sort(list);
+        return list;
+    }
+
+    private void addSemestersFromResultFile(ArrayList<String> list, String id, String filename) throws IOException {
+        File f = new File(filename);
+        if (!f.exists()) return;
+
+        BufferedReader br = new BufferedReader(new FileReader(f));
+        String line = br.readLine();  // skip header
+        while ((line = br.readLine()) != null) {
+            StringTokenizer st = new StringTokenizer(line, ",");
+            if (!st.hasMoreTokens())
+                continue;
+            String sid = st.nextToken();
+            if (!st.hasMoreTokens())
+                continue;
+            String sem = st.nextToken();
+            if (sid.equals(id) && !list.contains(sem)) {
+                list.add(sem);
+            }
+        }
+        br.close();
+    }
+
+    public String[] loadCourseInfo(String code) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader("data/courses.txt"));
+        br.readLine();
+        String line;
+
+        while ((line = br.readLine()) != null) {
+            String[] parts = line.split(",");
+            if (parts.length < 7) continue;
+
+            if (parts[0].equals(code)) {
+                return new String[]{parts[0], parts[1], parts[2]};
+            }
+        }
+        br.close();
+        return new String[]{code, "Unknown Course", "0"};
+    }
+
+    public ArrayList<String[]> loadStudentCourses(String id, String sem) throws IOException {
+        ArrayList<String[]> list = new ArrayList<>();
+        BufferedReader br = new BufferedReader(new FileReader("data/studentCourse.txt"));
+        br.readLine();
+        String line;
+
+        while ((line = br.readLine()) != null) {
+            StringTokenizer st = new StringTokenizer(line, ",");
+            String sid = st.nextToken();
+            String s = st.nextToken();
+            String code = st.nextToken();
+
+            if (sid.equals(id) && s.equals(sem)) {
+                list.add(loadCourseInfo(code));
+            }
+        }
+        br.close();
+        return list;
+    }
+
+    private String[] loadGradeFromFile(String id, String code, String sem,
+                                       String filename, boolean hasSemesterColumn) throws IOException {
+        File f = new File(filename);
+        if (!f.exists()) return null;
+
+        BufferedReader br = new BufferedReader(new FileReader(f));
+        br.readLine();
+        String line;
+
+        while ((line = br.readLine()) != null) {
+            StringTokenizer st = new StringTokenizer(line, ",");
+
+            if (!st.hasMoreTokens())
+                continue;
+            String sid = st.nextToken();
+            if (!st.hasMoreTokens())
+                continue;
+            String courseID = st.nextToken();
+
+            String semFromFile = null;
+            if (hasSemesterColumn) {
+                if (!st.hasMoreTokens()) continue;
+                semFromFile = st.nextToken();
+            }
+
+            if (!sid.equals(id) || !courseID.equals(code)) {
+                continue;
+            }
+            if (hasSemesterColumn && semFromFile != null && !semFromFile.equals(sem)) {
+                continue;
+            }
+
+            if (!st.hasMoreTokens()) continue;
+            String ass = st.nextToken();
+            if (!st.hasMoreTokens()) continue;
+            String exam = st.nextToken();
+            if (!st.hasMoreTokens()) continue;
+            String grade = st.nextToken();
+            if (!st.hasMoreTokens()) continue;
+            String gpa = st.nextToken();
+
+            br.close();
+            return new String[]{grade, gpa, ass, exam};
+        }
+
+        br.close();
+        return null;
+    }
+
+    public String[] loadGrade(String id, String code, String sem) throws IOException {
+
+        String[] data = loadGradeFromFile(id, code, sem, "data/grades.txt", true);
+        if (data != null) return data;
+
+        return new String[]{"-", "0.00", "0", "0"};
+    }
+
+    private Double loadCGPAFromFile(String id, String sem, String filename) throws IOException {
+        File f = new File(filename);
+        if (!f.exists()) return null;
+
+        BufferedReader br = new BufferedReader(new FileReader(f));
+        br.readLine();
+        String line;
+
+        while ((line = br.readLine()) != null) {
+            StringTokenizer st = new StringTokenizer(line, ",");
+            String sid = st.nextToken();
+            String s = st.nextToken();
+            String cgpaStr = st.nextToken();
+
+            if (sid.equals(id) && s.equals(sem)) {
+                br.close();
+                try {
+                    return Double.valueOf(Double.parseDouble(cgpaStr));
+                } catch (Exception ex) {
+                    return 0.0;
+                }
+            }
+        }
+        br.close();
+        return null;
+    }
+
+    public double loadCGPA(String id, String sem) throws IOException {
+        Double v = loadCGPAFromFile(id, sem, "data/result.txt");
+        if (v != null) return v.doubleValue();
+
+        v = loadCGPAFromFile(id, sem, "data/resultArchive.txt");
+        if (v != null) return v.doubleValue();
+
+        return 0.0;
+    }
+
+    //PDF Export
+    public String exportToPDF() throws Exception {
+
+        if (currentStudentId == null) {
+            return null;
+        }
+
+        Document doc = new Document(PageSize.A4, 40, 40, 40, 40);
+        String fileName = "AcademicReport_" + currentStudentId + ".pdf";
+        PdfWriter.getInstance(doc, new FileOutputStream(fileName));
+        doc.open();
+
+        com.itextpdf.text.Font titleFont =
+                new com.itextpdf.text.Font(
+                        com.itextpdf.text.Font.FontFamily.HELVETICA,
+                        16,
+                        com.itextpdf.text.Font.BOLD
+                );
+
+        com.itextpdf.text.Font infoFont =
+                new com.itextpdf.text.Font(
+                        com.itextpdf.text.Font.FontFamily.HELVETICA,
+                        11,
+                        com.itextpdf.text.Font.NORMAL
+                );
+
+        com.itextpdf.text.Font semTitleFont =
+                new com.itextpdf.text.Font(
+                        com.itextpdf.text.Font.FontFamily.HELVETICA,
+                        12,
+                        com.itextpdf.text.Font.BOLD
+                );
+
+        com.itextpdf.text.Font headerFont =
+                new com.itextpdf.text.Font(
+                        com.itextpdf.text.Font.FontFamily.HELVETICA,
+                        11,
+                        com.itextpdf.text.Font.BOLD
+                );
+
+        //Report Title
+        Paragraph title = new Paragraph("Academic Performance Report", titleFont);
+        title.setAlignment(Element.ALIGN_CENTER);
+        title.setSpacingAfter(15f);
+        doc.add(title);
+
+        //Student Info
+        doc.add(new Paragraph("Student Name : " + currentStudentName, infoFont));
+        doc.add(new Paragraph("Student ID   : " + currentStudentId, infoFont));
+        doc.add(new Paragraph("Program      : " + currentProgram, infoFont));
+        doc.add(Chunk.NEWLINE);
+
+        //Generate tables by sem
+        ArrayList<String> semesters = loadAllSemesters(currentStudentId);
+        ArrayList<String> filtered = new ArrayList<>();
+
+        if (currentIntake == null || "All".equalsIgnoreCase(currentIntake)) {
+            filtered.addAll(semesters);
+        } else if (currentIntake.startsWith("Year")) {
+            String yearNum = currentIntake.substring(5).trim();
+            for (String s : semesters) {
+                if (s.startsWith("Y" + yearNum)) filtered.add(s);
+            }
+        } else {
+            for (String s : semesters) {
+                if (s.equals(currentIntake)) filtered.add(s);
+            }
+        }
+        if (filtered.isEmpty()) filtered.addAll(semesters);
+
+        for (String sem : filtered) {
+
+            //Sem Title
+            Paragraph semTitle = new Paragraph("Semester: " + sem, semTitleFont);
+            semTitle.setSpacingBefore(8f);
+            semTitle.setSpacingAfter(4f);
+            doc.add(semTitle);
+
+            //Course Table
+            PdfPTable pdfTable = new PdfPTable(5);
+            pdfTable.setWidthPercentage(100);
+            pdfTable.setWidths(new float[]{15f, 45f, 8f, 10f, 10f});
+
+            String[] headers = {"Course Code", "Course Title", "Credit", "Grade", "GPA"};
+            for (String h : headers) {
+                PdfPCell cell = new PdfPCell(new Phrase(h, headerFont));
+                cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
+                cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                pdfTable.addCell(cell);
+            }
+
+            //Course by Sem
+            ArrayList<String[]> courseList = loadStudentCourses(currentStudentId, sem);
+            int totalCreditHours = 0;
+
+            for (String[] c : courseList) {
+                String code = c[0];
+                String titleTxt = c[1];
+                String credit = c[2];
+
+                String[] gradeData = loadGrade(currentStudentId, code, sem);
+                String grade = gradeData[0];
+                String gpa = gradeData[1];
+
+                try {
+                    totalCreditHours += Integer.parseInt(credit.trim());
+                } catch (Exception ignore) {}
+
+                pdfTable.addCell(new Phrase(code, infoFont));
+                pdfTable.addCell(new Phrase(titleTxt, infoFont));
+                pdfTable.addCell(new Phrase(credit, infoFont));
+                pdfTable.addCell(new Phrase(grade, infoFont));
+                pdfTable.addCell(new Phrase(gpa, infoFont));
+            }
+
+            doc.add(pdfTable);
+
+            //Summary rows under table: Total Credit Hours + CGPA
+            double semCGPA = loadCGPA(currentStudentId, sem);
+
+            PdfPTable summaryTable = new PdfPTable(2);
+            summaryTable.setWidthPercentage(40);
+            summaryTable.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            summaryTable.setSpacingBefore(4f);
+
+            PdfPCell c1 = new PdfPCell(new Phrase("Total Credit Hours", headerFont));
+            PdfPCell c2 = new PdfPCell(new Phrase(String.valueOf(totalCreditHours), infoFont));
+            c1.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            c2.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            summaryTable.addCell(c1);
+            summaryTable.addCell(c2);
+
+            PdfPCell c3 = new PdfPCell(new Phrase("CGPA", headerFont));
+            PdfPCell c4 = new PdfPCell(new Phrase(String.format("%.2f", semCGPA), infoFont));
+            c3.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            c4.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            summaryTable.addCell(c3);
+            summaryTable.addCell(c4);
+
+            doc.add(summaryTable);
+
+            //Summary Section
+            Paragraph semSummaryTitle = new Paragraph("Summary for " + sem, semTitleFont);
+            semSummaryTitle.setSpacingBefore(5f);
+            semSummaryTitle.setSpacingAfter(2f);
+            doc.add(semSummaryTitle);
+
+            Paragraph p = new Paragraph();
+            p.setFont(infoFont);
+
+            p.add("Summary of Progress:\n");
+            if (semCGPA >= 3.50)
+                p.add("- The student demonstrates excellent academic performance.\n\n");
+            else if (semCGPA >= 3.00)
+                p.add("- The student shows good consistent progress.\n\n");
+            else if (semCGPA >= 2.00)
+                p.add("- The student achieved satisfactory performance, improvement needed.\n\n");
+            else
+                p.add("- The student requires significant academic improvement.\n\n");
+
+            StringBuilder ach = (achievementsMap != null) ? achievementsMap.get(sem) : null;
+            if (ach != null && ach.length() > 0) {
+                p.add("Key Achievements:\n");
+                p.add(ach.toString());
+                p.add("\n");
+            }
+
+            StringBuilder impr = (improveMap != null) ? improveMap.get(sem) : null;
+            p.add("Recommendations of Improvement:\n");
+            if (impr != null && impr.length() > 0) {
+                p.add(impr.toString());
+                p.add("\n");
+            } else {
+                p.add("- The student has shown good learning attitude and consistent effort.\n");
+            }
+
+            doc.add(p);
+            doc.add(Chunk.NEWLINE);
+        }
+
+        doc.close();
+
+        return fileName;
+    }
+
+    //Email function
+    public void sendReportEmail(String toEmail, String pdfPath) {
+        if (toEmail == null || toEmail.isEmpty()) {
+            System.out.println("No email address, skip sending.");
+            return;
+        }
+
+        final String fromEmail = "wongjolin0217@gmail.com";
+        final String password  = "ptzvabojtjzppndv";
+
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+
+        Session session = Session.getInstance(props, new javax.mail.Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(fromEmail, password);
+            }
+        });
+
+        try {
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(fromEmail, "Academic System"));
+            message.setRecipients(Message.RecipientType.TO,
+                    InternetAddress.parse(toEmail));
+            message.setSubject("Your Academic Performance Report");
+
+            MimeBodyPart textPart = new MimeBodyPart();
+            textPart.setText(
+                    "Dear " + currentStudentName + ",\n\n"
+                  + "Attached is your Academic Performance Report.\n\n"
+                  + "Regards,\nUniversity");
+
+            MimeBodyPart attachmentPart = new MimeBodyPart();
+            DataSource source = new FileDataSource(pdfPath);
+            attachmentPart.setDataHandler(new DataHandler(source));
+            attachmentPart.setFileName(new java.io.File(pdfPath).getName());
+
+            Multipart multipart = new MimeMultipart();
+            multipart.addBodyPart(textPart);
+            multipart.addBodyPart(attachmentPart);
+
+            message.setContent(multipart);
+
+            Transport.send(message);
+            System.out.println("Email sent to " + toEmail);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel apr_titile;
     private javax.swing.JScrollPane arp_jScrollPane;
