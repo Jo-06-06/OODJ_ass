@@ -9,7 +9,7 @@ import java.util.*;
  *
  * @author User
  */
-//9/12 9.00
+//10/12 9.36
 public class ECEView_UI extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ECEView_UI.class.getName());
@@ -36,6 +36,7 @@ public class ECEView_UI extends javax.swing.JFrame {
                 close.setBackground(new java.awt.Color(120,140,140));
             }
         });
+        
     }
     
         private void displayDetails(String studentID, String semester, String eligibility,

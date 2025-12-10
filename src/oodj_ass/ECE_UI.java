@@ -4,7 +4,7 @@ package oodj_ass;
  *
  * @author User
  */
-//10/12 19.00
+//10/12 9.36
 import java.util.ArrayList;
 import java.io.*;
 import java.awt.Color;
@@ -58,9 +58,6 @@ public class ECE_UI extends javax.swing.JFrame {
         ECEView_UI view = new ECEView_UI(studentID, semester, eligibility, grades, courses);
         view.setVisible(true);
     }
-
-
-    
     
     private void addSidebarHover(javax.swing.JButton btn) {
 
