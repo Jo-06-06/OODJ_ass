@@ -1,6 +1,4 @@
 package oodj_ass;
-import javax.swing.JOptionPane;
-
 
 public class LoginUI extends javax.swing.JFrame {
     
