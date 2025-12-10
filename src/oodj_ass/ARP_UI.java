@@ -58,11 +58,11 @@ public class ARP_UI extends javax.swing.JFrame {
     public ARP_UI() {
         initComponents();
         // Set header font
-        arp_tabel1.getTableHeader().setFont(new java.awt.Font("Serif", java.awt.Font.BOLD, 20));
+        apr_tabel1.getTableHeader().setFont(new java.awt.Font("Serif", java.awt.Font.BOLD, 20));
 
         // Center header text
         javax.swing.table.DefaultTableCellRenderer headerRenderer = 
-                (javax.swing.table.DefaultTableCellRenderer) arp_tabel1.getTableHeader().getDefaultRenderer();
+                (javax.swing.table.DefaultTableCellRenderer) apr_tabel1.getTableHeader().getDefaultRenderer();
         headerRenderer.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         
         //Intake Drop Down Box
@@ -89,7 +89,7 @@ public class ARP_UI extends javax.swing.JFrame {
          });
 
         // Export PDF Button
-        arp_pdfButton.addActionListener(new java.awt.event.ActionListener() {
+        apr_pdfButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 if (currentStudentId == null) {
                     JOptionPane.showMessageDialog(ARP_UI.this, "Please search a student first.");
@@ -128,13 +128,13 @@ public class ARP_UI extends javax.swing.JFrame {
         logout = new javax.swing.JButton();
         apr_titile = new javax.swing.JLabel();
         sid_search = new javax.swing.JTextField();
-        arp_sid = new javax.swing.JLabel();
-        arp_search = new javax.swing.JButton();
-        arp_sid1 = new javax.swing.JLabel();
+        apr_intake = new javax.swing.JLabel();
+        apr_search = new javax.swing.JButton();
+        apr_sid1 = new javax.swing.JLabel();
         jComboBox1 = new javax.swing.JComboBox<>();
         jScrollPane1 = new javax.swing.JScrollPane();
-        arp_tabel1 = new javax.swing.JTable();
-        arp_pdfButton = new javax.swing.JButton();
+        apr_tabel1 = new javax.swing.JTable();
+        apr_pdfButton = new javax.swing.JButton();
         arp_jScrollPane = new javax.swing.JScrollPane();
         jTextArea_summary = new javax.swing.JTextArea();
 
@@ -276,29 +276,29 @@ public class ARP_UI extends javax.swing.JFrame {
         });
         jPanel1.add(sid_search, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 120, -1, -1));
 
-        arp_sid.setFont(new java.awt.Font("Serif", 0, 18)); // NOI18N
-        arp_sid.setText("Intake:");
-        jPanel1.add(arp_sid, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 120, -1, -1));
+        apr_intake.setFont(new java.awt.Font("Serif", 0, 18)); // NOI18N
+        apr_intake.setText("Intake:");
+        jPanel1.add(apr_intake, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 120, -1, -1));
 
-        arp_search.setFont(new java.awt.Font("Serif", 0, 14)); // NOI18N
-        arp_search.setBorderPainted(false);
-        arp_search.setFocusPainted(false);
-        arp_search.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        arp_search.setLabel("Search");
-        arp_search.setPreferredSize(new java.awt.Dimension(70, 30));
-        arp_search.addActionListener(new java.awt.event.ActionListener() {
+        apr_search.setFont(new java.awt.Font("Serif", 0, 14)); // NOI18N
+        apr_search.setBorderPainted(false);
+        apr_search.setFocusPainted(false);
+        apr_search.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        apr_search.setLabel("Search");
+        apr_search.setPreferredSize(new java.awt.Dimension(70, 30));
+        apr_search.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                arp_searchActionPerformed(evt);
+                apr_searchActionPerformed(evt);
             }
         });
-        jPanel1.add(arp_search, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 120, -1, -1));
+        jPanel1.add(apr_search, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 120, -1, -1));
 
-        arp_sid1.setFont(new java.awt.Font("Serif", 0, 18)); // NOI18N
-        arp_sid1.setText("Student ID:");
-        arp_sid1.setMaximumSize(new java.awt.Dimension(86, 30));
-        arp_sid1.setMinimumSize(new java.awt.Dimension(86, 30));
-        arp_sid1.setPreferredSize(new java.awt.Dimension(86, 30));
-        jPanel1.add(arp_sid1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 120, -1, -1));
+        apr_sid1.setFont(new java.awt.Font("Serif", 0, 18)); // NOI18N
+        apr_sid1.setText("Student ID:");
+        apr_sid1.setMaximumSize(new java.awt.Dimension(86, 30));
+        apr_sid1.setMinimumSize(new java.awt.Dimension(86, 30));
+        apr_sid1.setPreferredSize(new java.awt.Dimension(86, 30));
+        jPanel1.add(apr_sid1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 120, -1, -1));
 
         jComboBox1.setFont(new java.awt.Font("Segoe UI Variable", 0, 18)); // NOI18N
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -307,8 +307,8 @@ public class ARP_UI extends javax.swing.JFrame {
         jComboBox1.setPreferredSize(new java.awt.Dimension(100, 30));
         jPanel1.add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 120, -1, -1));
 
-        arp_tabel1.setFont(new java.awt.Font("Serif", 0, 18)); // NOI18N
-        arp_tabel1.setModel(new javax.swing.table.DefaultTableModel(
+        apr_tabel1.setFont(new java.awt.Font("Serif", 0, 18)); // NOI18N
+        apr_tabel1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
@@ -316,16 +316,16 @@ public class ARP_UI extends javax.swing.JFrame {
                 "Semester", "Course ID", "Course Name", "Credit Hours", "Grade", "GPA"
             }
         ));
-        arp_tabel1.setRowHeight(35);
-        arp_tabel1.setShowGrid(false);
-        jScrollPane1.setViewportView(arp_tabel1);
+        apr_tabel1.setRowHeight(35);
+        apr_tabel1.setShowGrid(false);
+        jScrollPane1.setViewportView(apr_tabel1);
 
         jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 170, 870, 230));
 
-        arp_pdfButton.setFont(new java.awt.Font("Serif", 0, 14)); // NOI18N
-        arp_pdfButton.setText("Export PDF");
-        arp_pdfButton.setToolTipText("");
-        jPanel1.add(arp_pdfButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(1020, 650, -1, -1));
+        apr_pdfButton.setFont(new java.awt.Font("Serif", 0, 14)); // NOI18N
+        apr_pdfButton.setText("Export PDF");
+        apr_pdfButton.setToolTipText("");
+        jPanel1.add(apr_pdfButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(1020, 650, -1, -1));
 
         arp_jScrollPane.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Academic Summary & Recommedations", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Serif", 0, 14))); // NOI18N
 
@@ -373,7 +373,7 @@ public class ARP_UI extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_logoutActionPerformed
 
-    private void arp_searchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_arp_searchActionPerformed
+    private void apr_searchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_apr_searchActionPerformed
         String studentID = sid_search.getText().trim();
 
         if (studentID.equals("")) {
@@ -428,10 +428,10 @@ public class ARP_UI extends javax.swing.JFrame {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(this, "Error generating report.");
         }
-    }//GEN-LAST:event_arp_searchActionPerformed
+    }//GEN-LAST:event_apr_searchActionPerformed
 
     private void sid_searchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sid_searchActionPerformed
-        sid_searchActionPerformed(evt); //when keyin the sid and press enter also can search
+        apr_searchActionPerformed(evt); //when keyin the sid and press enter also can search
     }//GEN-LAST:event_sid_searchActionPerformed
 
     /**
@@ -474,7 +474,7 @@ public class ARP_UI extends javax.swing.JFrame {
     //Table Summary ComboBox
     private void clearDisplay() {
         javax.swing.table.DefaultTableModel model =
-                (javax.swing.table.DefaultTableModel) arp_tabel1.getModel();
+                (javax.swing.table.DefaultTableModel) apr_tabel1.getModel();
         model.setRowCount(0);
         jTextArea_summary.setText("");
         jComboBox1.removeAllItems();
@@ -536,7 +536,7 @@ public class ARP_UI extends javax.swing.JFrame {
         }
 
         javax.swing.table.DefaultTableModel model =
-                (javax.swing.table.DefaultTableModel) arp_tabel1.getModel();
+                (javax.swing.table.DefaultTableModel) apr_tabel1.getModel();
         model.setRowCount(0);  // clear table
 
         double totalCGPA = 0;
@@ -1178,13 +1178,13 @@ public class ARP_UI extends javax.swing.JFrame {
         }
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel apr_intake;
+    private javax.swing.JButton apr_pdfButton;
+    private javax.swing.JButton apr_search;
+    private javax.swing.JLabel apr_sid1;
+    private javax.swing.JTable apr_tabel1;
     private javax.swing.JLabel apr_titile;
     private javax.swing.JScrollPane arp_jScrollPane;
-    private javax.swing.JButton arp_pdfButton;
-    private javax.swing.JButton arp_search;
-    private javax.swing.JLabel arp_sid;
-    private javax.swing.JLabel arp_sid1;
-    private javax.swing.JTable arp_tabel1;
     private javax.swing.JPanel dashboard;
     private javax.swing.JButton jButtonAPR;
     private javax.swing.JButton jButtonEligibility;
