@@ -365,7 +365,7 @@ public class ECE_UI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void search1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_search1ActionPerformed
-        search1ActionPerformed(evt);
+        search2ActionPerformed(evt);
     }//GEN-LAST:event_search1ActionPerformed
 
     private void search2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_search2ActionPerformed
