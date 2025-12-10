@@ -9,27 +9,27 @@ public class login {
         this.userManager = userManager;
     }
     
-    public User authenticate(String username, String password, String selectedRole){
-        if(username == null || password == null || selectedRole == null) {
+    public User authenticate(String username, String password){
+        if(username == null || password == null ) {
             return null;
         }
 
         User user = userManager.findByUsername(username.trim());
 
-        //if (user == null) return null; 
+        if (user == null) return null; 
         if (!user.isActive()) return null; 
         if (!user.getPassword().equals(password)) return null; 
         String expectedRole;
-        if ("Admin".equals(selectedRole)) {
-            expectedRole = "ADMIN";
-        } else if ("Academic Officer".equals(selectedRole)) {
-            expectedRole = "ACADEMIC_OFFICER";
-        } else {
-            expectedRole = selectedRole.toUpperCase();
-        }
-        if (!user.getRole().equalsIgnoreCase(expectedRole)) {
-            return null;
-        }
+//        if ("Admin".equals(selectedRole)) {
+//            expectedRole = "ADMIN";
+//        } else if ("Academic Officer".equals(selectedRole)) {
+//            expectedRole = "ACADEMIC_OFFICER";
+//        } else {
+//            expectedRole = selectedRole.toUpperCase();
+//        }
+//        if (!user.getRole().equalsIgnoreCase(expectedRole)) {
+//            return null;
+//        }
         Logger.writeLog(user.getUsername(), "LOGIN");
 
         return user;
