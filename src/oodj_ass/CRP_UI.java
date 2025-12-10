@@ -1792,11 +1792,11 @@ public class CRP_UI extends javax.swing.JFrame {
                 comboxCourseSelectorActionPerformed(evt);
             }
         });
-        milestoneTab.add(comboxCourseSelector, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 170, 110, 20));
+        milestoneTab.add(comboxCourseSelector, new org.netbeans.lib.awtextra.AbsoluteConstraints(700, 160, 130, 30));
 
         lblSelectCourse.setFont(new java.awt.Font("Serif", 0, 15)); // NOI18N
         lblSelectCourse.setText("Select Course:");
-        milestoneTab.add(lblSelectCourse, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 170, -1, -1));
+        milestoneTab.add(lblSelectCourse, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 170, -1, -1));
 
         tabTwoWay.addTab("Milestone", milestoneTab);
 
