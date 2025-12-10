@@ -251,6 +251,79 @@ public class RecoveryPlan {
         return LocalDateTime.now()
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
+    
+    public void setMilestones(List<RecoveryMilestone> newList) {
+        this.milestones = newList != null ? newList : new ArrayList<>();
+        updateTimestamp();
+    }
+    
+    public List<String> toMilestoneCsvLines() {
+        List<String> lines = new ArrayList<>();
+
+        for (RecoveryMilestone m : milestones) {
+            lines.add(planID + "," +
+                      m.getStudyWeek() + "," +
+                      m.getTask().replace(",", " ") + "," +
+                      m.isCompleted() + "," +
+                      (m.getNotes() == null ? "" : m.getNotes().replace(",", " ")));
+        }
+        return lines;
+    }
+
+    public void generateDefaultMilestones() {
+        this.milestones.clear(); // reset current list
+
+        String failType = course.getFailedComponent();
+        int attempt = course.getAttemptNumber();
+        int wAss = course.getAssignmentWeight();
+        int wExam = course.getExamWeight();
+
+        // --- Special case: FYP / Industrial Training ---
+        if (wAss == 100 && wExam == 0) {
+            addMilestone("Week 1",  "Meet supervisor and clarify project requirements.");
+            addMilestone("Week 3",  "Submit initial project outline or proposal draft.");
+            addMilestone("Week 6",  "Mid-progress checkpoint with supervisor.");
+            addMilestone("Week 10", "Submit final report or final deliverables.");
+            addMilestone("Week 12", "Prepare presentation / documentation and final submission.");
+            return;
+        }
+
+        // --- Attempt ≥ 3 → Full retake ---
+        if (attempt >= 3) {
+            addMilestone("Week 1",  "Register for full course retake and review syllabus.");
+            addMilestone("Week 2",  "Attend first consultation to plan retake strategy.");
+            addMilestone("Week 5",  "Submit compulsory coursework with improvement plan.");
+            addMilestone("Week 9",  "Attend revision session for overall course topics.");
+            addMilestone("Week 12", "Attempt final assessment for retake course.");
+            return;
+        }
+
+        // --- Normal cases: based on failed component ---
+        switch (failType) {
+
+            case "Assignment Only":
+                addMilestone("Week 1", "Review assignment feedback and identify weak areas.");
+                addMilestone("Week 2", "Attend academic consultation session.");
+                addMilestone("Week 4", "Submit improved assignment draft for lecturer review.");
+                addMilestone("Week 6", "Submit final assignment reattempt.");
+                break;
+
+            case "Exam Only":
+                addMilestone("Week 1", "Analyse exam mistakes and revise core chapters.");
+                addMilestone("Week 2", "Attend revision or tutorial class for exam topics.");
+                addMilestone("Week 4", "Complete 3 sets of past-year practice questions.");
+                addMilestone("Week 6", "Attempt mock test and evaluate performance.");
+                break;
+
+            case "Both Components":
+                addMilestone("Week 1", "Review feedback for both assignment and exam.");
+                addMilestone("Week 2", "Attend consultation for coursework + exam planning.");
+                addMilestone("Week 4", "Submit coursework improvement draft.");
+                addMilestone("Week 6", "Complete revision of exam chapters and attempt practice test.");
+                addMilestone("Week 8", "Final assignment submission + exam reattempt preparation.");
+                break;
+        }
+    }
 
     /**
      * **** NEW: Auto-generate a clear, human recommendation based on:
