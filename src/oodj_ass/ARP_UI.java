@@ -14,6 +14,7 @@ import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import java.awt.Color;
 import java.awt.event.*;
 import java.io.*;
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ import javax.swing.JOptionPane;
  *
  * @author User
  */
-//10/12 6.00PM
+//10/12 11.00PM
 public class ARP_UI extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ARP_UI.class.getName());
@@ -52,6 +53,37 @@ public class ARP_UI extends javax.swing.JFrame {
     private Map<String, StringBuilder> weaknessesMap  = new HashMap<>();
     private Map<String, StringBuilder> improveMap     = new HashMap<>();
 
+    private void addSidebarHover(javax.swing.JButton btn) {
+
+        Color normal = new Color(95,106,105);        // sidebar color (invisible)
+        Color hover  = new Color(130,140,140);       // reveal color
+        Color click  = new Color(160,170,170);       // click color
+
+        btn.setBackground(normal);
+
+        btn.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                btn.setBackground(hover);
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                btn.setBackground(normal);
+            }
+
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent e) {
+                btn.setBackground(click);
+            }
+
+            @Override
+            public void mouseReleased(java.awt.event.MouseEvent e) {
+                btn.setBackground(hover);
+            }
+        });
+    }
+    
     /**
      * Creates new form ARP_UI
      */
@@ -64,6 +96,12 @@ public class ARP_UI extends javax.swing.JFrame {
         javax.swing.table.DefaultTableCellRenderer headerRenderer = 
                 (javax.swing.table.DefaultTableCellRenderer) apr_tabel1.getTableHeader().getDefaultRenderer();
         headerRenderer.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        
+        //sidebarhover
+        addSidebarHover(jButtonUserManagement);
+        addSidebarHover(jButtonEligibility);
+        addSidebarHover(jButtonRecovery);
+        addSidebarHover(jButtonAPR);
         
         //Intake Drop Down Box
         jComboBox1.removeAllItems();

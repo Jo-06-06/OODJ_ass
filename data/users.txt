@@ -1,4 +1,4 @@
-ADM001,admin,admin123,Super Admin,admin@crs.edu,ADMIN,true
+ADM001,admin,admin123,Super Admin,yuxuanleong@gmail.com,ADMIN,true
 ADM005,test1,123,mrjack,test1@gmail.com,ADMIN,false
 ADM007,test2,Reset9310,test2,test2@gmail.com,ADMIN,false
 ADM006,muthu,123,muthuduplicate,muthudupe@gmail.com,ADMIN,false
