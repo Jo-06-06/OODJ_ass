@@ -4,7 +4,7 @@ package oodj_ass;
  *
  * @author User
  */
-//10/12 18.00
+//10/12 19.00
 import java.util.ArrayList;
 import java.io.*;
 import java.awt.Color;
@@ -413,7 +413,7 @@ public class ECE_UI extends javax.swing.JFrame {
     }//GEN-LAST:event_dropdownActionPerformed
 
     private void jButtonUserManagementActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonUserManagementActionPerformed
-        // TODO add your handling code here:
+
     }//GEN-LAST:event_jButtonUserManagementActionPerformed
 
     private void jButtonEligibilityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEligibilityActionPerformed
@@ -422,7 +422,9 @@ public class ECE_UI extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonEligibilityActionPerformed
 
     private void jButtonRecoveryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRecoveryActionPerformed
-
+        CRP_UI crp = new CRP_UI(new FileLoader());
+        crp.setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_jButtonRecoveryActionPerformed
 
     private void jButtonAPRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAPRActionPerformed

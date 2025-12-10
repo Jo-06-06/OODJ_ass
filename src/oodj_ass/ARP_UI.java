@@ -354,7 +354,7 @@ public class ARP_UI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonUserManagementActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonUserManagementActionPerformed
-        // TODO add your handling code here:
+
     }//GEN-LAST:event_jButtonUserManagementActionPerformed
 
     private void jButtonEligibilityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEligibilityActionPerformed
@@ -363,7 +363,7 @@ public class ARP_UI extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonEligibilityActionPerformed
 
     private void jButtonRecoveryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRecoveryActionPerformed
-        // TODO add your handling code here:
+ 
     }//GEN-LAST:event_jButtonRecoveryActionPerformed
 
     private void jButtonAPRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAPRActionPerformed
