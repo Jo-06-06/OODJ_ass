@@ -36,42 +36,35 @@ public class CRP_UI extends javax.swing.JFrame {
      */
     public CRP_UI(FileLoader loader) {
         this.fileLoader = loader;
-        initComponents();
         
+        initComponents();
 
         tabTwoWay.setSelectedIndex(0);
         
         loadAllFailedStudents();
         loadRecoveryPlansFromFile();
-        
-        Color normal = new Color(220,230,230);
-        Color hover  = new Color(200,210,210);
-        Color press  = new Color(160,180,180);
+    
 
         // Apply to every button in your UI
-        applyButtonStyle(btnSearch, normal, hover, press);
-        applyButtonStyle(btnCreatePlan, normal, hover, press);
-        applyButtonStyle(btnMilestoneTab, normal, hover, press);
-        applyButtonStyle(btnSavePlan, normal, hover, press);
-        applyButtonStyle(btnEditPlan, normal, hover, press);
-        applyButtonStyle(btnBack, normal, hover, press);
-        applyButtonStyle(btnUpdate, normal, hover, press);
-        applyButtonStyle(btnAdd, normal, hover, press);
-        applyButtonStyle(btnRemove, normal, hover, press);
-        applyButtonStyle(btnMarkAsCompleted, normal, hover, press);
-        
-        styleButton(btnCreatePlan);
-        styleButton(btnSavePlan);
-        styleButton(btnEditPlan);       // Edit Plan
-        styleButton(btnMilestoneTab);
-        styleButton(btnBack);
-        styleButton(btnSearch);        // Search
+        styleFlatButton(btnSearch);
+        styleFlatButton(btnCreatePlan);
+        styleFlatButton(btnMilestoneTab);
+        styleFlatButton(btnSavePlan);
+        styleFlatButton(btnEditPlan);
+        styleFlatButton(btnBack);
+        styleFlatButton(btnCreateAllPlans);
+        styleFlatButton(btnUpdate);
+        styleFlatButton(btnAdd);
+        styleFlatButton(btnRemove);
+        styleFlatButton(btnMarkAsCompleted);
 
 
         // Disable plan actions until a failed course is selected
         btnCreatePlan.setEnabled(false);
         btnSavePlan.setEnabled(false);
         btnEditPlan.setEnabled(false);
+        btnCreateAllPlans.setEnabled(false);
+
         jTableFailedComponents.setFillsViewportHeight(true);
         jTableFailedComponents.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         
@@ -130,9 +123,6 @@ public class CRP_UI extends javax.swing.JFrame {
                     // Clicked on empty area → clear selection & reset buttons
                     jTableFailedComponents.clearSelection();
                     currentPlan = null;
-                    btnCreatePlan.setEnabled(false);
-                    btnEditPlan.setEnabled(false); 
-                    btnSavePlan.setEnabled(false);
                 }
             }
              @Override
@@ -158,17 +148,19 @@ public class CRP_UI extends javax.swing.JFrame {
                 } else {
                     txtRecommendation.setText("");
                 }
-                
-                if (jTableFailedComponents.rowAtPoint(evt.getPoint()) == -1) {
-                    jTableFailedComponents.clearSelection();
-                    clearDetails();
-                    btnCreatePlan.setEnabled(false);
-                    btnEditPlan.setEnabled(false);
-                    btnSavePlan.setEnabled(false);
-                }
-                btnCreatePlan.setEnabled(true);
-                btnEditPlan.setEnabled(plan != null);
-                btnSavePlan.setEnabled(false);
+                    btnCreatePlan.setEnabled(true);
+                    btnEditPlan.setEnabled(plan != null);
+                    btnSavePlan.setEnabled(true);
+//                if (jTableFailedComponents.rowAtPoint(evt.getPoint()) == -1) {
+//                    jTableFailedComponents.clearSelection();
+//                    clearDetails();
+//                    btnCreatePlan.setEnabled(false);
+//                    btnEditPlan.setEnabled(false);
+//                    btnSavePlan.setEnabled(false);
+//                }
+//                btnCreatePlan.setEnabled(true);
+//                btnEditPlan.setEnabled(plan != null);
+//                btnSavePlan.setEnabled(true);
             }
             
         });
@@ -182,24 +174,54 @@ public class CRP_UI extends javax.swing.JFrame {
         // ===== Hover + selection colouring for table =====
         DefaultTableCellRenderer hoverRenderer = new DefaultTableCellRenderer() {
             @Override
-            public java.awt.Component getTableCellRendererComponent(
-                    javax.swing.JTable table, Object value,
-                    boolean isSelected, boolean hasFocus,
+            public Component getTableCellRendererComponent(
+                    JTable table, Object value, boolean isSelected, boolean hasFocus,
                     int row, int column) {
 
-                java.awt.Component c = super.getTableCellRendererComponent(
-                        table, value, isSelected, hasFocus, row, column);
+                Component c = super.getTableCellRendererComponent(
+                    table, value, isSelected, hasFocus, row, column);
+
+                String sid = table.getValueAt(row, 0).toString();
+                String cid = table.getValueAt(row, 1).toString();
+
+                Student s = fileLoader.getStudentByID(sid);
+                Course course = null;
+                for (Course cc : s.getCourses()) {
+                    if (cc.getCourseID().equals(cid)) {
+                        course = cc;
+                        break;
+                    }
+                }
+
+                String key = buildPlanKey(sid, cid,
+                        course != null ? course.getAttemptNumber() : 1);
+
+                boolean hasPlan = planByKey.containsKey(key);
 
                 if (isSelected) {
-                    c.setBackground(new Color(180, 205, 230));   // selected
-                } else if (row == hoveredRow) {
-                    c.setBackground(new Color(215, 225, 235));   // hover row
-                } else {
-                    c.setBackground(Color.WHITE);                // normal
+                    c.setBackground(new Color(180, 205, 230)); // selected blue
                 }
+                else if (row == hoveredRow) {
+                    c.setBackground(new Color(215, 225, 235)); // hover light blue
+                }
+                else if (hasPlan) {
+                    c.setBackground(new Color(230,230,230)); // planned course highlight
+                }
+                else {
+                    // default zebra rows
+                    c.setBackground(row % 2 == 0 ? new Color(245,245,245) : Color.WHITE);
+                }
+
                 return c;
             }
         };
+        
+        for (int i = 0; i < jTableFailedComponents.getColumnCount(); i++) {
+            jTableFailedComponents.getColumnModel()
+                    .getColumn(i)
+                    .setCellRenderer(hoverRenderer);
+        }
+
         
         jTableFailedComponents.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
@@ -226,14 +248,15 @@ public class CRP_UI extends javax.swing.JFrame {
         jScrollPane2.setWheelScrollingEnabled(true); 
     }
     
-    private void applyButtonStyle(JButton btn, Color normal, Color hover, Color press) {
+    private void styleFlatButton(JButton btn) {
 
-        btn.setBackground(normal);
-        btn.setFocusPainted(false);
-        btn.setOpaque(true);
+        // Light theme colors (matching "Create All Plans")
+        Color normal = new Color(235, 235, 235);   // light grey
+        Color hover  = new Color(215, 215, 215);   // darker grey on hover
+        Color click  = new Color(195, 195, 195);   // pressed
+
 
         btn.addMouseListener(new java.awt.event.MouseAdapter() {
-
             @Override
             public void mouseEntered(java.awt.event.MouseEvent e) {
                 btn.setBackground(hover);
@@ -246,7 +269,7 @@ public class CRP_UI extends javax.swing.JFrame {
 
             @Override
             public void mousePressed(java.awt.event.MouseEvent e) {
-                btn.setBackground(press);
+                btn.setBackground(click);
             }
 
             @Override
@@ -255,31 +278,81 @@ public class CRP_UI extends javax.swing.JFrame {
             }
         });
     }
-    
-    private void styleButton(JButton btn) {
-        btn.setFocusPainted(false);
-        btn.setContentAreaFilled(true);
-        btn.setBorder(BorderFactory.createEmptyBorder());
-        btn.setOpaque(true);
 
-        Color normal = new Color(240,240,240);
-        Color hover  = new Color(210,210,210);
+    // Create ALL Plans for student failed > 1 course
+    private void createAllPlansForStudent(String studentID) {
 
-        btn.setBackground(normal);
+        Student s = fileLoader.getStudentByID(studentID);
+        if (s == null) {
+            JOptionPane.showMessageDialog(this, "Student not found.");
+            return;
+        }
 
-        btn.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                btn.setBackground(hover);
+        // Gather failed courses
+        List<Course> failedCourses = new ArrayList<>();
+
+        for (Course c : s.getCourses()) {
+            if (!"None".equals(c.getFailedComponent())) {
+                failedCourses.add(c);
+            }
+        }
+
+        // No failed courses
+        if (failedCourses.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                "This student passed all courses.\nNo recovery plan is required.");
+            return;
+        }
+
+        int createdCount = 0;
+
+        for (Course c : failedCourses) {
+
+            int attempt = c.getAttemptNumber();
+            String key = buildPlanKey(s.getStudentID(), c.getCourseID(), attempt);
+
+            // SAFEGUARD: Skip if plan already exists
+            if (planByKey.containsKey(key)) {
+                continue;
             }
 
-            @Override
-            public void mouseExited(MouseEvent e) {
-                btn.setBackground(normal);
+            // SAFEGUARD: disallow plan creation for attempt ≥ 4
+            if (attempt >= 4) {
+                JOptionPane.showMessageDialog(this,
+                    "Warning: Course " + c.getCourseID() + " has reached maximum retake attempts.\n"
+                  + "Please refer this case to the Programme Head.");
+                continue;
             }
-        });
+
+            // Create new recovery plan
+            String planID = generatePlanID();
+            RecoveryPlan newPlan = new RecoveryPlan(planID, s, c);
+
+            planByKey.put(key, newPlan);
+            planByID.put(planID, newPlan);
+
+            createdCount++;
+        }
+
+        savePlansToFile();
+
+        if (createdCount == 0) {
+            JOptionPane.showMessageDialog(this,
+                "No new plans created.\nAll recovery plans already exist for this student.");
+        } else {
+            JOptionPane.showMessageDialog(this,
+                createdCount + " recovery plans created successfully!");
+        }
+
+        refreshFailedCoursesTableHighlight();
     }
 
+    private void refreshFailedCoursesTableHighlight() {
+        jTableFailedComponents.repaint();
+    }
+
+    
+    
     private void loadFailedComponents(String studentID) {
         DefaultTableModel model = (DefaultTableModel) jTableFailedComponents.getModel();
         model.setRowCount(0);
@@ -575,35 +648,6 @@ public class CRP_UI extends javax.swing.JFrame {
         return sb.toString();
     }
 
-//    private void searchStudent() {
-//        String studentID = txtStudentID.getText().trim();
-//
-//        if (studentID.isEmpty()) {
-//            JOptionPane.showMessageDialog(this, "Please enter a Student ID.");
-//            return;
-//        }
-//
-//        Student s = fileLoader.getStudentByID(studentID);
-//
-//        if (s == null) {
-//            JOptionPane.showMessageDialog(this,
-//                    "Student ID " + studentID + " does not exist in the system.",
-//                    "Invalid Student",
-//                    JOptionPane.ERROR_MESSAGE);
-//            return;
-//        }
-//
-//        loadFailedComponents(studentID);
-//
-//        // If no failed records, table is empty → show message
-//        if (jTableFailedComponents.getRowCount() == 0) {
-//            JOptionPane.showMessageDialog(this,
-//                    "Student " + studentID + " has passed all modules.",
-//                    "No Failed Components",
-//                    JOptionPane.INFORMATION_MESSAGE);
-//        }
-//    }
-
     private void updateStudentInfo(Student s) {
         if (s == null) {
             lblInfoStudentID.setText("");
@@ -714,7 +758,8 @@ public class CRP_UI extends javax.swing.JFrame {
         btnEditPlan = new javax.swing.JButton();
         jScrollPane6 = new javax.swing.JScrollPane();
         txtRecommendation = new javax.swing.JTextArea();
-        btnMilestoneTab = new javax.swing.JButton();
+        panelFailureBadge = new javax.swing.JPanel();
+        lblInfoFailure = new javax.swing.JLabel();
         panelFB = new javax.swing.JPanel();
         lblStudentID = new javax.swing.JLabel();
         lblInfoStudentID = new javax.swing.JLabel();
@@ -737,8 +782,8 @@ public class CRP_UI extends javax.swing.JFrame {
         lblInfoExamScore = new javax.swing.JLabel();
         lblStudentID2 = new javax.swing.JLabel();
         lblInfoCGPA = new javax.swing.JLabel();
-        panelFailureBadge = new javax.swing.JPanel();
-        lblInfoFailure = new javax.swing.JLabel();
+        jSeparator1 = new javax.swing.JSeparator();
+        btnMilestoneTab = new javax.swing.JButton();
         lblCRP1 = new javax.swing.JLabel();
         btnCreateAllPlans = new javax.swing.JButton();
         MilestonesTab = new javax.swing.JPanel();
@@ -803,15 +848,20 @@ public class CRP_UI extends javax.swing.JFrame {
             }
         });
 
+        btnSearch.setFont(new java.awt.Font("Helvetica Neue", 0, 14)); // NOI18N
         btnSearch.setText("Search");
+        btnSearch.setBorder(null);
         btnSearch.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSearchActionPerformed(evt);
             }
         });
 
-        btnCreatePlan.setFont(new java.awt.Font("Helvetica Neue", 0, 15)); // NOI18N
+        btnCreatePlan.setFont(new java.awt.Font("Helvetica Neue", 0, 16)); // NOI18N
         btnCreatePlan.setText("Create Plan");
+        btnCreatePlan.setBorder(null);
+        btnCreatePlan.setBorderPainted(false);
+        btnCreatePlan.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnCreatePlan.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCreatePlanActionPerformed(evt);
@@ -857,7 +907,7 @@ public class CRP_UI extends javax.swing.JFrame {
         lblplanid.setFont(new java.awt.Font("Serif", 1, 15)); // NOI18N
         lblplanid.setText("Plan ID:");
 
-        lblPlanID.setFont(new java.awt.Font("Tiro Devanagari Sanskrit", 1, 15)); // NOI18N
+        lblPlanID.setFont(new java.awt.Font("Serif", 1, 15)); // NOI18N
         lblPlanID.setText(" ");
 
         jLabel5.setFont(new java.awt.Font("Serif", 1, 15)); // NOI18N
@@ -893,39 +943,62 @@ public class CRP_UI extends javax.swing.JFrame {
 
         txtRecommendation.setEditable(false);
         txtRecommendation.setColumns(20);
+        txtRecommendation.setFont(new java.awt.Font("sansserif", 0, 14)); // NOI18N
         txtRecommendation.setLineWrap(true);
         txtRecommendation.setRows(10);
         txtRecommendation.setWrapStyleWord(true);
         jScrollPane6.setViewportView(txtRecommendation);
+
+        panelFailureBadge.setBackground(new java.awt.Color(211, 211, 211));
+
+        lblInfoFailure.setBackground(new java.awt.Color(255, 255, 255));
+        lblInfoFailure.setFont(new java.awt.Font("Serif", 1, 13)); // NOI18N
+        lblInfoFailure.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblInfoFailure.setText(" ");
+
+        javax.swing.GroupLayout panelFailureBadgeLayout = new javax.swing.GroupLayout(panelFailureBadge);
+        panelFailureBadge.setLayout(panelFailureBadgeLayout);
+        panelFailureBadgeLayout.setHorizontalGroup(
+            panelFailureBadgeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelFailureBadgeLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblInfoFailure, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        panelFailureBadgeLayout.setVerticalGroup(
+            panelFailureBadgeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(lblInfoFailure, javax.swing.GroupLayout.DEFAULT_SIZE, 24, Short.MAX_VALUE)
+        );
 
         javax.swing.GroupLayout RPpanelLayout = new javax.swing.GroupLayout(RPpanel);
         RPpanel.setLayout(RPpanelLayout);
         RPpanelLayout.setHorizontalGroup(
             RPpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(RPpanelLayout.createSequentialGroup()
-                .addContainerGap()
+                .addGroup(RPpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(lblplanid)
+                    .addComponent(jLabel5)
+                    .addComponent(jLabel6))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(RPpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(RPpanelLayout.createSequentialGroup()
-                        .addGroup(RPpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(lblplanid)
-                            .addComponent(jLabel5)
-                            .addComponent(jLabel6))
-                        .addGap(21, 21, 21)
-                        .addGroup(RPpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(priorityCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblPlanID, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addContainerGap(18, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, RPpanelLayout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(btnEditPlan, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(53, 53, 53)
-                        .addComponent(btnSavePlan)
-                        .addGap(74, 74, 74))))
+                        .addComponent(priorityCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(panelFailureBadge, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblPlanID, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(15, 15, 15))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, RPpanelLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(73, 73, 73))
+                .addGroup(RPpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, RPpanelLayout.createSequentialGroup()
+                        .addComponent(btnEditPlan)
+                        .addGap(56, 56, 56)
+                        .addComponent(btnSavePlan)
+                        .addGap(74, 74, 74))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, RPpanelLayout.createSequentialGroup()
+                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(73, 73, 73))))
         );
         RPpanelLayout.setVerticalGroup(
             RPpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -933,40 +1006,38 @@ public class CRP_UI extends javax.swing.JFrame {
                 .addGap(4, 4, 4)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(RPpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblplanid)
-                    .addComponent(lblPlanID))
-                .addGap(18, 18, 18)
-                .addGroup(RPpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(RPpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(RPpanelLayout.createSequentialGroup()
+                        .addGap(36, 36, 36)
                         .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(RPpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(priorityCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel6))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(RPpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(btnSavePlan)
-                            .addComponent(btnEditPlan, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(12, 12, 12))
+                        .addComponent(panelFailureBadge, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(RPpanelLayout.createSequentialGroup()
-                        .addComponent(jLabel5)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addGroup(RPpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblplanid)
+                            .addComponent(lblPlanID, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(RPpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(RPpanelLayout.createSequentialGroup()
+                                .addGap(111, 111, 111)
+                                .addGroup(RPpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel6)
+                                    .addComponent(priorityCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(RPpanelLayout.createSequentialGroup()
+                                .addComponent(jLabel5)
+                                .addGap(117, 117, 117)))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, 20, Short.MAX_VALUE)
+                .addGroup(RPpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(btnEditPlan, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
+                    .addComponent(btnSavePlan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
-        btnMilestoneTab.setFont(new java.awt.Font("Helvetica Neue", 0, 16)); // NOI18N
-        btnMilestoneTab.setText("View Milestones");
-        btnMilestoneTab.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnMilestoneTabActionPerformed(evt);
-            }
-        });
-
         panelFB.setBackground(new java.awt.Color(255, 255, 255));
-        panelFB.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        panelFB.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         panelFB.setDoubleBuffered(false);
 
-        lblStudentID.setFont(new java.awt.Font("Serif", 0, 14)); // NOI18N
+        lblStudentID.setFont(new java.awt.Font("Serif", 0, 15)); // NOI18N
         lblStudentID.setText("Student ID:");
         lblStudentID.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
         lblStudentID.setAlignmentY(0.0F);
@@ -975,7 +1046,7 @@ public class CRP_UI extends javax.swing.JFrame {
         lblInfoStudentID.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         lblInfoStudentID.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
 
-        lblStudentName.setFont(new java.awt.Font("Serif", 0, 14)); // NOI18N
+        lblStudentName.setFont(new java.awt.Font("Serif", 0, 16)); // NOI18N
         lblStudentName.setText("Student Name:");
         lblStudentName.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
         lblStudentName.setAlignmentY(0.0F);
@@ -986,7 +1057,7 @@ public class CRP_UI extends javax.swing.JFrame {
         lblTitleDetails.setText("Student Details");
         lblTitleDetails.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
 
-        lblCourseID.setFont(new java.awt.Font("Serif", 0, 14)); // NOI18N
+        lblCourseID.setFont(new java.awt.Font("Serif", 0, 16)); // NOI18N
         lblCourseID.setText("Course ID:");
         lblCourseID.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
         lblCourseID.setAlignmentY(0.0F);
@@ -994,7 +1065,7 @@ public class CRP_UI extends javax.swing.JFrame {
         lblInfoCourseID.setFont(new java.awt.Font("Serif", 0, 16)); // NOI18N
         lblInfoCourseID.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
 
-        lblCourseName.setFont(new java.awt.Font("Serif", 0, 14)); // NOI18N
+        lblCourseName.setFont(new java.awt.Font("Serif", 0, 16)); // NOI18N
         lblCourseName.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         lblCourseName.setText("Course Name:");
         lblCourseName.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
@@ -1002,34 +1073,33 @@ public class CRP_UI extends javax.swing.JFrame {
 
         lblInfoCourseName.setFont(new java.awt.Font("Serif", 0, 16)); // NOI18N
 
-        lblLecturer.setFont(new java.awt.Font("Serif", 0, 14)); // NOI18N
+        lblLecturer.setFont(new java.awt.Font("Serif", 0, 16)); // NOI18N
         lblLecturer.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         lblLecturer.setText("Lecturer:");
         lblLecturer.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
 
         lblInfoLecturer.setFont(new java.awt.Font("Serif", 0, 16)); // NOI18N
 
-        lblSemester.setFont(new java.awt.Font("Serif", 0, 14)); // NOI18N
+        lblSemester.setFont(new java.awt.Font("Serif", 0, 16)); // NOI18N
         lblSemester.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         lblSemester.setText("Semester: ");
         lblSemester.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
 
         lblInfoSemester.setFont(new java.awt.Font("Serif", 0, 16)); // NOI18N
 
-        lblAssScore.setFont(new java.awt.Font("Serif", 0, 14)); // NOI18N
-        lblAssScore.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        lblAssScore.setFont(new java.awt.Font("Serif", 0, 16)); // NOI18N
         lblAssScore.setText("Assignment Score:");
         lblAssScore.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
 
         lblInfoAssScore.setFont(new java.awt.Font("Serif", 0, 16)); // NOI18N
         lblInfoAssScore.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
 
-        lblExamScore.setFont(new java.awt.Font("Serif", 0, 14)); // NOI18N
+        lblExamScore.setFont(new java.awt.Font("Serif", 0, 16)); // NOI18N
         lblExamScore.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         lblExamScore.setText("Exam Score:");
         lblExamScore.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
 
-        lblAttempt.setFont(new java.awt.Font("Serif", 0, 14)); // NOI18N
+        lblAttempt.setFont(new java.awt.Font("Serif", 0, 16)); // NOI18N
         lblAttempt.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         lblAttempt.setText("Attempt:");
         lblAttempt.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
@@ -1039,212 +1109,201 @@ public class CRP_UI extends javax.swing.JFrame {
 
         lblInfoExamScore.setFont(new java.awt.Font("Serif", 0, 16)); // NOI18N
 
-        lblStudentID2.setFont(new java.awt.Font("Serif", 0, 14)); // NOI18N
+        lblStudentID2.setFont(new java.awt.Font("Serif", 0, 16)); // NOI18N
         lblStudentID2.setText("CGPA:");
         lblStudentID2.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
         lblStudentID2.setAlignmentY(0.0F);
 
         lblInfoCGPA.setFont(new java.awt.Font("Serif", 0, 16)); // NOI18N
 
-        panelFailureBadge.setBackground(new java.awt.Color(211, 211, 211));
+        jSeparator1.setToolTipText("");
 
-        lblInfoFailure.setBackground(new java.awt.Color(255, 255, 255));
-        lblInfoFailure.setFont(new java.awt.Font("Serif", 1, 15)); // NOI18N
-        lblInfoFailure.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblInfoFailure.setText(" ");
-
-        javax.swing.GroupLayout panelFailureBadgeLayout = new javax.swing.GroupLayout(panelFailureBadge);
-        panelFailureBadge.setLayout(panelFailureBadgeLayout);
-        panelFailureBadgeLayout.setHorizontalGroup(
-            panelFailureBadgeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelFailureBadgeLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lblInfoFailure, javax.swing.GroupLayout.DEFAULT_SIZE, 138, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        panelFailureBadgeLayout.setVerticalGroup(
-            panelFailureBadgeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(lblInfoFailure, javax.swing.GroupLayout.DEFAULT_SIZE, 22, Short.MAX_VALUE)
-        );
+        btnMilestoneTab.setFont(new java.awt.Font("Helvetica Neue", 0, 17)); // NOI18N
+        btnMilestoneTab.setText("View Milestones");
+        btnMilestoneTab.setBorder(null);
+        btnMilestoneTab.setBorderPainted(false);
+        btnMilestoneTab.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMilestoneTabActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout panelFBLayout = new javax.swing.GroupLayout(panelFB);
         panelFB.setLayout(panelFBLayout);
         panelFBLayout.setHorizontalGroup(
             panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelFBLayout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelFBLayout.createSequentialGroup()
-                        .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 454, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(panelFBLayout.createSequentialGroup()
+                        .addGap(161, 161, 161)
+                        .addComponent(lblTitleDetails))
+                    .addGroup(panelFBLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(panelFBLayout.createSequentialGroup()
                                 .addComponent(lblLecturer, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(lblInfoLecturer, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE))
+                                .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(lblInfoLecturer, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(panelFBLayout.createSequentialGroup()
+                                        .addComponent(lblInfoAttempt, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(btnMilestoneTab, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE))))
                             .addGroup(panelFBLayout.createSequentialGroup()
                                 .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(panelFBLayout.createSequentialGroup()
-                                        .addComponent(lblAttempt, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(43, 43, 43)
-                                        .addComponent(lblInfoAttempt))
-                                    .addGroup(panelFBLayout.createSequentialGroup()
                                         .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(lblStudentID, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(lblStudentName))
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                            .addGroup(panelFBLayout.createSequentialGroup()
+                                                .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                    .addComponent(lblStudentID, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                    .addComponent(lblStudentName))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                    .addComponent(lblInfoStudentID, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                    .addComponent(lblInfoStudentName, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                            .addGroup(panelFBLayout.createSequentialGroup()
+                                                .addComponent(lblSemester, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(lblInfoSemester, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(lblInfoStudentID, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(lblInfoStudentName, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                    .addGroup(panelFBLayout.createSequentialGroup()
-                                        .addComponent(lblSemester, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(lblStudentID2)
+                                            .addComponent(lblExamScore)
+                                            .addComponent(lblAssScore))
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(lblInfoSemester, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                            .addComponent(lblInfoExamScore, javax.swing.GroupLayout.DEFAULT_SIZE, 57, Short.MAX_VALUE)
+                                            .addComponent(lblInfoCGPA, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                            .addComponent(lblInfoAssScore, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                                     .addGroup(panelFBLayout.createSequentialGroup()
                                         .addComponent(lblCourseID, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(lblInfoCourseID, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(lblInfoCourseID, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
                                     .addGroup(panelFBLayout.createSequentialGroup()
-                                        .addGap(34, 34, 34)
-                                        .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(lblExamScore)
-                                            .addComponent(lblAssScore)
-                                            .addComponent(lblStudentID2))
+                                        .addComponent(lblCourseName, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                                .addComponent(lblInfoAssScore, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .addComponent(lblInfoExamScore, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                            .addComponent(lblInfoCGPA)))
-                                    .addGroup(panelFBLayout.createSequentialGroup()
-                                        .addGap(59, 59, 59)
-                                        .addComponent(panelFailureBadge, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                        .addGap(360, 360, 360))
-                    .addGroup(panelFBLayout.createSequentialGroup()
-                        .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(panelFBLayout.createSequentialGroup()
-                                .addComponent(lblCourseName, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(lblInfoCourseName, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(panelFBLayout.createSequentialGroup()
-                                .addGap(167, 167, 167)
-                                .addComponent(lblTitleDetails)))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                                        .addComponent(lblInfoCourseName, javax.swing.GroupLayout.PREFERRED_SIZE, 261, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(lblAttempt, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(0, 0, Short.MAX_VALUE)))))
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         panelFBLayout.setVerticalGroup(
             panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelFBLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(lblTitleDetails, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(14, 14, 14)
-                .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblStudentID, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblInfoStudentID, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblAssScore, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblInfoAssScore))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblInfoStudentName, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblStudentName, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblExamScore, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblInfoExamScore))
-                .addGap(8, 8, 8)
+                .addGap(5, 5, 5)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblStudentID2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(lblSemester, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(lblInfoSemester, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(lblInfoCGPA)))
+                        .addComponent(lblStudentID, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblInfoStudentID, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(panelFBLayout.createSequentialGroup()
+                        .addGap(5, 5, 5)
+                        .addComponent(lblAssScore, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lblInfoAssScore, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblCourseID, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblInfoCourseID, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblCourseName, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblInfoCourseName, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblLecturer, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblInfoLecturer, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panelFBLayout.createSequentialGroup()
-                        .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lblAttempt, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblInfoAttempt))
-                        .addGap(16, 16, 16))
-                    .addGroup(panelFBLayout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
-                        .addComponent(panelFailureBadge, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap())))
+                    .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(lblInfoStudentName, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblStudentName, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblInfoExamScore, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lblExamScore, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(lblSemester, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(lblInfoCGPA, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblInfoSemester, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblStudentID2, javax.swing.GroupLayout.Alignment.TRAILING)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblInfoCourseID, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblCourseID, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(lblInfoCourseName, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblCourseName, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(lblInfoLecturer, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblLecturer, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(lblInfoAttempt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lblAttempt, javax.swing.GroupLayout.DEFAULT_SIZE, 23, Short.MAX_VALUE))
+                    .addComponent(btnMilestoneTab, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
 
         lblCRP1.setBackground(new java.awt.Color(0, 0, 0));
         lblCRP1.setFont(new java.awt.Font("Serif", 1, 36)); // NOI18N
         lblCRP1.setText("Course Recovery Plan");
 
-        btnCreateAllPlans.setFont(new java.awt.Font("Serif", 0, 18)); // NOI18N
+        btnCreateAllPlans.setFont(new java.awt.Font("Helvetica Neue", 0, 16)); // NOI18N
         btnCreateAllPlans.setText("Create All Plans");
+        btnCreateAllPlans.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCreateAllPlansActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout panelOverviewLayout = new javax.swing.GroupLayout(panelOverview);
         panelOverview.setLayout(panelOverviewLayout);
         panelOverviewLayout.setHorizontalGroup(
             panelOverviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelOverviewLayout.createSequentialGroup()
-                .addGap(18, 18, 18)
+                .addGap(24, 24, 24)
                 .addComponent(txtStudentID, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnSearch)
-                .addGap(189, 189, 189)
-                .addComponent(btnCreateAllPlans, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(53, 53, 53)
-                .addComponent(btnMilestoneTab)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnCreatePlan)
-                .addGap(64, 64, 64))
+                .addComponent(btnSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnCreateAllPlans)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnCreatePlan, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(67, 67, 67))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelOverviewLayout.createSequentialGroup()
+                .addGap(0, 20, Short.MAX_VALUE)
+                .addGroup(panelOverviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 865, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(panelOverviewLayout.createSequentialGroup()
+                        .addComponent(panelFB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(RPpanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(65, 65, 65))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelOverviewLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(lblCRP1, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(264, 264, 264))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelOverviewLayout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addGroup(panelOverviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 865, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(panelOverviewLayout.createSequentialGroup()
-                        .addComponent(panelFB, javax.swing.GroupLayout.PREFERRED_SIZE, 456, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(RPpanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(65, 65, 65))
         );
         panelOverviewLayout.setVerticalGroup(
             panelOverviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelOverviewLayout.createSequentialGroup()
                 .addGroup(panelOverviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(panelOverviewLayout.createSequentialGroup()
-                        .addGap(40, 40, 40)
-                        .addComponent(lblCRP1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGroup(panelOverviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(panelOverviewLayout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
-                                .addGroup(panelOverviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(btnMilestoneTab, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(btnCreatePlan)))
-                            .addGroup(panelOverviewLayout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(btnCreateAllPlans))))
-                    .addGroup(panelOverviewLayout.createSequentialGroup()
                         .addGap(110, 110, 110)
-                        .addGroup(panelOverviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(panelOverviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(txtStudentID, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnSearch))))
-                .addGap(18, 18, 18)
+                            .addComponent(btnSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(20, 20, 20))
+                    .addGroup(panelOverviewLayout.createSequentialGroup()
+                        .addGroup(panelOverviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelOverviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(btnCreatePlan, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(btnCreateAllPlans))
+                            .addGroup(panelOverviewLayout.createSequentialGroup()
+                                .addGap(40, 40, 40)
+                                .addComponent(lblCRP1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 206, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(11, 11, 11)
-                .addGroup(panelOverviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(panelFB, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(RPpanel, javax.swing.GroupLayout.PREFERRED_SIZE, 260, Short.MAX_VALUE))
-                .addGap(5, 5, 5))
+                .addGroup(panelOverviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(RPpanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(panelFB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         tabTwoWay.addTab("Overview", panelOverview);
@@ -1495,8 +1554,8 @@ public class CRP_UI extends javax.swing.JFrame {
             }
 
             currentPlan.setRecommendation(txtRecommendation.getText());
-            currentPlan.setPriority(priorityCombo.getSelectedItem().toString());
-            currentPlan.updateLastUpdated();
+//            currentPlan.setPriority(priorityCombo.getSelectedItem().toString());
+//            currentPlan.updateLastUpdated();
 
             savePlansToFile();
 
@@ -1519,6 +1578,15 @@ public class CRP_UI extends javax.swing.JFrame {
         priorityCombo.setEnabled(true);
         btnSavePlan.setEnabled(true);
     }//GEN-LAST:event_btnEditPlanActionPerformed
+
+    private void btnCreateAllPlansActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateAllPlansActionPerformed
+        String studentID = lblInfoStudentID.getText().trim();
+        if (studentID.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please search a student first.");
+            return;
+        }
+        createAllPlansForStudent(studentID);
+    }//GEN-LAST:event_btnCreateAllPlansActionPerformed
     
     private void populatePlanUI(RecoveryPlan plan) {
         lblPlanID.setText(plan.getPlanID());
@@ -1582,6 +1650,7 @@ public class CRP_UI extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane6;
+    private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTable jTable2;
     private javax.swing.JTable jTableFailedComponents;
     private javax.swing.JLabel lblAssScore;

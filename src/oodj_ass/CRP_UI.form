@@ -143,34 +143,32 @@
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
-                          <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
                           <Component id="txtStudentID" min="-2" pref="99" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="btnSearch" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="-2" pref="189" max="-2" attributes="0"/>
-                          <Component id="btnCreateAllPlans" max="32767" attributes="0"/>
-                          <EmptySpace min="-2" pref="53" max="-2" attributes="0"/>
-                          <Component id="btnMilestoneTab" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                          <Component id="btnCreatePlan" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="-2" pref="64" max="-2" attributes="0"/>
-                      </Group>
-                      <Group type="102" alignment="1" attributes="0">
+                          <Component id="btnSearch" min="-2" pref="68" max="-2" attributes="0"/>
                           <EmptySpace max="32767" attributes="0"/>
-                          <Component id="lblCRP1" min="-2" pref="350" max="-2" attributes="0"/>
-                          <EmptySpace min="-2" pref="264" max="-2" attributes="0"/>
+                          <Component id="btnCreateAllPlans" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="btnCreatePlan" min="-2" pref="95" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="67" max="-2" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="1" attributes="0">
-                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="20" max="32767" attributes="0"/>
                           <Group type="103" groupAlignment="0" max="-2" attributes="0">
                               <Component id="jScrollPane2" min="-2" pref="865" max="-2" attributes="0"/>
                               <Group type="102" attributes="0">
-                                  <Component id="panelFB" min="-2" pref="456" max="-2" attributes="0"/>
+                                  <Component id="panelFB" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="32767" attributes="0"/>
                                   <Component id="RPpanel" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                           <EmptySpace min="-2" pref="65" max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="102" alignment="1" attributes="0">
+                          <EmptySpace max="32767" attributes="0"/>
+                          <Component id="lblCRP1" min="-2" pref="350" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="264" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -178,39 +176,36 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
                           <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                              <Group type="102" alignment="0" attributes="0">
-                                  <EmptySpace min="-2" pref="40" max="-2" attributes="0"/>
-                                  <Component id="lblCRP1" min="-2" pref="50" max="-2" attributes="0"/>
+                              <Group type="102" attributes="0">
+                                  <EmptySpace min="-2" pref="110" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="3" attributes="0">
+                                      <Component id="txtStudentID" alignment="3" min="-2" pref="31" max="-2" attributes="0"/>
+                                      <Component id="btnSearch" alignment="3" min="-2" pref="31" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
+                              </Group>
+                              <Group type="102" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
-                                      <Group type="102" attributes="0">
-                                          <EmptySpace pref="30" max="32767" attributes="0"/>
-                                          <Group type="103" groupAlignment="3" attributes="0">
-                                              <Component id="btnMilestoneTab" alignment="3" min="-2" pref="26" max="-2" attributes="0"/>
-                                              <Component id="btnCreatePlan" alignment="3" min="-2" max="-2" attributes="0"/>
-                                          </Group>
+                                      <Group type="103" alignment="1" groupAlignment="3" attributes="0">
+                                          <Component id="btnCreatePlan" alignment="3" min="-2" pref="28" max="-2" attributes="0"/>
+                                          <Component id="btnCreateAllPlans" alignment="3" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                       <Group type="102" alignment="0" attributes="0">
-                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                          <Component id="btnCreateAllPlans" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace min="-2" pref="40" max="-2" attributes="0"/>
+                                          <Component id="lblCRP1" min="-2" pref="50" max="-2" attributes="0"/>
+                                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                                       </Group>
                                   </Group>
-                              </Group>
-                              <Group type="102" alignment="0" attributes="0">
-                                  <EmptySpace min="-2" pref="110" max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="1" attributes="0">
-                                      <Component id="txtStudentID" min="-2" pref="31" max="-2" attributes="0"/>
-                                      <Component id="btnSearch" min="-2" max="-2" attributes="0"/>
-                                  </Group>
+                                  <EmptySpace max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Component id="jScrollPane2" min="-2" pref="206" max="-2" attributes="0"/>
                           <EmptySpace min="-2" pref="11" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                              <Component id="panelFB" max="32767" attributes="0"/>
-                              <Component id="RPpanel" pref="260" max="32767" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="RPpanel" min="-2" max="-2" attributes="0"/>
+                              <Component id="panelFB" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -228,7 +223,13 @@
                 </Component>
                 <Component class="javax.swing.JButton" name="btnSearch">
                   <Properties>
+                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                      <Font name="Helvetica Neue" size="14" style="0"/>
+                    </Property>
                     <Property name="text" type="java.lang.String" value="Search"/>
+                    <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+                      <Border info="null"/>
+                    </Property>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSearchActionPerformed"/>
@@ -237,9 +238,16 @@
                 <Component class="javax.swing.JButton" name="btnCreatePlan">
                   <Properties>
                     <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                      <Font name="Helvetica Neue" size="15" style="0"/>
+                      <Font name="Helvetica Neue" size="16" style="0"/>
                     </Property>
                     <Property name="text" type="java.lang.String" value="Create Plan"/>
+                    <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+                      <Border info="null"/>
+                    </Property>
+                    <Property name="borderPainted" type="boolean" value="false"/>
+                    <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+                      <Color id="Hand Cursor"/>
+                    </Property>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCreatePlanActionPerformed"/>
@@ -305,35 +313,37 @@
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" attributes="0">
-                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="1" attributes="0">
+                                  <Component id="lblplanid" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" attributes="0">
-                                      <Group type="103" groupAlignment="1" attributes="0">
-                                          <Component id="lblplanid" min="-2" max="-2" attributes="0"/>
-                                          <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
-                                          <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
-                                      </Group>
-                                      <EmptySpace min="-2" pref="21" max="-2" attributes="0"/>
-                                      <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="priorityCombo" min="-2" max="-2" attributes="0"/>
-                                          <Component id="lblPlanID" min="-2" pref="64" max="-2" attributes="0"/>
-                                          <Component id="jScrollPane6" min="-2" pref="215" max="-2" attributes="0"/>
-                                      </Group>
-                                      <EmptySpace pref="18" max="32767" attributes="0"/>
+                                      <Component id="priorityCombo" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                      <Component id="panelFailureBadge" max="32767" attributes="0"/>
                                   </Group>
-                                  <Group type="102" alignment="1" attributes="0">
-                                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                                      <Component id="btnEditPlan" min="-2" pref="89" max="-2" attributes="0"/>
-                                      <EmptySpace min="-2" pref="53" max="-2" attributes="0"/>
-                                      <Component id="btnSavePlan" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace min="-2" pref="74" max="-2" attributes="0"/>
-                                  </Group>
+                                  <Component id="jScrollPane6" min="-2" pref="215" max="-2" attributes="0"/>
+                                  <Component id="lblPlanID" min="-2" pref="76" max="-2" attributes="0"/>
                               </Group>
+                              <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="1" attributes="0">
                               <EmptySpace max="32767" attributes="0"/>
-                              <Component id="jLabel2" min="-2" pref="208" max="-2" attributes="0"/>
-                              <EmptySpace min="-2" pref="73" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" alignment="1" attributes="0">
+                                      <Component id="btnEditPlan" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace min="-2" pref="56" max="-2" attributes="0"/>
+                                      <Component id="btnSavePlan" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace min="-2" pref="74" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Group type="102" alignment="1" attributes="0">
+                                      <Component id="jLabel2" min="-2" pref="208" max="-2" attributes="0"/>
+                                      <EmptySpace min="-2" pref="73" max="-2" attributes="0"/>
+                                  </Group>
+                              </Group>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -343,31 +353,40 @@
                               <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
                               <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="lblplanid" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="lblPlanID" alignment="3" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace type="separate" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
                                   <Group type="102" attributes="0">
+                                      <EmptySpace min="-2" pref="36" max="-2" attributes="0"/>
                                       <Component id="jScrollPane6" min="-2" pref="108" max="-2" attributes="0"/>
                                       <EmptySpace max="32767" attributes="0"/>
-                                      <Group type="103" groupAlignment="3" attributes="0">
-                                          <Component id="priorityCombo" alignment="3" min="-2" max="-2" attributes="0"/>
-                                          <Component id="jLabel6" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      </Group>
-                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                      <Group type="103" groupAlignment="3" attributes="0">
-                                          <Component id="btnSavePlan" alignment="3" min="-2" max="-2" attributes="0"/>
-                                          <Component id="btnEditPlan" alignment="3" min="-2" pref="21" max="-2" attributes="0"/>
-                                      </Group>
-                                      <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
+                                      <Component id="panelFailureBadge" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <Group type="102" attributes="0">
-                                      <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="32767" attributes="0"/>
+                                      <Group type="103" groupAlignment="3" attributes="0">
+                                          <Component id="lblplanid" alignment="3" min="-2" max="-2" attributes="0"/>
+                                          <Component id="lblPlanID" alignment="3" min="-2" pref="24" max="-2" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Group type="102" alignment="0" attributes="0">
+                                              <EmptySpace min="111" pref="111" max="-2" attributes="0"/>
+                                              <Group type="103" groupAlignment="3" attributes="0">
+                                                  <Component id="jLabel6" alignment="3" min="-2" max="-2" attributes="0"/>
+                                                  <Component id="priorityCombo" alignment="3" min="-2" max="-2" attributes="0"/>
+                                              </Group>
+                                          </Group>
+                                          <Group type="102" alignment="0" attributes="0">
+                                              <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
+                                              <EmptySpace min="-2" pref="117" max="-2" attributes="0"/>
+                                          </Group>
+                                      </Group>
                                   </Group>
                               </Group>
+                              <EmptySpace type="unrelated" pref="20" max="32767" attributes="0"/>
+                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                  <Component id="btnEditPlan" pref="30" max="32767" attributes="0"/>
+                                  <Component id="btnSavePlan" max="32767" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -393,7 +412,7 @@
                     <Component class="javax.swing.JLabel" name="lblPlanID">
                       <Properties>
                         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                          <Font name="Tiro Devanagari Sanskrit" size="15" style="1"/>
+                          <Font name="Serif" size="15" style="1"/>
                         </Property>
                         <Property name="text" type="java.lang.String" value=" "/>
                       </Properties>
@@ -468,6 +487,9 @@
                           <Properties>
                             <Property name="editable" type="boolean" value="false"/>
                             <Property name="columns" type="int" value="20"/>
+                            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                              <Font name="sansserif" size="14" style="0"/>
+                            </Property>
                             <Property name="lineWrap" type="boolean" value="true"/>
                             <Property name="rows" type="int" value="10"/>
                             <Property name="wrapStyleWord" type="boolean" value="true"/>
@@ -475,117 +497,141 @@
                         </Component>
                       </SubComponents>
                     </Container>
+                    <Container class="javax.swing.JPanel" name="panelFailureBadge">
+                      <Properties>
+                        <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                          <Color blue="d3" green="d3" red="d3" type="rgb"/>
+                        </Property>
+                      </Properties>
+
+                      <Layout>
+                        <DimensionLayout dim="0">
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="102" alignment="0" attributes="0">
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="lblInfoFailure" max="32767" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
+                        </DimensionLayout>
+                        <DimensionLayout dim="1">
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="lblInfoFailure" alignment="0" pref="24" max="32767" attributes="0"/>
+                          </Group>
+                        </DimensionLayout>
+                      </Layout>
+                      <SubComponents>
+                        <Component class="javax.swing.JLabel" name="lblInfoFailure">
+                          <Properties>
+                            <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                              <Color blue="ff" green="ff" red="ff" type="rgb"/>
+                            </Property>
+                            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                              <Font name="Serif" size="13" style="1"/>
+                            </Property>
+                            <Property name="horizontalAlignment" type="int" value="0"/>
+                            <Property name="text" type="java.lang.String" value=" "/>
+                          </Properties>
+                        </Component>
+                      </SubComponents>
+                    </Container>
                   </SubComponents>
                 </Container>
-                <Component class="javax.swing.JButton" name="btnMilestoneTab">
-                  <Properties>
-                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                      <Font name="Helvetica Neue" size="16" style="0"/>
-                    </Property>
-                    <Property name="text" type="java.lang.String" value="View Milestones"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnMilestoneTabActionPerformed"/>
-                  </Events>
-                </Component>
                 <Container class="javax.swing.JPanel" name="panelFB">
                   <Properties>
                     <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                       <Color blue="ff" green="ff" red="ff" type="rgb"/>
                     </Property>
                     <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                      <Border info="org.netbeans.modules.form.compat2.border.EtchedBorderInfo">
-                        <EtchetBorder/>
+                      <Border info="org.netbeans.modules.form.compat2.border.LineBorderInfo">
+                        <LineBorder>
+                          <Color PropertyName="color" blue="cc" green="cc" red="cc" type="rgb"/>
+                        </LineBorder>
                       </Border>
                     </Property>
                     <Property name="doubleBuffered" type="boolean" value="false"/>
+                    <Property name="mixingCutoutShape" type="java.awt.Shape" editor="org.netbeans.modules.form.ComponentChooserEditor">
+                      <ComponentRef name="default"/>
+                    </Property>
                   </Properties>
 
                   <Layout>
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" attributes="0">
-                              <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="102" alignment="1" attributes="0">
-                                      <Group type="103" groupAlignment="1" attributes="0">
-                                          <Group type="102" alignment="1" attributes="0">
+                                  <Component id="jSeparator1" min="-2" pref="454" max="-2" attributes="0"/>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <EmptySpace min="-2" pref="161" max="-2" attributes="0"/>
+                                      <Component id="lblTitleDetails" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Group type="102" attributes="0">
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Group type="102" alignment="0" attributes="0">
                                               <Component id="lblLecturer" min="-2" pref="100" max="-2" attributes="0"/>
                                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                              <Component id="lblInfoLecturer" min="-2" pref="129" max="-2" attributes="0"/>
-                                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                              <Group type="103" groupAlignment="0" attributes="0">
+                                                  <Component id="lblInfoLecturer" min="-2" pref="129" max="-2" attributes="0"/>
+                                                  <Group type="102" alignment="0" attributes="0">
+                                                      <Component id="lblInfoAttempt" min="-2" pref="41" max="-2" attributes="0"/>
+                                                      <EmptySpace max="32767" attributes="0"/>
+                                                      <Component id="btnMilestoneTab" min="-2" pref="148" max="-2" attributes="0"/>
+                                                  </Group>
+                                              </Group>
                                           </Group>
                                           <Group type="102" attributes="0">
                                               <Group type="103" groupAlignment="0" attributes="0">
                                                   <Group type="102" alignment="0" attributes="0">
-                                                      <Component id="lblAttempt" min="-2" pref="61" max="-2" attributes="0"/>
-                                                      <EmptySpace min="-2" pref="43" max="-2" attributes="0"/>
-                                                      <Component id="lblInfoAttempt" min="-2" max="-2" attributes="0"/>
-                                                  </Group>
-                                                  <Group type="102" attributes="0">
                                                       <Group type="103" groupAlignment="0" attributes="0">
-                                                          <Component id="lblStudentID" min="-2" pref="100" max="-2" attributes="0"/>
-                                                          <Component id="lblStudentName" max="-2" attributes="0"/>
+                                                          <Group type="102" alignment="0" attributes="0">
+                                                              <Group type="103" groupAlignment="0" attributes="0">
+                                                                  <Component id="lblStudentID" min="-2" pref="100" max="-2" attributes="0"/>
+                                                                  <Component id="lblStudentName" max="-2" attributes="0"/>
+                                                              </Group>
+                                                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                                              <Group type="103" groupAlignment="0" attributes="0">
+                                                                  <Component id="lblInfoStudentID" alignment="0" min="-2" pref="74" max="-2" attributes="0"/>
+                                                                  <Component id="lblInfoStudentName" alignment="0" min="-2" pref="99" max="-2" attributes="0"/>
+                                                              </Group>
+                                                          </Group>
+                                                          <Group type="102" alignment="0" attributes="0">
+                                                              <Component id="lblSemester" min="-2" pref="100" max="-2" attributes="0"/>
+                                                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                                              <Component id="lblInfoSemester" min="-2" pref="80" max="-2" attributes="0"/>
+                                                          </Group>
+                                                      </Group>
+                                                      <EmptySpace max="-2" attributes="0"/>
+                                                      <Group type="103" groupAlignment="0" attributes="0">
+                                                          <Component id="lblStudentID2" min="-2" max="-2" attributes="0"/>
+                                                          <Component id="lblExamScore" min="-2" max="-2" attributes="0"/>
+                                                          <Component id="lblAssScore" min="-2" max="-2" attributes="0"/>
                                                       </Group>
                                                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                                      <Group type="103" groupAlignment="0" attributes="0">
-                                                          <Component id="lblInfoStudentID" min="-2" pref="74" max="-2" attributes="0"/>
-                                                          <Component id="lblInfoStudentName" min="-2" pref="99" max="-2" attributes="0"/>
+                                                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                                          <Component id="lblInfoExamScore" pref="57" max="32767" attributes="0"/>
+                                                          <Component id="lblInfoCGPA" alignment="0" max="32767" attributes="0"/>
+                                                          <Component id="lblInfoAssScore" alignment="0" max="32767" attributes="0"/>
                                                       </Group>
-                                                  </Group>
-                                                  <Group type="102" attributes="0">
-                                                      <Component id="lblSemester" min="-2" pref="100" max="-2" attributes="0"/>
-                                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                                      <Component id="lblInfoSemester" min="-2" pref="80" max="-2" attributes="0"/>
                                                   </Group>
                                                   <Group type="102" alignment="0" attributes="0">
                                                       <Component id="lblCourseID" min="-2" pref="100" max="-2" attributes="0"/>
                                                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                                       <Component id="lblInfoCourseID" min="-2" pref="80" max="-2" attributes="0"/>
                                                   </Group>
+                                                  <Group type="102" alignment="0" attributes="0">
+                                                      <Component id="lblCourseName" min="-2" pref="100" max="-2" attributes="0"/>
+                                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                                      <Component id="lblInfoCourseName" min="-2" pref="261" max="-2" attributes="0"/>
+                                                  </Group>
+                                                  <Component id="lblAttempt" alignment="0" min="-2" pref="61" max="-2" attributes="0"/>
                                               </Group>
                                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                                              <Group type="103" groupAlignment="0" attributes="0">
-                                                  <Group type="102" attributes="0">
-                                                      <EmptySpace min="-2" pref="34" max="-2" attributes="0"/>
-                                                      <Group type="103" groupAlignment="0" attributes="0">
-                                                          <Component id="lblExamScore" min="-2" max="-2" attributes="0"/>
-                                                          <Component id="lblAssScore" min="-2" max="-2" attributes="0"/>
-                                                          <Component id="lblStudentID2" min="-2" max="-2" attributes="0"/>
-                                                      </Group>
-                                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                                      <Group type="103" groupAlignment="0" attributes="0">
-                                                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                                              <Component id="lblInfoAssScore" max="32767" attributes="0"/>
-                                                              <Component id="lblInfoExamScore" max="32767" attributes="0"/>
-                                                          </Group>
-                                                          <Component id="lblInfoCGPA" min="-2" max="-2" attributes="0"/>
-                                                      </Group>
-                                                  </Group>
-                                                  <Group type="102" alignment="0" attributes="0">
-                                                      <EmptySpace min="-2" pref="59" max="-2" attributes="0"/>
-                                                      <Component id="panelFailureBadge" min="-2" max="-2" attributes="0"/>
-                                                  </Group>
-                                              </Group>
                                           </Group>
                                       </Group>
-                                      <EmptySpace min="-2" pref="360" max="-2" attributes="0"/>
-                                  </Group>
-                                  <Group type="102" attributes="0">
-                                      <Group type="103" groupAlignment="0" attributes="0">
-                                          <Group type="102" alignment="0" attributes="0">
-                                              <Component id="lblCourseName" min="-2" pref="100" max="-2" attributes="0"/>
-                                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                              <Component id="lblInfoCourseName" min="-2" pref="230" max="-2" attributes="0"/>
-                                          </Group>
-                                          <Group type="102" attributes="0">
-                                              <EmptySpace min="-2" pref="167" max="-2" attributes="0"/>
-                                              <Component id="lblTitleDetails" min="-2" max="-2" attributes="0"/>
-                                          </Group>
-                                      </Group>
-                                      <EmptySpace max="32767" attributes="0"/>
                                   </Group>
                               </Group>
+                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -594,58 +640,61 @@
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="lblTitleDetails" min="-2" pref="24" max="-2" attributes="0"/>
-                              <EmptySpace min="-2" pref="14" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="lblStudentID" alignment="3" min="-2" pref="18" max="-2" attributes="0"/>
-                                  <Component id="lblInfoStudentID" alignment="3" min="-2" pref="22" max="-2" attributes="0"/>
-                                  <Component id="lblAssScore" alignment="3" min="-2" pref="17" max="-2" attributes="0"/>
-                                  <Component id="lblInfoAssScore" alignment="3" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="lblInfoStudentName" alignment="3" min="-2" pref="22" max="-2" attributes="0"/>
-                                  <Component id="lblStudentName" alignment="3" min="-2" pref="20" max="-2" attributes="0"/>
-                                  <Component id="lblExamScore" alignment="3" min="-2" pref="20" max="-2" attributes="0"/>
-                                  <Component id="lblInfoExamScore" alignment="3" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
+                              <Component id="jSeparator1" min="-2" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="lblStudentID2" alignment="1" max="32767" attributes="0"/>
                                   <Group type="103" groupAlignment="3" attributes="0">
-                                      <Component id="lblSemester" alignment="3" min="-2" pref="18" max="-2" attributes="0"/>
-                                      <Component id="lblInfoSemester" alignment="3" min="-2" pref="24" max="-2" attributes="0"/>
-                                      <Component id="lblInfoCGPA" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="lblStudentID" alignment="3" min="-2" pref="22" max="-2" attributes="0"/>
+                                      <Component id="lblInfoStudentID" alignment="3" min="-2" pref="22" max="-2" attributes="0"/>
                                   </Group>
-                              </Group>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="lblCourseID" alignment="3" min="-2" pref="18" max="-2" attributes="0"/>
-                                  <Component id="lblInfoCourseID" alignment="3" min="-2" pref="20" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="lblCourseName" alignment="3" min="-2" pref="18" max="-2" attributes="0"/>
-                                  <Component id="lblInfoCourseName" alignment="3" min="-2" pref="24" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="lblLecturer" alignment="3" min="-2" pref="18" max="-2" attributes="0"/>
-                                  <Component id="lblInfoLecturer" alignment="3" min="-2" pref="22" max="-2" attributes="0"/>
-                              </Group>
-                              <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" alignment="0" attributes="0">
-                                      <Group type="103" groupAlignment="3" attributes="0">
-                                          <Component id="lblAttempt" alignment="3" min="-2" pref="23" max="-2" attributes="0"/>
-                                          <Component id="lblInfoAttempt" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      </Group>
-                                      <EmptySpace min="-2" pref="16" max="-2" attributes="0"/>
+                                      <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
+                                      <Component id="lblAssScore" min="-2" pref="17" max="-2" attributes="0"/>
                                   </Group>
-                                  <Group type="102" attributes="0">
-                                      <EmptySpace pref="12" max="32767" attributes="0"/>
-                                      <Component id="panelFailureBadge" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="lblInfoAssScore" alignment="1" min="-2" pref="22" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="103" groupAlignment="3" attributes="0">
+                                      <Component id="lblInfoStudentName" alignment="3" min="-2" pref="22" max="-2" attributes="0"/>
+                                      <Component id="lblStudentName" alignment="3" min="-2" pref="20" max="-2" attributes="0"/>
+                                      <Component id="lblInfoExamScore" alignment="0" min="-2" pref="22" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Component id="lblExamScore" alignment="1" min="-2" pref="20" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="32767" attributes="0"/>
+                              <Group type="103" groupAlignment="1" attributes="0">
+                                  <Component id="lblSemester" min="-2" pref="18" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="lblInfoCGPA" min="-2" pref="24" max="-2" attributes="0"/>
+                                      <Component id="lblInfoSemester" min="-2" pref="24" max="-2" attributes="0"/>
+                                      <Component id="lblStudentID2" alignment="1" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
+                              <EmptySpace max="32767" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="lblInfoCourseID" alignment="1" min="-2" pref="20" max="-2" attributes="0"/>
+                                  <Component id="lblCourseID" alignment="1" min="-2" pref="18" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="1" attributes="0">
+                                  <Component id="lblInfoCourseName" min="-2" pref="24" max="-2" attributes="0"/>
+                                  <Component id="lblCourseName" min="-2" pref="18" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="1" attributes="0">
+                                  <Component id="lblInfoLecturer" min="-2" pref="22" max="-2" attributes="0"/>
+                                  <Component id="lblLecturer" min="-2" pref="18" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                      <Component id="lblInfoAttempt" max="32767" attributes="0"/>
+                                      <Component id="lblAttempt" pref="23" max="32767" attributes="0"/>
+                                  </Group>
+                                  <Component id="btnMilestoneTab" min="-2" pref="29" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -654,7 +703,7 @@
                     <Component class="javax.swing.JLabel" name="lblStudentID">
                       <Properties>
                         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                          <Font name="Serif" size="14" style="0"/>
+                          <Font name="Serif" size="15" style="0"/>
                         </Property>
                         <Property name="text" type="java.lang.String" value="Student ID:"/>
                         <Property name="verticalAlignment" type="int" value="3"/>
@@ -673,7 +722,7 @@
                     <Component class="javax.swing.JLabel" name="lblStudentName">
                       <Properties>
                         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                          <Font name="Serif" size="14" style="0"/>
+                          <Font name="Serif" size="16" style="0"/>
                         </Property>
                         <Property name="text" type="java.lang.String" value="Student Name:"/>
                         <Property name="verticalAlignment" type="int" value="3"/>
@@ -699,7 +748,7 @@
                     <Component class="javax.swing.JLabel" name="lblCourseID">
                       <Properties>
                         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                          <Font name="Serif" size="14" style="0"/>
+                          <Font name="Serif" size="16" style="0"/>
                         </Property>
                         <Property name="text" type="java.lang.String" value="Course ID:"/>
                         <Property name="verticalAlignment" type="int" value="3"/>
@@ -717,7 +766,7 @@
                     <Component class="javax.swing.JLabel" name="lblCourseName">
                       <Properties>
                         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                          <Font name="Serif" size="14" style="0"/>
+                          <Font name="Serif" size="16" style="0"/>
                         </Property>
                         <Property name="horizontalAlignment" type="int" value="2"/>
                         <Property name="text" type="java.lang.String" value="Course Name:"/>
@@ -735,7 +784,7 @@
                     <Component class="javax.swing.JLabel" name="lblLecturer">
                       <Properties>
                         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                          <Font name="Serif" size="14" style="0"/>
+                          <Font name="Serif" size="16" style="0"/>
                         </Property>
                         <Property name="horizontalAlignment" type="int" value="2"/>
                         <Property name="text" type="java.lang.String" value="Lecturer:"/>
@@ -752,7 +801,7 @@
                     <Component class="javax.swing.JLabel" name="lblSemester">
                       <Properties>
                         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                          <Font name="Serif" size="14" style="0"/>
+                          <Font name="Serif" size="16" style="0"/>
                         </Property>
                         <Property name="horizontalAlignment" type="int" value="2"/>
                         <Property name="text" type="java.lang.String" value="Semester: "/>
@@ -769,9 +818,8 @@
                     <Component class="javax.swing.JLabel" name="lblAssScore">
                       <Properties>
                         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                          <Font name="Serif" size="14" style="0"/>
+                          <Font name="Serif" size="16" style="0"/>
                         </Property>
-                        <Property name="horizontalAlignment" type="int" value="2"/>
                         <Property name="text" type="java.lang.String" value="Assignment Score:"/>
                         <Property name="verticalAlignment" type="int" value="3"/>
                       </Properties>
@@ -787,7 +835,7 @@
                     <Component class="javax.swing.JLabel" name="lblExamScore">
                       <Properties>
                         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                          <Font name="Serif" size="14" style="0"/>
+                          <Font name="Serif" size="16" style="0"/>
                         </Property>
                         <Property name="horizontalAlignment" type="int" value="2"/>
                         <Property name="text" type="java.lang.String" value="Exam Score:"/>
@@ -797,7 +845,7 @@
                     <Component class="javax.swing.JLabel" name="lblAttempt">
                       <Properties>
                         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                          <Font name="Serif" size="14" style="0"/>
+                          <Font name="Serif" size="16" style="0"/>
                         </Property>
                         <Property name="horizontalAlignment" type="int" value="2"/>
                         <Property name="text" type="java.lang.String" value="Attempt:"/>
@@ -822,7 +870,7 @@
                     <Component class="javax.swing.JLabel" name="lblStudentID2">
                       <Properties>
                         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                          <Font name="Serif" size="14" style="0"/>
+                          <Font name="Serif" size="16" style="0"/>
                         </Property>
                         <Property name="text" type="java.lang.String" value="CGPA:"/>
                         <Property name="verticalAlignment" type="int" value="3"/>
@@ -836,44 +884,26 @@
                         </Property>
                       </Properties>
                     </Component>
-                    <Container class="javax.swing.JPanel" name="panelFailureBadge">
+                    <Component class="javax.swing.JSeparator" name="jSeparator1">
                       <Properties>
-                        <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                          <Color blue="d3" green="d3" red="d3" type="rgb"/>
-                        </Property>
+                        <Property name="toolTipText" type="java.lang.String" value=""/>
                       </Properties>
-
-                      <Layout>
-                        <DimensionLayout dim="0">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" alignment="0" attributes="0">
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="lblInfoFailure" pref="138" max="32767" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                              </Group>
-                          </Group>
-                        </DimensionLayout>
-                        <DimensionLayout dim="1">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="lblInfoFailure" alignment="0" pref="22" max="32767" attributes="0"/>
-                          </Group>
-                        </DimensionLayout>
-                      </Layout>
-                      <SubComponents>
-                        <Component class="javax.swing.JLabel" name="lblInfoFailure">
-                          <Properties>
-                            <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                              <Color blue="ff" green="ff" red="ff" type="rgb"/>
-                            </Property>
-                            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                              <Font name="Serif" size="15" style="1"/>
-                            </Property>
-                            <Property name="horizontalAlignment" type="int" value="0"/>
-                            <Property name="text" type="java.lang.String" value=" "/>
-                          </Properties>
-                        </Component>
-                      </SubComponents>
-                    </Container>
+                    </Component>
+                    <Component class="javax.swing.JButton" name="btnMilestoneTab">
+                      <Properties>
+                        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                          <Font name="Helvetica Neue" size="17" style="0"/>
+                        </Property>
+                        <Property name="text" type="java.lang.String" value="View Milestones"/>
+                        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+                          <Border info="null"/>
+                        </Property>
+                        <Property name="borderPainted" type="boolean" value="false"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnMilestoneTabActionPerformed"/>
+                      </Events>
+                    </Component>
                   </SubComponents>
                 </Container>
                 <Component class="javax.swing.JLabel" name="lblCRP1">
@@ -890,10 +920,13 @@
                 <Component class="javax.swing.JButton" name="btnCreateAllPlans">
                   <Properties>
                     <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                      <Font name="Serif" size="18" style="0"/>
+                      <Font name="Helvetica Neue" size="16" style="0"/>
                     </Property>
                     <Property name="text" type="java.lang.String" value="Create All Plans"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCreateAllPlansActionPerformed"/>
+                  </Events>
                 </Component>
               </SubComponents>
             </Container>
