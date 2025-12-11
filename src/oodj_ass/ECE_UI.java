@@ -4,10 +4,14 @@ package oodj_ass;
  *
  * @author User
  */
-//10/12 11.00
+//11/12 8.45
 import java.util.ArrayList;
 import java.io.*;
 import java.awt.Color;
+import javax.mail.*;
+import javax.mail.internet.*;
+import java.util.Properties;
+
 
 public class ECE_UI extends javax.swing.JFrame {
     
@@ -33,6 +37,15 @@ public class ECE_UI extends javax.swing.JFrame {
         return list;
     }
 
+    // Find student row by ID in student.txt
+    private String[] findStudentById(ArrayList<String[]> students, String sid) {
+        for (String[] s : students) {
+            if (s[0].equalsIgnoreCase(sid)) {   // s[0] = studentID
+                return s;
+            }
+        }
+        return null; // not found
+}
     
     private void updateTable(ArrayList<String[]> data) {
         javax.swing.table.DefaultTableModel model =
@@ -135,7 +148,121 @@ public class ECE_UI extends javax.swing.JFrame {
 
     }
 
+    // Send eligibility email to ALL students in result.txt
+    private void sendEligibilityEmails() {
+        // Load results and students
+        ArrayList<String[]> resultList = loadFile("result.txt");
+        ArrayList<String[]> studentList = loadFile("students.txt");
 
+        int sentCount = 0;
+        int skippedCount = 0;
+
+        for (String[] r : resultList) {
+            String sid   = r[0];  // studentID
+            String sem   = r[1];  // semester
+            String cgpa  = r[2];  // CGPA
+            String elig  = r[3];  // YES / NO
+
+            // Find student details in student.txt
+            String[] s = findStudentById(studentList, sid);
+            if (s == null) {
+                skippedCount++;
+                continue; // no matching student row
+            }
+
+            String firstName = s[1];
+            String lastName  = s[2];
+            String program   = s[3];
+            String email     = s[4];
+
+            // Build subject & body based on eligibility
+            String subject;
+            String body;
+
+            if (elig.equalsIgnoreCase("YES")) {
+                subject = "Eligibility Confirmation for Progression – " + sid;
+
+                body = "Dear " + firstName + " " + lastName + ",\n\n"
+                     + "This email is to inform you that you are ELIGIBLE to progress to the next level of study.\n\n"
+                     + "Details:\n"
+                     + "Student ID : " + sid + "\n"
+                     + "Programme  : " + program + "\n"
+                     + "Semester   : " + sem + "\n"
+                     + "CGPA       : " + cgpa + "\n"
+                     + "Eligibility: " + elig + "\n\n"
+                     + "You may proceed with your course registration according to the academic schedule.\n"
+                     + "Please ensure your fees are paid before the start of the intake.\n\n"
+                     + "If you have any questions, kindly contact the Academic Office.\n\n"
+                     + "Best regards,\n"
+                     + "Academic Affairs Department";
+            } else {
+                subject = "Eligibility Status and Course Recovery – " + sid;
+
+                body = "Dear " + firstName + " " + lastName + ",\n\n"
+                     + "This email is to inform you that you are currently NOT ELIGIBLE to progress to the next level of study.\n\n"
+                     + "Details:\n"
+                     + "Student ID : " + sid + "\n"
+                     + "Programme  : " + program + "\n"
+                     + "Semester   : " + sem + "\n"
+                     + "CGPA       : " + cgpa + "\n"
+                     + "Eligibility: " + elig + "\n\n"
+                     + "You are required to follow the Course Recovery Plan (CRP) to improve your academic standing.\n"
+                     + "Please meet your academic advisor or course administrator to discuss your recovery options.\n"
+                     + "Please ensure all outstanding fees are paid before beginning any recovery steps.\n\n"
+                     + "If you have any questions, kindly contact the Academic Office.\n\n"
+                     + "Best regards,\n"
+                     + "Academic Affairs Department";
+            } 
+
+            //Actually send the email (real or simulated)
+            try {
+                sendEmail(email, subject, body);
+                sentCount++;
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                skippedCount++;
+            }
+        }
+
+        javax.swing.JOptionPane.showMessageDialog(
+            this,
+            "Eligibility email process completed.\n"
+          + "Successfully sent: " + sentCount + "\n"
+          + "Skipped / Failed: " + skippedCount,
+            "Email Status",
+            javax.swing.JOptionPane.INFORMATION_MESSAGE
+        );
+    }
+
+    // Utility: send one email using JavaMail
+    private void sendEmail(String to, String subject, String body) throws Exception {
+        // TODO: replace with your real email + app password
+        final String FROM_EMAIL = "wongjolin0217@gmail.com";
+        final String FROM_PASSWORD = "ptzvabojtjzppndv";
+
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+
+        Session session = Session.getInstance(props, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(FROM_EMAIL, FROM_PASSWORD);
+            }
+        });
+
+        Message message = new MimeMessage(session);
+        message.setFrom(new InternetAddress(FROM_EMAIL));
+        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+        message.setSubject(subject);
+        message.setText(body);
+
+        Transport.send(message);
+    }
+
+    
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -160,6 +287,7 @@ public class ECE_UI extends javax.swing.JFrame {
         jButtonAPR = new javax.swing.JButton();
         logout = new javax.swing.JButton();
         ece_sid = new javax.swing.JLabel();
+        eceSendEmail = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Eligibility Check and Enrolment");
@@ -343,6 +471,15 @@ public class ECE_UI extends javax.swing.JFrame {
         ece_sid.setText("Student ID:");
         backgroud.add(ece_sid, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 120, -1, -1));
 
+        eceSendEmail.setFont(new java.awt.Font("Serif", 0, 18)); // NOI18N
+        eceSendEmail.setText("Send Eligibility Email");
+        eceSendEmail.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                eceSendEmailActionPerformed(evt);
+            }
+        });
+        backgroud.add(eceSendEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(930, 620, -1, -1));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -437,6 +574,19 @@ public class ECE_UI extends javax.swing.JFrame {
 
     }//GEN-LAST:event_jComboBox1ActionPerformed
 
+    private void eceSendEmailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eceSendEmailActionPerformed
+        int choice = javax.swing.JOptionPane.showConfirmDialog(
+                this,
+                "Are you sure you want to send eligibility emails to ALL students?",
+                "Confirm Email Sending",
+                javax.swing.JOptionPane.YES_NO_OPTION
+        );
+
+        if (choice == javax.swing.JOptionPane.YES_OPTION) {
+            sendEligibilityEmails();
+        }
+    }//GEN-LAST:event_eceSendEmailActionPerformed
+
 
     /**
      * @param args the command line arguments
@@ -467,6 +617,7 @@ public class ECE_UI extends javax.swing.JFrame {
     private javax.swing.JPanel backgroud;
     private javax.swing.JPanel dashboard;
     private javax.swing.JComboBox<String> dropdown;
+    private javax.swing.JButton eceSendEmail;
     private javax.swing.JLabel ece_sid;
     private javax.swing.JButton jButtonAPR;
     private javax.swing.JButton jButtonEligibility;
