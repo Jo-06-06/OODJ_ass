@@ -101,6 +101,13 @@ public class Student {
         return lowest;
     }
     
+    public Course getCourseByID(String cid) {
+        for (Course c : courses) {
+            if (c.getCourseID().equals(cid)) return c;
+        }
+        return null;
+    }
+
     public static double getGradePoint(String g) {
         switch (g) {
             case "A+": return 4.0;

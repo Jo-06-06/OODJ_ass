@@ -21,7 +21,7 @@ public class CRP_UI extends javax.swing.JFrame {
     private User currentUser;
     private FileLoader fileLoader;
     private CRP crp;
-    
+   
     private static final String RECOVERY_PLAN_FILE = "data/recoveryPlans.txt";
     private static final String MILESTONE_FILE = "data/recoveryMilestones.txt";
 
@@ -37,37 +37,40 @@ public class CRP_UI extends javax.swing.JFrame {
     private int hoveredMilestoneRow = -1;
     
     public CRP_UI(User user) {
-        FileLoader loader = new FileLoader();
-        loader.loadAll(); // load students, courses, grades etc.
-
-        List<Student> students = loader.getStudents();
-        Email mailer = new Email(); // or your existing Email object
-
-        CRP crpManager = new CRP(students, mailer);
-
-        // Call your main constructor
-        this.fileLoader = loader;
-        this.crp = crpManager;
         this.currentUser = user;
-
-        initComponents();
-        tabTwoWay.setSelectedIndex(0);
+        initEverything();
     }
-    /**
-     * Creates new form CRP_UI
-     */
-    public CRP_UI(FileLoader loader, CRP crpManager, User user) {
-        this.fileLoader = loader;
-        this.crp = crpManager;  
+
+    // default constructor for testing
+    public CRP_UI() {
+        this.currentUser = null;
+        initEverything();
+    }
+
+    private void initEverything() {
+
+        fileLoader = new FileLoader();
+        fileLoader.loadAll();
+
+        Email mailer = new Email();
+        crp = new CRP(fileLoader.getStudents(), mailer);
+
         initComponents();
-        this.currentUser = user;
-        tabTwoWay.setSelectedIndex(0);
-        
-        // Load data
         loadAllFailedStudents();
         loadRecoveryPlansFromFile();
         loadMilestonesFromFile();
-        
+//    public CRP_UI(FileLoader loader, CRP crpManager) {
+//        this.fileLoader = loader;
+//        this.crp = crpManager;  
+//
+//        Email mailer = new Email();        
+//        initComponents();
+//        tabTwoWay.setSelectedIndex(0);
+//
+//        loadAllFailedStudents();
+//        loadRecoveryPlansFromFile();
+//        loadMilestonesFromFile();
+//        
         // Style all buttons
         styleFlatButton(btnSearch);
         styleFlatButton(btnCreatePlan);
@@ -87,24 +90,26 @@ public class CRP_UI extends javax.swing.JFrame {
         btnEditPlan.setEnabled(false);
         btnCreateAllPlans.setEnabled(false);
         
+        // ---- Milestone table basic setup ----
         jTableMilestones.setShowGrid(true);
         jTableMilestones.setGridColor(new Color(180, 180, 180));  // light grey
         jTableMilestones.setIntercellSpacing(new Dimension(1, 1));
-
         jTableMilestones.setRowHeight(30);
 
         // Set bounds (you may adjust for better alignment)
         lblSelectCourse.setBounds(40, 70, 150, 25);
         comboxCourseSelector.setBounds(185, 70, 180, 25);
 
-        // Table scroll behaviour
+        // ---- Failed components table scroll + header ----
         jTableFailedComponents.setFillsViewportHeight(true);
         jTableFailedComponents.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         JTableHeader hd = jTableFailedComponents.getTableHeader();
         //header.setPreferredSize(new Dimension(header.getWidth(), 32)); 
         hd.setFont(new Font("Helvetica Neue", Font.BOLD, 16)); 
 
-        JScrollPane sp = (JScrollPane) jTableFailedComponents.getParent().getParent();
+        JScrollPane sp = (JScrollPane) SwingUtilities.getAncestorOfClass(
+                JScrollPane.class, jTableFailedComponents
+        );
         sp.getVerticalScrollBar().setUnitIncrement(16);
         sp.getHorizontalScrollBar().setUnitIncrement(16);
         
@@ -145,14 +150,13 @@ public class CRP_UI extends javax.swing.JFrame {
             }
         });
 
-        // ==== TABLE GRID STYLE ====
+        // ==== TABLE GRID + ROW COLOUR RENDERER ====
         jTableFailedComponents.setShowGrid(true);
         jTableFailedComponents.setGridColor(new Color(180, 180, 180));
         jTableFailedComponents.setRowHeight(26);
         jTableFailedComponents.setSelectionBackground(new Color(180, 205, 230));
         jTableFailedComponents.setSelectionForeground(Color.BLACK);
 
-        // ==== UNIFIED ROW RENDERER (hover + zebra + planned rows) ====
         DefaultTableCellRenderer rowRenderer = new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(
@@ -201,7 +205,6 @@ public class CRP_UI extends javax.swing.JFrame {
                 return c;
             }
         };
-
         for (int i = 0; i < jTableFailedComponents.getColumnCount(); i++) {
             jTableFailedComponents.getColumnModel().getColumn(i).setCellRenderer(rowRenderer);
         }
@@ -220,21 +223,16 @@ public class CRP_UI extends javax.swing.JFrame {
         JTableHeader header = jTableMilestones.getTableHeader();
         header.setPreferredSize(new Dimension(header.getWidth(), 32)); 
         header.setFont(new Font("Serif", Font.BOLD, 16)); 
-
         jTableMilestones.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
         TableColumnModel col = jTableMilestones.getColumnModel();
-        
         col.getColumn(0).setMinWidth(100);  // Week
-        col.getColumn(0).setMaxWidth(120);
-
-        col.getColumn(1).setPreferredWidth(390); // Task
+        col.getColumn(0).setMaxWidth(110);
+        col.getColumn(1).setPreferredWidth(370); // Task
         col.getColumn(1).setMinWidth(320);
-
         col.getColumn(2).setMinWidth(100); // Status
         col.getColumn(2).setMaxWidth(120);
-
-        col.getColumn(3).setPreferredWidth(170); // Remarks
+        col.getColumn(3).setPreferredWidth(140); // Remarks
         
         jTableMilestones.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
@@ -293,15 +291,16 @@ public class CRP_UI extends javax.swing.JFrame {
                 return c;
             }
         };
-
         // Apply to every column
         for (int i = 0; i < jTableMilestones.getColumnCount(); i++) {
             jTableMilestones.getColumnModel().getColumn(i)
                     .setCellRenderer(milestoneRenderer);
         }
         
+        // ==== Course selector behaviour ====
         initCourseSelectorListener();
-        
+
+        // ==== Hover for milestone rows ====
         jTableMilestones.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
@@ -320,8 +319,7 @@ public class CRP_UI extends javax.swing.JFrame {
         refreshPlanButtons();
         refreshMilestoneButtons();
         updateMilestoneProgressBar();
-
-        // also make the progress bar show text
+        // make the progress bar show text
         progressBarMilestones.setStringPainted(true);
         progressBarMilestones.setValue(0);
         progressBarMilestones.setString("0%");
@@ -1203,6 +1201,96 @@ public class CRP_UI extends javax.swing.JFrame {
                 comboxCourseSelector.setSelectedIndex(0);
             }
     }
+    
+    private String buildSinglePlanEmail(Student stu, RecoveryPlan plan) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("Dear ").append(stu.getFullName()).append(",\n\n");
+        sb.append("This is to inform you that a Recovery Plan has been issued for the following course:\n\n");
+
+        sb.append("Course Code: ").append(plan.getCourse().getCourseID()).append("\n");
+        sb.append("Course Name: ").append(plan.getCourse().getCourseName()).append("\n");
+        sb.append("Attempt: A-").append(plan.getCourse().getAttemptNumber()).append("\n");
+        sb.append("Failed Component: ").append(plan.getCourse().getFailedComponent()).append("\n\n");
+
+        sb.append("Summary of Recommendation:\n");
+        sb.append(plan.getRecommendation()).append("\n\n");
+
+        sb.append("Required Milestones:\n");
+        for (RecoveryMilestone m : plan.getMilestones()) {
+            sb.append(" • ").append(m.getStudyWeek())
+              .append(" – ").append(m.getTask()).append("\n");
+        }
+
+        sb.append("\nPlease follow the above milestones and complete all required tasks within the allocated timeframe.");
+        sb.append("\nIf you require academic support, kindly reach out to your lecturer or programme office.\n\n");
+
+        sb.append("Regards,\n");
+        sb.append("APU Academic Support Team\n");
+        sb.append("Asia Pacific University of Technology & Innovation (APU)");
+
+        return sb.toString();
+    }
+
+    private String buildMultiPlanEmail(Student stu, List<RecoveryPlan> plans) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("Dear ").append(stu.getFullName()).append(",\n\n");
+        sb.append("This is to notify you that Recovery Plans have been issued for the following courses:\n\n");
+
+        for (RecoveryPlan p : plans) {
+
+            sb.append("---------------------------------------------------\n");
+            sb.append("Course Code : ").append(p.getCourse().getCourseID()).append("\n");
+            sb.append("Course Name : ").append(p.getCourse().getCourseName()).append("\n");
+            sb.append("Attempt     : A-").append(p.getCourse().getAttemptNumber()).append("\n");
+            sb.append("Failed Component : ").append(p.getCourse().getFailedComponent()).append("\n\n");
+
+            sb.append("Recommendation:\n");
+            sb.append(p.getRecommendation()).append("\n\n");
+
+            sb.append("Milestones:\n");
+            for (RecoveryMilestone m : p.getMilestones()) {
+                sb.append(" • ").append(m.getStudyWeek())
+                  .append(" – ").append(m.getTask()).append("\n");
+            }
+            sb.append("\n");
+        }
+
+        sb.append("---------------------------------------------------\n");
+        sb.append("Please ensure that you follow all milestones carefully.\n");
+        sb.append("If you require further assistance, kindly contact your lecturer or programme office.\n\n");
+
+        sb.append("Regards,\n");
+        sb.append("APU Academic Support Team\n");
+        sb.append("Asia Pacific University of Technology & Innovation (APU)");
+
+        return sb.toString();
+    }
+
+    private boolean showEmailPreview(String subject, String body, String recipient) {
+        JTextArea previewArea = new JTextArea(20, 50);
+        previewArea.setText(
+            "To: " + recipient + "\n" +
+            "Subject: " + subject + "\n\n" +
+            body
+        );
+        previewArea.setEditable(false);
+        previewArea.setLineWrap(true);
+        previewArea.setWrapStyleWord(true);
+
+        JScrollPane scrollPane = new JScrollPane(previewArea);
+
+        int option = JOptionPane.showConfirmDialog(
+                this,
+                scrollPane,
+                "Email Preview",
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.INFORMATION_MESSAGE
+        );
+
+        return option == JOptionPane.OK_OPTION;
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -1297,9 +1385,7 @@ public class CRP_UI extends javax.swing.JFrame {
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setMaximumSize(new java.awt.Dimension(1160, 700));
         setMinimumSize(new java.awt.Dimension(1160, 700));
-        setPreferredSize(new java.awt.Dimension(1160, 700));
         setResizable(false);
 
         jPanel1.setBackground(new java.awt.Color(183, 201, 197));
@@ -1333,6 +1419,7 @@ public class CRP_UI extends javax.swing.JFrame {
         btnCreatePlan.setBorder(null);
         btnCreatePlan.setBorderPainted(false);
         btnCreatePlan.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnCreatePlan.setOpaque(true);
         btnCreatePlan.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCreatePlanActionPerformed(evt);
@@ -2281,6 +2368,29 @@ public class CRP_UI extends javax.swing.JFrame {
                 saveMilestonesToFile();
                 isNewPlan = true;
             }
+                       
+            savePlansToFile();
+            saveMilestonesToFile();
+            
+            if (isNewPlan) {
+                String subject = "APU Notification: Recovery Plan Created for " + failedCourse.getCourseID();
+                String body = buildSinglePlanEmail(student, plan);
+
+                // PREVIEW BEFORE SENDING
+                if (showEmailPreview(subject, body, student.getEmail())) {
+                    boolean sent = new Email().sendEmail(student.getEmail(), subject, body);
+
+                    if (!sent) {
+                        JOptionPane.showMessageDialog(this,
+                            "Recovery Plan was created, but the email failed to send.",
+                            "Email Error", JOptionPane.WARNING_MESSAGE);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(this,
+                        "Email sending cancelled.",
+                        "Cancelled", JOptionPane.INFORMATION_MESSAGE);
+                }
+            }
             comboxCourseSelector.setVisible(true);
             lblSelectCourse.setVisible(true);
 
@@ -2289,6 +2399,7 @@ public class CRP_UI extends javax.swing.JFrame {
             // UI updates
             populatePlanUI(plan);
             populateMilestoneTable(plan);
+            refreshFailedCoursesTableHighlight();
             refreshMilestoneButtons();
             refreshCourseSelectorForStudent(student);
 
@@ -2353,6 +2464,29 @@ public class CRP_UI extends javax.swing.JFrame {
         if (student == null) {
             JOptionPane.showMessageDialog(this, "Student not found.");
             return;
+        }
+        List<RecoveryPlan> newPlans = new ArrayList<>();
+
+        for (Course c : student.getCourses()) {
+            int attempt = c.getAttemptNumber();
+            String key = buildPlanKey(student.getStudentID(), c.getCourseID(), attempt);
+
+            RecoveryPlan rp = planByKey.get(key);
+            if (rp != null && rp.getMilestones().size() > 0) {
+                newPlans.add(rp);
+            }
+        }
+        if (!newPlans.isEmpty()) {
+            String subject = "APU Notification: Your Recovery Plans Have Been Issued";
+            String body = buildMultiPlanEmail(student, newPlans);
+
+            if (showEmailPreview(subject, body, student.getEmail())) {
+                new Email().sendEmail(student.getEmail(), subject, body);
+            } else {
+                JOptionPane.showMessageDialog(this,
+                    "Email sending cancelled.",
+                    "Cancelled", JOptionPane.INFORMATION_MESSAGE);
+            }
         }
 
         createAllPlansForStudent(studentID);
@@ -2571,7 +2705,10 @@ public class CRP_UI extends javax.swing.JFrame {
 //    /**
 //     * @param args the command line arguments
 //     */
-    public static void main(String args[]) {
+  public static void main(String args[]) {
+//      java.awt.EventQueue.invokeLater(() -> {
+//        new CRP_UI().setVisible(true);
+//      });
 //        java.awt.EventQueue.invokeLater(new Runnable() {
 //            public void run() {
 //        /* Set the Nimbus look and feel */
@@ -2593,10 +2730,9 @@ public class CRP_UI extends javax.swing.JFrame {
 //        FileLoader loader = new FileLoader();
 //        loader.loadAll();
 //        /* Create and display the form */        
-//        new CRP_UI(loader, ).setVisible(true);
+//        new CRP_UI().setVisible(true);
+
 //        }
-//        CRP_UI ui = new CRP_UI(fl, crp);
-//        ui.setVisible(true);
 //    });
 }
 

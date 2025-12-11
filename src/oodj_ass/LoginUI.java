@@ -12,8 +12,11 @@ public class LoginUI extends javax.swing.JFrame {
      */
     public LoginUI() {
         initComponents();
+        getRootPane().setDefaultButton(btnLogin);
+        txtPassword.addActionListener(evt -> btnLogin.doClick());
+        txtUsername.addActionListener(evt -> txtPassword.requestFocusInWindow());
     }
-
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -118,7 +121,7 @@ public class LoginUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
-      
+
         String username = txtUsername.getText();
         String password = new String(txtPassword.getPassword());
   
