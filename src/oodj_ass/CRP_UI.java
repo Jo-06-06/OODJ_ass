@@ -1583,7 +1583,8 @@ public class CRP_UI extends javax.swing.JFrame {
 
         btnMilestoneTab.setFont(new java.awt.Font("Helvetica Neue", 0, 17)); // NOI18N
         btnMilestoneTab.setText("View Milestones");
-        btnMilestoneTab.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        btnMilestoneTab.setBorder(null);
+        btnMilestoneTab.setOpaque(true);
         btnMilestoneTab.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnMilestoneTabActionPerformed(evt);
