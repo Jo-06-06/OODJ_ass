@@ -1,13 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package oodj_ass;
-
-/**
- *
- * @author jolin
- */
 
 import java.io.*;
 import java.util.*;
@@ -98,7 +89,6 @@ public class ECE {
     }
 
     // update grade
-
     public static void updateGrades() {
 
         ArrayList<String[]> grades = loadFile("grades.txt", true);
@@ -144,7 +134,6 @@ public class ECE {
     }
 
     // calculate cgpa
-
     public static void calculateCGPA() {
 
         ArrayList<String[]> grades = loadFile("grades.txt", true);
@@ -196,71 +185,12 @@ public class ECE {
     }
 
     
-    public static void displayEligibility() {
 
-    ArrayList<String[]> grades = loadFile("grades.txt", true);
-    ArrayList<String[]> studentInfo = loadFile("studentInfo.txt", true);
-    ArrayList<String[]> courses = loadFile("courses.txt", true);
-    ArrayList<String[]> result = loadFile("result.txt", true);
 
-    System.out.println("\n======= Eligibility Details =======");
-
-    for (String[] res : result) {
-
-        String sid = res[0];
-        String sem = res[1];
-        double finalCGPA = Double.parseDouble(res[2]);
-        String eligibilityStatus = res[3];
-
-        System.out.println("\n===== Student: " + sid + " (" + sem + ") =====");
-
-        double totalGP = 0;
-        int totalCH = 0;
-        int failCount = 0;
-
-        // PRINT COURSE DETAILS
-        for (String[] g : grades) {
-
-            if (!g[0].equals(sid)) continue;        // match student
-            if (!g[2].equals(sem)) continue;        // match semester
-
-            double gpa = Double.parseDouble(g[6]);
-            String grade = g[5];
-            String courseID = g[1];
-
-            String[] c = findCourse(courseID, courses);
-            int credit = Integer.parseInt(c[2]);
-
-            double gp = gpa * credit;
-
-            totalGP += gp;
-            totalCH += credit;
-            if (gpa < 2.0) failCount++;
-
-            System.out.println(
-                courseID + " | Grade: " + grade +
-                " (" + String.format("%.2f", gpa) + ") * " +
-                credit + " credits = " + String.format("%.2f", gp)
-            );
-        }
-
-        // SUMMARY
-        System.out.println("Total Grade Points = " + String.format("%.2f", totalGP));
-        System.out.println("Total Credit Hours = " + totalCH);
-        System.out.println("Total Fails = " + failCount);
-        System.out.println("CGPA = " + String.format("%.2f", finalCGPA));
-        System.out.println("Eligible Next Year: " + eligibilityStatus);
-    }
-
-    System.out.println("\n===================================\n");
-}
-
-    
-    // =============================== MAIN ================================
+// =============================== MAIN ================================
 
     public static void main(String[] args) {
         updateGrades();
         calculateCGPA();
-        displayEligibility();
     }
 }

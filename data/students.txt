@@ -2,15 +2,15 @@ studentID,firstName,lastName,major,email
 S001,Fiona,Smith,Bachelor of Mechanical Engineering,tp086245@mail.apu.edu.my
 S002,George,Wilson,Bachelor of Science in Computer Science,george.wilson@university.edu
 S003,Ivan,Ng,Bachelor of International Hospitality Management,ivan.ng@university.edu
-S004,Evia,Cheng,Bachelor of Mechanical Engineering,tp081917@mail.apu.edu.my
+S004,Evia,Cheng,Bachelor of Mechanical Engineering,evia.cheng@mail.apu.edu.my
 S005,Steven,Goh,Bachelor of Science in Computer Science,steven.goh@university.edu
 S006,Quinn,Chen,Bachelor of International Hospitality Management,tp081917@mail.apu.edu.my
 S007,Oscar,Smith,Bachelor of Mechanical Engineering,tp081917@mail.apu.edu.my
 S008,Eric,Teo,Bachelor of Science in Computer Science,eric.teo@university.edu
 S009,Rachel,Davis,Bachelor of International Hospitality Management,rachel.davis@university.edu
 S010,Charlie,Miller,Bachelor of Mechanical Engineering,tp081917@mail.apu.edu.my
-S011,Ivy,Smith,Bachelor of Science in Computer Science,tp081917@mail.apu.edu.my
-S012,Lin,Chen,Bachelor of International Hospitality Management,tp081917@mail.apu.edu.my
+S011,Ivy,Smith,Bachelor of Science in Computer Science,charlie.miller@mail.apu.edu.my
+S012,Lin,Chen,Bachelor of International Hospitality Management,lin.chen@mail.apu.edu.my
 S013,Alys,Chow,Bachelor of Mechanical Engineering,alys.chow@university.edu
 S014,Diana,Brown,Bachelor of Science in Computer Science,diana.brown@university.edu
 S015,Alice,Wilson,Bachelor of International Hospitality Management,alice.wilson@university.edu
