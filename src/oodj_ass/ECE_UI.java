@@ -234,9 +234,8 @@ public class ECE_UI extends javax.swing.JFrame {
         );
     }
 
-    // Utility: send one email using JavaMail
+    // send one email using JavaMail
     private void sendEmail(String to, String subject, String body) throws Exception {
-        // TODO: replace with your real email + app password
         final String FROM_EMAIL = "wongjolin0217@gmail.com";
         final String FROM_PASSWORD = "ptzvabojtjzppndv";
 
