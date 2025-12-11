@@ -105,6 +105,8 @@ public class ECE_UI extends javax.swing.JFrame {
     public ECE_UI(User user) {
         initComponents();
         this.currentUser = user;
+        
+        updateTable(loadFile("result.txt"));
                 
         jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {

@@ -162,7 +162,7 @@ public class ECEView_UI extends javax.swing.JFrame {
                 closeActionPerformed(evt);
             }
         });
-        backgroud.add(close, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 540, -1, -1));
+        backgroud.add(close, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 550, -1, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
