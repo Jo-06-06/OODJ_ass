@@ -17,7 +17,6 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumnModel;
 
 
-
 public class CRP_UI extends javax.swing.JFrame {
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(CRP_UI.class.getName());
     private static final String RECOVERY_PLAN_FILE = "data/recoveryPlans.txt";
@@ -25,6 +24,7 @@ public class CRP_UI extends javax.swing.JFrame {
 
     private FileLoader fileLoader;
     private RecoveryPlan currentPlan;
+    private CRP crp;
 
     // key = "studentID|courseID|attemptNum"
     private Map<String, RecoveryPlan> planByKey = new LinkedHashMap<>();
@@ -39,9 +39,9 @@ public class CRP_UI extends javax.swing.JFrame {
     /**
      * Creates new form CRP_UI
      */
-    public CRP_UI(FileLoader loader) {
+    public CRP_UI(FileLoader loader, CRP crpManager) {
         this.fileLoader = loader;
-
+        this.crp = crpManager;  
         initComponents();
         tabTwoWay.setSelectedIndex(0);
         
@@ -58,7 +58,7 @@ public class CRP_UI extends javax.swing.JFrame {
         styleFlatButton(btnEditPlan);
         styleFlatButton(btnBack);
         styleFlatButton(btnCreateAllPlans);
-        styleFlatButton(btnUpdate);
+        styleFlatButton(btnEdit);
         styleFlatButton(btnAdd);
         styleFlatButton(btnRemove);
         styleFlatButton(btnMarkAsCompleted);
@@ -83,13 +83,14 @@ public class CRP_UI extends javax.swing.JFrame {
         jTableFailedComponents.setFillsViewportHeight(true);
         jTableFailedComponents.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         JTableHeader hd = jTableFailedComponents.getTableHeader();
-//        header.setPreferredSize(new Dimension(header.getWidth(), 32)); 
+        //header.setPreferredSize(new Dimension(header.getWidth(), 32)); 
         hd.setFont(new Font("Helvetica Neue", Font.BOLD, 16)); 
 
         JScrollPane sp = (JScrollPane) jTableFailedComponents.getParent().getParent();
         sp.getVerticalScrollBar().setUnitIncrement(16);
         sp.getHorizontalScrollBar().setUnitIncrement(16);
         
+        normaliseButtons();
         // ==== TABLE HOVER HANDLER ====
         jTableFailedComponents.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
@@ -116,7 +117,6 @@ public class CRP_UI extends javax.swing.JFrame {
                     jTableFailedComponents.clearSelection();
                     currentPlan = null;
                     clearDetails();
-                    refreshButtonStates();
                 }
             }
         });
@@ -198,6 +198,7 @@ public class CRP_UI extends javax.swing.JFrame {
                 return false; 
             }
         };
+        
         jTableMilestones.setModel(model);
         JTableHeader header = jTableMilestones.getTableHeader();
         header.setPreferredSize(new Dimension(header.getWidth(), 32)); 
@@ -208,13 +209,13 @@ public class CRP_UI extends javax.swing.JFrame {
         TableColumnModel col = jTableMilestones.getColumnModel();
         
         col.getColumn(0).setMinWidth(100);  // Week
-        col.getColumn(0).setMaxWidth(130);
+        col.getColumn(0).setMaxWidth(120);
 
-        col.getColumn(1).setPreferredWidth(420); // Task
+        col.getColumn(1).setPreferredWidth(390); // Task
         col.getColumn(1).setMinWidth(320);
 
         col.getColumn(2).setMinWidth(100); // Status
-        col.getColumn(2).setMaxWidth(130);
+        col.getColumn(2).setMaxWidth(120);
 
         col.getColumn(3).setPreferredWidth(170); // Remarks
         
@@ -223,46 +224,6 @@ public class CRP_UI extends javax.swing.JFrame {
                 refreshMilestoneButtons();
             }
         });
-
-        comboxCourseSelector.addActionListener(e -> {
-            if (comboxCourseSelector.getSelectedItem() == null) return;
-
-            String label = comboxCourseSelector.getSelectedItem().toString();
-
-            // Extract course ID before "("
-            String cid = label.split(" ")[0].trim();
-
-            Student s = currentPlan.getStudent();
-            if (s == null) return;
-
-            Course targetCourse = null;
-            for (Course c : s.getCourses()) {
-                if (c.getCourseID().equals(cid)) {
-                    targetCourse = c;
-                    break;
-                }
-            }
-
-            if (targetCourse == null) return;
-
-            String key = buildPlanKey(s.getStudentID(), cid, targetCourse.getAttemptNumber());
-            RecoveryPlan selectedPlan = planByKey.get(key);
-
-            if (selectedPlan == null) {
-                JOptionPane.showMessageDialog(this,
-                    "No recovery plan created for " + cid);
-                return;
-            }
-
-            currentPlan = selectedPlan;
-
-            populatePlanUI(selectedPlan);
-            populateMilestoneTable(selectedPlan);
-            refreshMilestoneButtons();
-        });
-
-
-
 
         jTableMilestones.addMouseListener(new MouseAdapter() {
             @Override
@@ -321,7 +282,9 @@ public class CRP_UI extends javax.swing.JFrame {
             jTableMilestones.getColumnModel().getColumn(i)
                     .setCellRenderer(milestoneRenderer);
         }
-  
+        
+        initCourseSelectorListener();
+        
         jTableMilestones.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
@@ -337,7 +300,80 @@ public class CRP_UI extends javax.swing.JFrame {
                 jTableMilestones.repaint();
             }
         });
+        refreshPlanButtons();
+        refreshMilestoneButtons();
+        updateMilestoneProgressBar();
+
+        // also make the progress bar show text
+        progressBarMilestones.setStringPainted(true);
+        progressBarMilestones.setValue(0);
+        progressBarMilestones.setString("0%");
+
     }
+    
+    private void initCourseSelectorListener() {
+        comboxCourseSelector.addActionListener(e -> {
+
+            if (comboxCourseSelector.getSelectedItem() == null) return;
+            if (currentPlan == null) return;   // IMPORTANT: avoid NPE
+
+            String label = comboxCourseSelector.getSelectedItem().toString();
+
+            // Extract course ID before " (A-"
+            String cid = label.split(" ")[0].trim();
+
+            Student s = currentPlan.getStudent();
+            if (s == null) return;
+
+            Course targetCourse = null;
+            for (Course c : s.getCourses()) {
+                if (c.getCourseID().equals(cid)) {
+                    targetCourse = c;
+                    break;
+                }
+            }
+            if (targetCourse == null) return;
+
+            String key = buildPlanKey(
+                    s.getStudentID(),
+                    cid,
+                    targetCourse.getAttemptNumber()
+            );
+
+            RecoveryPlan selectedPlan = planByKey.get(key);
+            if (selectedPlan == null) {
+                JOptionPane.showMessageDialog(this,
+                    "No recovery plan created for " + cid);
+                return;
+            }
+
+            currentPlan = selectedPlan;
+
+            // Sync UI with selected course plan
+            populatePlanUI(selectedPlan);
+            populateMilestoneTable(selectedPlan);
+            refreshMilestoneButtons();
+        });
+    }
+
+    private void normaliseButtons() {
+        JButton[] buttons = {
+            btnAdd, btnEdit, btnSaveChanges, btnRemove,
+            btnMarkAsCompleted, btnUpdateGrade, btnCreatePlan,
+            btnCreateAllPlans, btnSavePlan, btnEditPlan, btnBack
+        };
+
+        for (JButton b : buttons) {
+            if (b == null) continue;
+
+            b.setFocusPainted(false);
+            b.setContentAreaFilled(true);
+            b.setOpaque(true);
+            b.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+            b.setBackground(new Color(245, 245, 245)); // slight 3D feel
+        }
+    }
+
     private void styleFlatButton(JButton btn) {
         Color normal   = new Color(235, 235, 235);  // base
         Color hover    = new Color(215, 215, 215);  // on hover
@@ -373,36 +409,6 @@ public class CRP_UI extends javax.swing.JFrame {
         });
     }
 
-    private void refreshButtonStates() {
-        boolean hasRowSelected = jTableFailedComponents.getSelectedRow() != -1;
-        boolean hasCurrentPlan = (currentPlan != null);
-
-        // --- Create Plan ---
-        // You can always create a plan when a failed row is selected
-        btnCreatePlan.setEnabled(hasRowSelected);
-
-        // --- Edit Plan ---
-        // Only enabled when plan exists AND recommendation is NOT currently editable
-        btnEditPlan.setEnabled(hasCurrentPlan && !txtRecommendation.isEditable());
-
-        // --- Save Plan ---
-        // Only enabled when editing mode is active
-        btnSavePlan.setEnabled(txtRecommendation.isEditable());
-
-        // --- Create All Plans ---
-        // Enabled when at least ONE failed course is displayed
-        boolean hasFailedCourses = jTableFailedComponents.getRowCount() > 0;
-        btnCreateAllPlans.setEnabled(hasFailedCourses);
-
-        // --- Milestone Buttons ---
-        boolean onMilestoneTab = (tabTwoWay.getSelectedIndex() == 1);
-
-        btnAdd.setEnabled(onMilestoneTab && hasCurrentPlan);
-        btnUpdate.setEnabled(onMilestoneTab && hasCurrentPlan);
-        btnRemove.setEnabled(onMilestoneTab && hasCurrentPlan);
-        btnMarkAsCompleted.setEnabled(onMilestoneTab && hasCurrentPlan);
-    }
-    
     private void refreshUIControllers() {
         refreshPlanButtons();
         refreshMilestoneButtons();
@@ -410,33 +416,82 @@ public class CRP_UI extends javax.swing.JFrame {
     }
         
     private void refreshPlanButtons() {
-        boolean hasRowSelection = jTableFailedComponents.getSelectedRow() != -1;
+        boolean rowSelected = jTableFailedComponents.getSelectedRow() != -1;
         boolean hasPlan = (currentPlan != null);
-        boolean editing = txtRecommendation.isEditable();
 
         // Always allowed if a failed course is selected
-        btnCreatePlan.setEnabled(hasRowSelection);
+        btnCreatePlan.setEnabled(rowSelected && !hasPlan);
 
         // Edit only if an existing plan exists
-        btnEditPlan.setEnabled(hasPlan && !editing);
+        btnEditPlan.setEnabled(hasPlan && !txtRecommendation.isEditable());
 
         // Save only when in edit mode
-        btnSavePlan.setEnabled(editing);
+        btnSavePlan.setEnabled(txtRecommendation.isEditable());
 
         // Create All Plans only when there is at least 1 failed course shown
-        btnCreateAllPlans.setEnabled(jTableFailedComponents.getRowCount() > 0);
-    }
+        boolean studentLoaded = !lblInfoStudentID.getText().trim().isEmpty();
+        boolean hasFailedCourses = jTableFailedComponents.getRowCount() > 0;
+        btnCreateAllPlans.setEnabled(studentLoaded && hasFailedCourses);    }
 
     private void refreshMilestoneButtons() {
+        boolean onMilestoneTab = (tabTwoWay.getSelectedIndex() == 1);
         boolean hasPlan = (currentPlan != null);
-        boolean rowSelected = (jTableMilestones.getSelectedRow() != -1);
 
-        btnAdd.setEnabled(hasPlan);
-        btnUpdate.setEnabled(hasPlan && rowSelected);
-        btnRemove.setEnabled(hasPlan && rowSelected);
-        btnMarkAsCompleted.setEnabled(hasPlan && rowSelected);
+        if (!onMilestoneTab || !hasPlan) {
+            btnAdd.setEnabled(false);
+            btnEdit.setEnabled(false);
+            btnRemove.setEnabled(false);
+            btnMarkAsCompleted.setEnabled(false);
+            btnUpdateGrade.setEnabled(false);
+            return;
+        }
+
+        String status = currentPlan.getStatus();
+        boolean awaiting = status.equals("AWAITING_GRADE");
+        boolean completed = status.startsWith("COMPLETED");
+
+        int row = jTableMilestones.getSelectedRow();
+        boolean rowSelected = (row != -1);
+
+        // milestone cannot be changed if awaiting/complete
+        boolean canEditStructure = !(awaiting || completed);
+
+        btnAdd.setEnabled(canEditStructure);
+        btnEdit.setEnabled(canEditStructure && rowSelected);
+        btnRemove.setEnabled(canEditStructure && rowSelected);
+
+        // Mark as completed allowed ONLY while in progress
+        btnMarkAsCompleted.setEnabled(!awaiting && !completed && rowSelected);
+
+        // update grade only when ALL milestones completed
+        btnUpdateGrade.setEnabled(awaiting);
     }
+
     
+    private void refreshButtonsByStatus() {
+        if (currentPlan == null) return;
+
+        String st = currentPlan.getStatus();
+
+        boolean awaiting = st.equals("AWAITING_GRADE");
+        boolean completed = st.startsWith("COMPLETED");
+
+        // Milestones cannot be changed anymore once awaiting/complete
+        boolean milestoneEditable = !(awaiting || completed);
+
+        btnAdd.setEnabled(milestoneEditable);
+        btnEdit.setEnabled(milestoneEditable);
+        btnRemove.setEnabled(milestoneEditable);
+        btnMarkAsCompleted.setEnabled(milestoneEditable);
+
+        // Grade button logic
+        if (awaiting) {
+            btnUpdateGrade.setEnabled(true);
+        } else {
+            btnUpdateGrade.setEnabled(false);
+        }
+    }
+
     private void refreshCourseSelector() {
         comboxCourseSelector.removeAllItems();
 
@@ -458,7 +513,6 @@ public class CRP_UI extends javax.swing.JFrame {
 
         comboxCourseSelector.setSelectedItem(currentLabel);
     }
-
     
     private Course getSelectedCourseFromCombo(Student s) {
         String selected = (String) comboxCourseSelector.getSelectedItem();
@@ -483,7 +537,7 @@ public class CRP_UI extends javax.swing.JFrame {
             }
         }
     }
-
+    
     // Create ALL Plans for student failed > 1 course
     private void createAllPlansForStudent(String studentID) {
         Student s = fileLoader.getStudentByID(studentID);
@@ -564,7 +618,6 @@ public class CRP_UI extends javax.swing.JFrame {
         if (row == -1) {
             currentPlan = null;
             clearDetails();
-            refreshButtonStates();
             populateMilestoneTable(null); 
             refreshMilestoneButtons();
             return;
@@ -580,7 +633,6 @@ public class CRP_UI extends javax.swing.JFrame {
         if (student == null) {
             currentPlan = null;
             clearDetails();
-            refreshButtonStates();
             return;
         }
 
@@ -595,7 +647,6 @@ public class CRP_UI extends javax.swing.JFrame {
         if (failedCourse == null) {
             currentPlan = null;
             clearDetails();
-            refreshButtonStates();
             return;
         }
         comboxCourseSelector.setVisible(true);
@@ -612,15 +663,16 @@ public class CRP_UI extends javax.swing.JFrame {
                 failedCourse.getAttemptNumber()
         );
         RecoveryPlan plan = planByKey.get(key);
-        currentPlan = plan;   // <-- this is important!
+        currentPlan = plan; 
 
         populatePlanUI(plan);
-        refreshButtonStates();
         populateMilestoneTable(plan);
-        refreshCourseSelectorForStudent(student);
         
         refreshPlanButtons();
+        refreshCourseSelectorForStudent(student);
         refreshMilestoneButtons();
+        updateMilestoneProgressBar();
+
         tabTwoWay.setSelectedIndex(0);
     }
 
@@ -698,8 +750,8 @@ public class CRP_UI extends javax.swing.JFrame {
             updateCourseInfo(null);
             updateStudentInfo(student);
         }
+        refreshPlanButtons();
     }
-
 
     private void loadAllFailedStudents() {
         DefaultTableModel model = (DefaultTableModel) jTableFailedComponents.getModel();
@@ -1039,13 +1091,38 @@ public class CRP_UI extends javax.swing.JFrame {
 
     private void updateMilestoneProgressBar() {
         if (currentPlan == null) {
-            jProgressBar1.setValue(0);
+            progressBarMilestones.setValue(0);
+            progressBarMilestones.setString("0%");
+            progressBarMilestones.setForeground(new Color(0, 122, 204));
             return;
         }
 
-        int percent = (int) currentPlan.getProgressPercentage();
-        jProgressBar1.setValue(percent);
+        int progress = (int) Math.round(currentPlan.getProgressPercentage());
+        progressBarMilestones.setValue(progress);
+        progressBarMilestones.setString(progress + "%");
+
+        // Make it more professional
+        progressBarMilestones.setBorderPainted(true);
+        progressBarMilestones.setBorder(
+                javax.swing.BorderFactory.createLineBorder(Color.DARK_GRAY, 1)
+        );
+        progressBarMilestones.setUI(new javax.swing.plaf.basic.BasicProgressBarUI());
+
+        // --- Colour logic ---
+        if (progress == 100) {
+            progressBarMilestones.setForeground(new Color(0, 170, 0));       // green
+        } else if (progress >= 50) {
+            progressBarMilestones.setForeground(new Color(255, 153, 0));     // orange
+        } else {
+            progressBarMilestones.setForeground(new Color(200, 30, 30));     // red
+        }
+
+        // --- Update Grade button ---
+        btnUpdateGrade.setEnabled(
+                "AWAITING_GRADE".equalsIgnoreCase(currentPlan.getStatus())
+        );
     }
+
 
     private void saveMilestonesToFile() {
         try (PrintWriter pw = new PrintWriter(new FileWriter(MILESTONE_FILE))) {
@@ -1103,15 +1180,27 @@ public class CRP_UI extends javax.swing.JFrame {
     private void refreshCourseSelectorForStudent(Student s) {
         comboxCourseSelector.removeAllItems();
 
-            if (s == null) return;
-
-            for (Course c : s.getFailedCourses()) {
-                String label = c.getCourseID() + " (A-" + c.getAttemptNumber() + ")";
-                comboxCourseSelector.addItem(label);
+            if (s == null) {
+                comboxCourseSelector.setVisible(false);
+                lblSelectCourse.setVisible(false);
+                return;
             }
 
+            boolean hasFailed = false;
+
+            for (Course c : s.getCourses()) {
+                if (!"None".equalsIgnoreCase(c.getFailedComponent())) {
+                    String label = c.getCourseID() + " (A-" + c.getAttemptNumber() + ")";
+                    comboxCourseSelector.addItem(label);
+                    hasFailed = true;
+                }
+            }
+            
+            comboxCourseSelector.setVisible(hasFailed);
+            lblSelectCourse.setVisible(hasFailed);
             // If student has only 1 failed course → auto-select it
-            if (comboxCourseSelector.getItemCount() == 1) {
+            // Auto-select the only failed course if just one
+            if (hasFailed && comboxCourseSelector.getItemCount() == 1) {
                 comboxCourseSelector.setSelectedIndex(0);
             }
     }
@@ -1171,23 +1260,25 @@ public class CRP_UI extends javax.swing.JFrame {
         lblStudentID2 = new javax.swing.JLabel();
         lblInfoCGPA = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
+        btnMilestoneTab = new javax.swing.JButton();
         lblCRP1 = new javax.swing.JLabel();
         btnCreateAllPlans = new javax.swing.JButton();
-        btnMilestoneTab = new javax.swing.JButton();
         milestoneTab = new javax.swing.JPanel();
         lblMilestonesTable = new javax.swing.JLabel();
         jMilestoneScrollPane = new javax.swing.JScrollPane();
         jTableMilestones = new javax.swing.JTable();
-        jProgressBar1 = new javax.swing.JProgressBar();
+        progressBarMilestones = new javax.swing.JProgressBar();
         lblProgress = new javax.swing.JLabel();
         btnAdd = new javax.swing.JButton();
-        btnUpdate = new javax.swing.JButton();
+        btnEdit = new javax.swing.JButton();
         btnRemove = new javax.swing.JButton();
         btnMarkAsCompleted = new javax.swing.JButton();
         btnBack = new javax.swing.JButton();
         lblCRP = new javax.swing.JLabel();
         comboxCourseSelector = new javax.swing.JComboBox<>();
         lblSelectCourse = new javax.swing.JLabel();
+        btnSaveChanges = new javax.swing.JButton();
+        btnUpdateGrade = new javax.swing.JButton();
 
         javax.swing.GroupLayout jFrame1Layout = new javax.swing.GroupLayout(jFrame1.getContentPane());
         jFrame1.getContentPane().setLayout(jFrame1Layout);
@@ -1508,6 +1599,15 @@ public class CRP_UI extends javax.swing.JFrame {
 
         jSeparator1.setToolTipText("");
 
+        btnMilestoneTab.setFont(new java.awt.Font("Helvetica Neue", 0, 17)); // NOI18N
+        btnMilestoneTab.setText("View Milestones");
+        btnMilestoneTab.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        btnMilestoneTab.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMilestoneTabActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout panelFBLayout = new javax.swing.GroupLayout(panelFB);
         panelFB.setLayout(panelFBLayout);
         panelFBLayout.setHorizontalGroup(
@@ -1519,11 +1619,21 @@ public class CRP_UI extends javax.swing.JFrame {
                         .addComponent(lblLecturer, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblInfoLecturer, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblInfoAttempt, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(panelFBLayout.createSequentialGroup()
+                                .addComponent(lblInfoLecturer, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(panelFBLayout.createSequentialGroup()
+                                .addComponent(lblInfoAttempt, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnMilestoneTab, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addContainerGap())
                     .addGroup(panelFBLayout.createSequentialGroup()
                         .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(panelFBLayout.createSequentialGroup()
+                                .addComponent(lblCourseName, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(lblInfoCourseName, javax.swing.GroupLayout.PREFERRED_SIZE, 261, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(lblAttempt, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(panelFBLayout.createSequentialGroup()
                                 .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(panelFBLayout.createSequentialGroup()
@@ -1537,7 +1647,11 @@ public class CRP_UI extends javax.swing.JFrame {
                                     .addGroup(panelFBLayout.createSequentialGroup()
                                         .addComponent(lblSemester, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(lblInfoSemester, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                        .addComponent(lblInfoSemester, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(panelFBLayout.createSequentialGroup()
+                                        .addComponent(lblCourseID, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(lblInfoCourseID, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(lblStudentID2)
@@ -1547,16 +1661,7 @@ public class CRP_UI extends javax.swing.JFrame {
                                 .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(lblInfoExamScore, javax.swing.GroupLayout.DEFAULT_SIZE, 57, Short.MAX_VALUE)
                                     .addComponent(lblInfoCGPA, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(lblInfoAssScore, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                            .addGroup(panelFBLayout.createSequentialGroup()
-                                .addComponent(lblCourseID, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(lblInfoCourseID, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(panelFBLayout.createSequentialGroup()
-                                .addComponent(lblCourseName, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(lblInfoCourseName, javax.swing.GroupLayout.PREFERRED_SIZE, 261, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(lblAttempt, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(lblInfoAssScore, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                         .addGap(0, 0, Short.MAX_VALUE))))
             .addGroup(panelFBLayout.createSequentialGroup()
                 .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1608,10 +1713,12 @@ public class CRP_UI extends javax.swing.JFrame {
                     .addComponent(lblInfoLecturer, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblLecturer, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(lblInfoAttempt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblAttempt, javax.swing.GroupLayout.DEFAULT_SIZE, 23, Short.MAX_VALUE))
-                .addGap(12, 12, 12))
+                .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(lblInfoAttempt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lblAttempt, javax.swing.GroupLayout.DEFAULT_SIZE, 23, Short.MAX_VALUE))
+                    .addComponent(btnMilestoneTab, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
 
         lblCRP1.setBackground(new java.awt.Color(0, 0, 0));
@@ -1626,45 +1733,34 @@ public class CRP_UI extends javax.swing.JFrame {
             }
         });
 
-        btnMilestoneTab.setFont(new java.awt.Font("Helvetica Neue", 0, 17)); // NOI18N
-        btnMilestoneTab.setText("View Milestones");
-        btnMilestoneTab.setBorder(null);
-        btnMilestoneTab.setBorderPainted(false);
-        btnMilestoneTab.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnMilestoneTabActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout panelOverviewLayout = new javax.swing.GroupLayout(panelOverview);
         panelOverview.setLayout(panelOverviewLayout);
         panelOverviewLayout.setHorizontalGroup(
             panelOverviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelOverviewLayout.createSequentialGroup()
-                .addGap(24, 24, 24)
-                .addComponent(txtStudentID, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnCreateAllPlans)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnCreatePlan, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(67, 67, 67))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelOverviewLayout.createSequentialGroup()
-                .addGap(0, 30, Short.MAX_VALUE)
-                .addGroup(panelOverviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 865, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(panelOverviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(panelOverviewLayout.createSequentialGroup()
-                        .addGroup(panelOverviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(panelFB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnMilestoneTab, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(24, 24, 24)
+                        .addComponent(txtStudentID, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(RPpanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(btnCreateAllPlans, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnCreatePlan, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(panelOverviewLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(panelOverviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 865, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(panelOverviewLayout.createSequentialGroup()
+                                .addComponent(panelFB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(RPpanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addGap(65, 65, 65))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelOverviewLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(panelOverviewLayout.createSequentialGroup()
+                .addGap(280, 280, 280)
                 .addComponent(lblCRP1, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(264, 264, 264))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panelOverviewLayout.setVerticalGroup(
             panelOverviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1677,24 +1773,19 @@ public class CRP_UI extends javax.swing.JFrame {
                             .addComponent(btnSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(20, 20, 20))
                     .addGroup(panelOverviewLayout.createSequentialGroup()
-                        .addGroup(panelOverviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelOverviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(btnCreatePlan, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(btnCreateAllPlans))
-                            .addGroup(panelOverviewLayout.createSequentialGroup()
-                                .addGap(40, 40, 40)
-                                .addComponent(lblCRP1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE)))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lblCRP1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(38, 38, 38)
+                        .addGroup(panelOverviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnCreatePlan, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnCreateAllPlans, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 206, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(11, 11, 11)
                 .addGroup(panelOverviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(RPpanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(panelOverviewLayout.createSequentialGroup()
-                        .addComponent(panelFB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnMilestoneTab, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(31, Short.MAX_VALUE))
+                    .addComponent(panelFB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(262, Short.MAX_VALUE))
         );
 
         tabTwoWay.addTab("Overview", panelOverview);
@@ -1704,9 +1795,9 @@ public class CRP_UI extends javax.swing.JFrame {
         milestoneTab.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         lblMilestonesTable.setBackground(new java.awt.Color(255, 255, 255));
-        lblMilestonesTable.setFont(new java.awt.Font("Serif", 0, 28)); // NOI18N
+        lblMilestonesTable.setFont(new java.awt.Font("Serif", 1, 28)); // NOI18N
         lblMilestonesTable.setText("Milestone Table");
-        milestoneTab.add(lblMilestonesTable, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 130, 190, -1));
+        milestoneTab.add(lblMilestonesTable, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 130, 210, -1));
 
         jTableMilestones.setFont(new java.awt.Font("Serif", 0, 16)); // NOI18N
         jTableMilestones.setModel(new javax.swing.table.DefaultTableModel(
@@ -1719,8 +1810,17 @@ public class CRP_UI extends javax.swing.JFrame {
             new String [] {
                 "Student Week", "Task", "Status", "Remarks"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                true, false, true, true
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         jTableMilestones.setRowHeight(25);
+        jTableMilestones.setShowGrid(false);
         jMilestoneScrollPane.setViewportView(jTableMilestones);
         if (jTableMilestones.getColumnModel().getColumnCount() > 0) {
             jTableMilestones.getColumnModel().getColumn(0).setResizable(false);
@@ -1730,11 +1830,12 @@ public class CRP_UI extends javax.swing.JFrame {
         }
 
         milestoneTab.add(jMilestoneScrollPane, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 200, 770, 170));
-        milestoneTab.add(jProgressBar1, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 410, 470, 20));
+        milestoneTab.add(progressBarMilestones, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 400, 470, 20));
 
-        lblProgress.setFont(new java.awt.Font("Helvetica Neue", 0, 22)); // NOI18N
+        lblProgress.setFont(new java.awt.Font("Serif", 1, 22)); // NOI18N
         lblProgress.setText("Progress:");
-        milestoneTab.add(lblProgress, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 400, -1, 30));
+        lblProgress.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
+        milestoneTab.add(lblProgress, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 390, -1, 30));
 
         btnAdd.setFont(new java.awt.Font("Helvetica Neue", 0, 18)); // NOI18N
         btnAdd.setText("Add ");
@@ -1743,17 +1844,17 @@ public class CRP_UI extends javax.swing.JFrame {
                 btnAddActionPerformed(evt);
             }
         });
-        milestoneTab.add(btnAdd, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 460, 110, 30));
+        milestoneTab.add(btnAdd, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 460, 110, 30));
 
-        btnUpdate.setFont(new java.awt.Font("Helvetica Neue", 0, 18)); // NOI18N
-        btnUpdate.setText("Edit");
-        btnUpdate.setPreferredSize(new java.awt.Dimension(72, 29));
-        btnUpdate.addActionListener(new java.awt.event.ActionListener() {
+        btnEdit.setFont(new java.awt.Font("Helvetica Neue", 0, 18)); // NOI18N
+        btnEdit.setText("Edit");
+        btnEdit.setPreferredSize(new java.awt.Dimension(72, 29));
+        btnEdit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnUpdateActionPerformed(evt);
+                btnEditActionPerformed(evt);
             }
         });
-        milestoneTab.add(btnUpdate, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 460, 110, 30));
+        milestoneTab.add(btnEdit, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 460, 110, 30));
 
         btnRemove.setFont(new java.awt.Font("Helvetica Neue", 0, 18)); // NOI18N
         btnRemove.setText("Delete");
@@ -1763,7 +1864,7 @@ public class CRP_UI extends javax.swing.JFrame {
                 btnRemoveActionPerformed(evt);
             }
         });
-        milestoneTab.add(btnRemove, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 460, 110, 30));
+        milestoneTab.add(btnRemove, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 460, 110, 30));
 
         btnMarkAsCompleted.setFont(new java.awt.Font("Helvetica Neue", 0, 18)); // NOI18N
         btnMarkAsCompleted.setText("Mark as Completed");
@@ -1772,7 +1873,7 @@ public class CRP_UI extends javax.swing.JFrame {
                 btnMarkAsCompletedActionPerformed(evt);
             }
         });
-        milestoneTab.add(btnMarkAsCompleted, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 460, 210, 30));
+        milestoneTab.add(btnMarkAsCompleted, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 460, 210, 30));
 
         btnBack.setFont(new java.awt.Font("Helvetica Neue", 0, 16)); // NOI18N
         btnBack.setText("Back");
@@ -1798,6 +1899,25 @@ public class CRP_UI extends javax.swing.JFrame {
         lblSelectCourse.setFont(new java.awt.Font("Serif", 0, 15)); // NOI18N
         lblSelectCourse.setText("Select Course:");
         milestoneTab.add(lblSelectCourse, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 170, -1, -1));
+
+        btnSaveChanges.setFont(new java.awt.Font("Helvetica Neue", 0, 18)); // NOI18N
+        btnSaveChanges.setText("Save");
+        btnSaveChanges.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaveChangesActionPerformed(evt);
+            }
+        });
+        milestoneTab.add(btnSaveChanges, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 460, 110, 30));
+
+        btnUpdateGrade.setFont(new java.awt.Font("Helvetica Neue", 0, 18)); // NOI18N
+        btnUpdateGrade.setText("Update Grade");
+        btnUpdateGrade.setPreferredSize(new java.awt.Dimension(72, 29));
+        btnUpdateGrade.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUpdateGradeActionPerformed(evt);
+            }
+        });
+        milestoneTab.add(btnUpdateGrade, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 395, 150, 30));
 
         tabTwoWay.addTab("Milestone", milestoneTab);
 
@@ -1895,7 +2015,7 @@ public class CRP_UI extends javax.swing.JFrame {
         String key = buildPlanKey(s.getStudentID(), first.getCourseID(), first.getAttemptNumber());
         RecoveryPlan plan = planByKey.get(key);
         txtRecommendation.setText(plan != null ? plan.getRecommendation() : "");
-        refreshButtonStates();
+        refreshPlanButtons();
     }//GEN-LAST:event_btnSearchActionPerformed
 
     private void txtStudentIDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtStudentIDActionPerformed
@@ -1903,7 +2023,7 @@ public class CRP_UI extends javax.swing.JFrame {
     loadFailedComponents(studentID);    }//GEN-LAST:event_txtStudentIDActionPerformed
 
 
-    private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
+    private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
         if (currentPlan == null) return;
 
         int row = jTableMilestones.getSelectedRow();
@@ -1921,13 +2041,15 @@ public class CRP_UI extends javax.swing.JFrame {
         if (newTask == null) return;
 
         currentPlan.updateMilestone(row, newWeek, newTask);
-
-        populateMilestoneTable(currentPlan);
-        saveMilestonesToFile();
         
-        jTableMilestones.repaint();
+        saveMilestonesToFile();
+        populateMilestoneTable(currentPlan);
+        refreshMilestoneButtons();
         updateMilestoneProgressBar();
-    }//GEN-LAST:event_btnUpdateActionPerformed
+        checkPlanCompletion();
+
+        jTableMilestones.repaint();
+    }//GEN-LAST:event_btnEditActionPerformed
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
         if (currentPlan == null) {
@@ -1943,18 +2065,42 @@ public class CRP_UI extends javax.swing.JFrame {
 
         currentPlan.addMilestone(week, task);
 
-        populateMilestoneTable(currentPlan);
         saveMilestonesToFile();
+        populateMilestoneTable(currentPlan);
         
-        jTableMilestones.repaint();
         updateMilestoneProgressBar();
+        checkPlanCompletion();
+        refreshMilestoneButtons();
+
+        jTableMilestones.repaint();
+
     }//GEN-LAST:event_btnAddActionPerformed
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
         tabTwoWay.setSelectedIndex(0);
-        
-        comboxCourseSelector.setVisible(false);
-        lblSelectCourse.setVisible(false);
+
+    // Hide course selector in overview 
+    comboxCourseSelector.setVisible(false);
+    lblSelectCourse.setVisible(false);
+
+    // Refresh the failed course table (remove passed courses)
+    loadAllFailedStudents();
+
+    // If the plan was completed, remove UI plan details
+    if (currentPlan != null && currentPlan.getStatus().startsWith("COMPLETED")) {
+        currentPlan = null;
+        clearDetails();
+    }
+
+    // Reselect first row if exists
+    if (jTableFailedComponents.getRowCount() > 0) {
+        jTableFailedComponents.setRowSelectionInterval(0, 0);
+        handleFailedRowSelection();   // your own method
+    } else {
+        clearDetails();
+    }
+
+    refreshButtonsByStatus();
     }//GEN-LAST:event_btnBackActionPerformed
 
     private void btnMilestoneTabActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMilestoneTabActionPerformed
@@ -1965,12 +2111,11 @@ public class CRP_UI extends javax.swing.JFrame {
 
         // populate table
         populateMilestoneTable(currentPlan);
-        refreshMilestoneButtons();
 
         // update progress bar
         updateMilestoneProgressBar();  
         tabTwoWay.setSelectedIndex(1);
-
+        refreshMilestoneButtons();
     }//GEN-LAST:event_btnMilestoneTabActionPerformed
 
     private void btnCreatePlanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreatePlanActionPerformed
@@ -1991,13 +2136,17 @@ public class CRP_UI extends javax.swing.JFrame {
             }
 
             Course failedCourse = null;
-                for (Course c : student.getCourses()) {
-                    if (c.getCourseID().equals(cid)) {
-                        failedCourse = c;
-                        break;
-                    }
+            for (Course c : student.getCourses()) {
+                if (c.getCourseID().equals(cid)) {
+                    failedCourse = c;
+                    break;
                 }
-
+            }
+                
+            if (failedCourse == null) {
+                JOptionPane.showMessageDialog(this, "Course not found.");
+                return;
+            }   
             int attempt = failedCourse.getAttemptNumber();
             String key = buildPlanKey(sid, cid, attempt);
 
@@ -2037,9 +2186,11 @@ public class CRP_UI extends javax.swing.JFrame {
             txtRecommendation.setEditable(isNewPlan);
             priorityCombo.setEnabled(isNewPlan);
             btnSavePlan.setEnabled(isNewPlan);
-            btnEditPlan.setEnabled(!isNewPlan);   // existing plan → use Edit button
+            btnEditPlan.setEnabled(!isNewPlan);   
             
-            refreshButtonStates();
+            refreshPlanButtons();
+            refreshMilestoneButtons();
+            updateMilestoneProgressBar();
     }//GEN-LAST:event_btnCreatePlanActionPerformed
 
     private void btnSavePlanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSavePlanActionPerformed
@@ -2057,7 +2208,7 @@ public class CRP_UI extends javax.swing.JFrame {
         txtRecommendation.setEditable(false);
         priorityCombo.setEnabled(false);
 
-        refreshButtonStates();
+        refreshPlanButtons();
     }//GEN-LAST:event_btnSavePlanActionPerformed
 
     private void priorityComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_priorityComboActionPerformed
@@ -2073,7 +2224,7 @@ public class CRP_UI extends javax.swing.JFrame {
         txtRecommendation.setEditable(true);
         priorityCombo.setEnabled(true);
 
-        refreshButtonStates();
+        refreshPlanButtons();
     }//GEN-LAST:event_btnEditPlanActionPerformed
 
     private void btnCreateAllPlansActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateAllPlansActionPerformed
@@ -2096,10 +2247,11 @@ public class CRP_UI extends javax.swing.JFrame {
         saveMilestonesToFile();
 
         refreshFailedCoursesTableHighlight();
-        refreshButtonStates();
+        refreshPlanButtons();
         handleFailedRowSelection();
         refreshMilestoneButtons();
         refreshCourseSelectorForStudent(student);
+
         JOptionPane.showMessageDialog(this,
                 "All recovery plans for this student have been processed.");
     }//GEN-LAST:event_btnCreateAllPlansActionPerformed
@@ -2117,12 +2269,13 @@ public class CRP_UI extends javax.swing.JFrame {
                 "Completion Notes (optional):");
 
         currentPlan.markMilestoneCompleted(row, notes);
-
-        populateMilestoneTable(currentPlan);
         saveMilestonesToFile();
-        
-        jTableMilestones.repaint();
+        populateMilestoneTable(currentPlan);
+        refreshMilestoneButtons();
         updateMilestoneProgressBar();
+        checkPlanCompletion();
+
+        jTableMilestones.repaint();
     }//GEN-LAST:event_btnMarkAsCompletedActionPerformed
 
     private void btnRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveActionPerformed
@@ -2135,17 +2288,79 @@ public class CRP_UI extends javax.swing.JFrame {
         }
 
         currentPlan.removeMilestone(row);
-
-        populateMilestoneTable(currentPlan);
-        saveMilestonesToFile();
         
-        jTableMilestones.repaint();
+        saveMilestonesToFile();
+        populateMilestoneTable(currentPlan);
+        refreshMilestoneButtons();
         updateMilestoneProgressBar();
+        checkPlanCompletion();
+
+        jTableMilestones.repaint();
     }//GEN-LAST:event_btnRemoveActionPerformed
 
     private void comboxCourseSelectorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboxCourseSelectorActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_comboxCourseSelectorActionPerformed
+
+    private void btnSaveChangesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveChangesActionPerformed
+        saveMilestonesToFile();
+        populateMilestoneTable(currentPlan);
+        refreshMilestoneButtons();
+        updateMilestoneProgressBar();
+    }//GEN-LAST:event_btnSaveChangesActionPerformed
+
+    private void btnUpdateGradeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateGradeActionPerformed
+        if (currentPlan == null) return;
+
+        Course c = currentPlan.getCourse();
+        String failType = c.getFailedComponent();
+
+        Integer newAssRaw = null;
+        Integer newExamRaw = null;
+
+        // ---- Assignment Only ----
+        if (failType.equals("Assignment Only") || failType.equals("Both Components")) {
+            String in = JOptionPane.showInputDialog(
+                    this,
+                    "Enter new ASSIGNMENT grade (0–100):",
+                    "Update Assignment Grade",
+                    JOptionPane.PLAIN_MESSAGE
+            );
+            if (in == null) return;
+            newAssRaw = Integer.parseInt(in.trim());
+        }
+
+        // ---- Exam Only ----
+        if (failType.equals("Exam Only") || failType.equals("Both Components")) {
+            String in = JOptionPane.showInputDialog(
+                    this,
+                    "Enter new EXAM grade (0–100):",
+                    "Update Exam Grade",
+                    JOptionPane.PLAIN_MESSAGE
+            );
+            if (in == null) return;
+            newExamRaw = Integer.parseInt(in.trim());
+        }
+
+        // ---- Pass values to CRP ----
+        boolean ok = crp.enterRecoveryGrade(
+                currentPlan.getPlanID(),
+                newAssRaw,
+                newExamRaw
+        );
+
+        if (!ok) {
+            JOptionPane.showMessageDialog(this, "Grade update failed.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        JOptionPane.showMessageDialog(this,
+                "Grades updated.\nFinal Status: " + currentPlan.getStatus());
+
+        populatePlanUI(currentPlan);
+        populateMilestoneTable(currentPlan);
+        refreshButtonsByStatus();
+    }//GEN-LAST:event_btnUpdateGradeActionPerformed
     
     private void populatePlanUI(RecoveryPlan plan) {
         if (plan == null) {
@@ -2164,8 +2379,29 @@ public class CRP_UI extends javax.swing.JFrame {
 
         txtRecommendation.setEditable(false);
         priorityCombo.setEnabled(false);
+        refreshButtonsByStatus();
     }
+    
+    private void checkPlanCompletion() {
+        if (currentPlan == null) return;
 
+        boolean allDone = currentPlan.getMilestones()
+                                     .stream()
+                                     .allMatch(m -> m.isCompleted());
+
+        if (allDone) {
+            // Move plan state into the correct phase
+            if (!"COMPLETED-PASSED".equals(currentPlan.getStatus()) &&
+                !"COMPLETED-FAILED".equals(currentPlan.getStatus())) {
+
+                currentPlan.setStatus("AWAITING_GRADE");
+            }
+        }
+
+        // Always keep UI synced
+        updateMilestoneProgressBar();
+        refreshMilestoneButtons();
+    }
 
     private void populateMilestoneTable(RecoveryPlan plan) {
 
@@ -2187,35 +2423,35 @@ public class CRP_UI extends javax.swing.JFrame {
         jTableMilestones.repaint();
     }
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        FileLoader loader = new FileLoader();
-        loader.loadAll();
-        /* Create and display the form */        
-        new CRP_UI(loader).setVisible(true);
-        }
-    });
-}
+//    /**
+//     * @param args the command line arguments
+//     */
+//    public static void main(String args[]) {
+//        java.awt.EventQueue.invokeLater(new Runnable() {
+//            public void run() {
+//        /* Set the Nimbus look and feel */
+//        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+//        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+//         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+//         */
+//        try {
+//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+//                if ("Nimbus".equals(info.getName())) {
+//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//                    break;
+//                }
+//            }
+//        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
+//            logger.log(java.util.logging.Level.SEVERE, null, ex);
+//        }
+//        //</editor-fold>
+//        FileLoader loader = new FileLoader();
+//        loader.loadAll();
+//        /* Create and display the form */        
+//        new CRP_UI(loader, ).setVisible(true);
+//        }
+//    });
+//}
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel RPpanel;
@@ -2223,13 +2459,15 @@ public class CRP_UI extends javax.swing.JFrame {
     private javax.swing.JButton btnBack;
     private javax.swing.JButton btnCreateAllPlans;
     private javax.swing.JButton btnCreatePlan;
+    private javax.swing.JButton btnEdit;
     private javax.swing.JButton btnEditPlan;
     private javax.swing.JButton btnMarkAsCompleted;
     private javax.swing.JButton btnMilestoneTab;
     private javax.swing.JButton btnRemove;
+    private javax.swing.JButton btnSaveChanges;
     private javax.swing.JButton btnSavePlan;
     private javax.swing.JButton btnSearch;
-    private javax.swing.JButton btnUpdate;
+    private javax.swing.JButton btnUpdateGrade;
     private javax.swing.JComboBox<String> comboxCourseSelector;
     private javax.swing.JFrame jFrame1;
     private javax.swing.JLabel jLabel2;
@@ -2238,7 +2476,6 @@ public class CRP_UI extends javax.swing.JFrame {
     private javax.swing.JScrollPane jMilestoneScrollPane;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JSeparator jSeparator1;
@@ -2278,6 +2515,7 @@ public class CRP_UI extends javax.swing.JFrame {
     private javax.swing.JPanel panelFailureBadge;
     private javax.swing.JPanel panelOverview;
     private javax.swing.JComboBox<String> priorityCombo;
+    private javax.swing.JProgressBar progressBarMilestones;
     private javax.swing.JTabbedPane tabTwoWay;
     private javax.swing.JTextArea txtRecommendation;
     private javax.swing.JTextField txtStudentID;
