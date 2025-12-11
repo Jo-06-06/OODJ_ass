@@ -45,9 +45,11 @@ public class LoginUI extends javax.swing.JFrame {
         jPanel1.setPreferredSize(new java.awt.Dimension(450, 500));
 
         jLabel1.setFont(new java.awt.Font("Serif", 1, 14)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("Username");
 
         jLabel2.setFont(new java.awt.Font("Serif", 1, 14)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setText("Password");
 
         btnLogin.setFont(new java.awt.Font("Serif", 1, 14)); // NOI18N
