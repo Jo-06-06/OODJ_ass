@@ -270,7 +270,6 @@ public class APR_UI extends javax.swing.JFrame {
 
         btnHome.setBackground(new java.awt.Color(95, 106, 105));
         btnHome.setFont(new java.awt.Font("Serif", 1, 18)); // NOI18N
-        btnHome.setIcon(new javax.swing.ImageIcon("/Volumes/Macintosh HD/Users/jolin/Downloads/home (1).png")); // NOI18N
         btnHome.setBorder(null);
         btnHome.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -384,6 +383,11 @@ public class APR_UI extends javax.swing.JFrame {
         apr_pdfButton.setFont(new java.awt.Font("Serif", 0, 14)); // NOI18N
         apr_pdfButton.setText("Export PDF");
         apr_pdfButton.setToolTipText("");
+        apr_pdfButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                apr_pdfButtonActionPerformed(evt);
+            }
+        });
         jPanel1.add(apr_pdfButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(1020, 650, -1, -1));
 
         arp_jScrollPane.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Academic Summary & Recommedations", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Serif", 0, 14))); // NOI18N
@@ -503,6 +507,10 @@ public class APR_UI extends javax.swing.JFrame {
         new MainDashboard(currentUser).setVisible(true);
         this.dispose();
     }//GEN-LAST:event_btnHomeActionPerformed
+
+    private void apr_pdfButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_apr_pdfButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_apr_pdfButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1195,58 +1203,59 @@ public class APR_UI extends javax.swing.JFrame {
 
     //Email function
     public void sendReportEmail(String toEmail, String pdfPath) {
-        if (toEmail == null || toEmail.isEmpty()) {
-            System.out.println("No email address, skip sending.");
-            return;
-        }
-
-        final String fromEmail = "wongjolin0217@gmail.com";
-        final String password  = "ptzvabojtjzppndv";
-
-        Properties props = new Properties();
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", "smtp.gmail.com");
-        props.put("mail.smtp.port", "587");
-
-        Session session = Session.getInstance(props, new javax.mail.Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(fromEmail, password);
+            if (toEmail == null || toEmail.isEmpty()) {
+                System.out.println("No email address, skip sending.");
+                return;
             }
-        });
 
-        try {
-            Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(fromEmail, "Academic System"));
-            message.setRecipients(Message.RecipientType.TO,
-                    InternetAddress.parse(toEmail));
-            message.setSubject("Your Academic Performance Report");
+            final String fromEmail = "wongjolin0217@gmail.com";
+            final String password  = "ptzvabojtjzppndv";
 
-            MimeBodyPart textPart = new MimeBodyPart();
-            textPart.setText(
-                    "Dear " + currentStudentName + ",\n\n"
-                  + "Attached is your Academic Performance Report.\n\n"
-                  + "Regards,\nUniversity");
+            Properties props = new Properties();
+            props.put("mail.smtp.auth", "true");
+            props.put("mail.smtp.starttls.enable", "true");
+            props.put("mail.smtp.host", "smtp.gmail.com");
+            props.put("mail.smtp.port", "587");
 
-            MimeBodyPart attachmentPart = new MimeBodyPart();
-            DataSource source = new FileDataSource(pdfPath);
-            attachmentPart.setDataHandler(new DataHandler(source));
-            attachmentPart.setFileName(new java.io.File(pdfPath).getName());
+            Session session = Session.getInstance(props, new javax.mail.Authenticator() {
+                @Override
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication(fromEmail, password);
+                }
+            });
 
-            Multipart multipart = new MimeMultipart();
-            multipart.addBodyPart(textPart);
-            multipart.addBodyPart(attachmentPart);
+            try {
+                Message message = new MimeMessage(session);
+                message.setFrom(new InternetAddress(fromEmail, "Academic System"));
+                message.setRecipients(Message.RecipientType.TO,
+                        InternetAddress.parse(toEmail));
+                message.setSubject("Your Academic Performance Report");
 
-            message.setContent(multipart);
+                MimeBodyPart textPart = new MimeBodyPart();
+                textPart.setText(
+                        "Dear " + currentStudentName + ",\n\n"
+                      + "Attached is your Academic Performance Report.\n\n"
+                      + "Regards,\nUniversity");
 
-            Transport.send(message);
-            System.out.println("Email sent to " + toEmail);
+                MimeBodyPart attachmentPart = new MimeBodyPart();
+                DataSource source = new FileDataSource(pdfPath);
+                attachmentPart.setDataHandler(new DataHandler(source));
+                attachmentPart.setFileName(new java.io.File(pdfPath).getName());
 
-        } catch (Exception ex) {
-            ex.printStackTrace();
+                Multipart multipart = new MimeMultipart();
+                multipart.addBodyPart(textPart);
+                multipart.addBodyPart(attachmentPart);
+
+                message.setContent(multipart);
+
+                Transport.send(message);
+                System.out.println("Email sent to " + toEmail);
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
-    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel apr_intake;
     private javax.swing.JButton apr_pdfButton;

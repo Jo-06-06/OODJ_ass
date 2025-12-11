@@ -7,6 +7,7 @@ public class MainDashboard extends javax.swing.JFrame {
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MainDashboard.class.getName());
     private final User currentUser;
 
+    
     public MainDashboard(User user) {
         initComponents();
         this.currentUser = user;

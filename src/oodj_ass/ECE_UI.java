@@ -4,13 +4,12 @@ package oodj_ass;
  *
  * @author User
  */
-//11/12 8.45
+//11/12 10.30
 import java.util.ArrayList;
 import java.io.*;
 import java.awt.Color;
-import javax.mail.*;
-import javax.mail.internet.*;
-import java.util.Properties;
+import javax.swing.JOptionPane;
+
 
 
 public class ECE_UI extends javax.swing.JFrame {
@@ -152,7 +151,7 @@ public class ECE_UI extends javax.swing.JFrame {
 
     // Send eligibility email to ALL students in result.txt
     private void sendEligibilityEmails() {
-        // Load results and students
+
         ArrayList<String[]> resultList = loadFile("result.txt");
         ArrayList<String[]> studentList = loadFile("students.txt");
 
@@ -160,16 +159,15 @@ public class ECE_UI extends javax.swing.JFrame {
         int skippedCount = 0;
 
         for (String[] r : resultList) {
-            String sid   = r[0];  // studentID
-            String sem   = r[1];  // semester
-            String cgpa  = r[2];  // CGPA
-            String elig  = r[3];  // YES / NO
+            String sid   = r[0];
+            String sem   = r[1];
+            String cgpa  = r[2];
+            String elig  = r[3].trim().toUpperCase();  // IMPORTANT
 
-            // Find student details in student.txt
             String[] s = findStudentById(studentList, sid);
             if (s == null) {
                 skippedCount++;
-                continue; // no matching student row
+                continue;
             }
 
             String firstName = s[1];
@@ -177,12 +175,13 @@ public class ECE_UI extends javax.swing.JFrame {
             String program   = s[3];
             String email     = s[4];
 
-            // Build subject & body based on eligibility
             String subject;
             String body;
 
-            if (elig.equalsIgnoreCase("YES")) {
-                subject = "Eligibility Confirmation for Progression – " + sid;
+            // ------------ ELIGIBLE EMAIL --------------
+            if (elig.equals("YES")) {
+
+                subject = "Eligibility Confirmation – " + sid;
 
                 body = "Dear " + firstName + " " + lastName + ",\n\n"
                      + "This email is to inform you that you are ELIGIBLE to progress to the next level of study.\n\n"
@@ -192,16 +191,19 @@ public class ECE_UI extends javax.swing.JFrame {
                      + "Semester   : " + sem + "\n"
                      + "CGPA       : " + cgpa + "\n"
                      + "Eligibility: " + elig + "\n\n"
-                     + "You may proceed with your course registration according to the academic schedule.\n"
-                     + "Please ensure your fees are paid before the start of the intake.\n\n"
+                     + "Please ensure your fees are paid before the start of the intake.\n"
+                     + "You may proceed with your course registration according to the academic schedule.\n\n"
                      + "If you have any questions, kindly contact the Academic Office.\n\n"
                      + "Best regards,\n"
                      + "Academic Affairs Department";
-            } else {
+
+            }
+            // ------------ NOT ELIGIBLE EMAIL --------------
+            else {
                 subject = "Eligibility Status and Course Recovery – " + sid;
 
                 body = "Dear " + firstName + " " + lastName + ",\n\n"
-                     + "This email is to inform you that you are currently NOT ELIGIBLE to progress to the next level of study.\n\n"
+                     + "This email is to inform you that you are NOT ELIGIBLE to progress to the next level of study.\n\n"
                      + "Details:\n"
                      + "Student ID : " + sid + "\n"
                      + "Programme  : " + program + "\n"
@@ -214,11 +216,12 @@ public class ECE_UI extends javax.swing.JFrame {
                      + "If you have any questions, kindly contact the Academic Office.\n\n"
                      + "Best regards,\n"
                      + "Academic Affairs Department";
-            } 
+            }
 
-            //Actually send the email (real or simulated)
+            // ---------- ONLY SEND ONE TIME ----------
             try {
-                sendEmail(email, subject, body);
+                Email mail = new Email();
+                mail.sendEmail(email, subject, body);
                 sentCount++;
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -226,42 +229,17 @@ public class ECE_UI extends javax.swing.JFrame {
             }
         }
 
-        javax.swing.JOptionPane.showMessageDialog(
-            this,
-            "Eligibility email process completed.\n"
-          + "Successfully sent: " + sentCount + "\n"
-          + "Skipped / Failed: " + skippedCount,
-            "Email Status",
-            javax.swing.JOptionPane.INFORMATION_MESSAGE
+        JOptionPane.showMessageDialog(
+                this,
+                "Eligibility email process completed.\n"
+              + "Successfully sent: " + sentCount + "\n"
+              + "Skipped / Failed: " + skippedCount,
+                "Email Status",
+                JOptionPane.INFORMATION_MESSAGE
         );
     }
 
-    // send one email using JavaMail
-    private void sendEmail(String to, String subject, String body) throws Exception {
-        final String FROM_EMAIL = "wongjolin0217@gmail.com";
-        final String FROM_PASSWORD = "ptzvabojtjzppndv";
 
-        Properties props = new Properties();
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", "smtp.gmail.com");
-        props.put("mail.smtp.port", "587");
-
-        Session session = Session.getInstance(props, new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(FROM_EMAIL, FROM_PASSWORD);
-            }
-        });
-
-        Message message = new MimeMessage(session);
-        message.setFrom(new InternetAddress(FROM_EMAIL));
-        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
-        message.setSubject(subject);
-        message.setText(body);
-
-        Transport.send(message);
-    }
 
     
     
