@@ -38,9 +38,9 @@ import javax.swing.JOptionPane;
  * @author User
  */
 //10/12 11.00PM
-public class ARP_UI extends javax.swing.JFrame {
-    
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ARP_UI.class.getName());
+public class APR_UI extends javax.swing.JFrame {
+    private User currentUser;
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(APR_UI.class.getName());
     
     private String currentStudentId = null;
     private String currentStudentName = "";
@@ -87,8 +87,10 @@ public class ARP_UI extends javax.swing.JFrame {
     /**
      * Creates new form ARP_UI
      */
-    public ARP_UI() {
+    public APR_UI(User user) {
         initComponents();
+        this.currentUser = user;
+
         // Set header font
         apr_tabel1.getTableHeader().setFont(new java.awt.Font("Serif", java.awt.Font.BOLD, 20));
 
@@ -120,7 +122,7 @@ public class ARP_UI extends javax.swing.JFrame {
                          loadAndDisplayReport(currentStudentId, selected);
                      } catch (Exception ex) {
                          ex.printStackTrace();
-                         JOptionPane.showMessageDialog(ARP_UI.this, "Error updating report.");
+                         JOptionPane.showMessageDialog(APR_UI.this, "Error updating report.");
                      }
                  }
              }
@@ -130,7 +132,7 @@ public class ARP_UI extends javax.swing.JFrame {
         apr_pdfButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 if (currentStudentId == null) {
-                    JOptionPane.showMessageDialog(ARP_UI.this, "Please search a student first.");
+                    JOptionPane.showMessageDialog(APR_UI.this, "Please search a student first.");
                     return;
                 }
                 try {
@@ -138,11 +140,11 @@ public class ARP_UI extends javax.swing.JFrame {
                     if (pdfFile != null) {
                         sendReportEmail(currentStudentEmail, pdfFile);
                     }
-                    JOptionPane.showMessageDialog(ARP_UI.this,
+                    JOptionPane.showMessageDialog(APR_UI.this,
                             "PDF exported successfully.\nEmail has been sent to: " + currentStudentEmail);
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(ARP_UI.this, "PDF export failed or email not sent.");
+                    JOptionPane.showMessageDialog(APR_UI.this, "PDF export failed or email not sent.");
                 }
             }
         });
@@ -164,6 +166,7 @@ public class ARP_UI extends javax.swing.JFrame {
         jButtonRecovery = new javax.swing.JButton();
         jButtonAPR = new javax.swing.JButton();
         logout = new javax.swing.JButton();
+        btnHome = new javax.swing.JButton();
         apr_titile = new javax.swing.JLabel();
         sid_search = new javax.swing.JTextField();
         apr_intake = new javax.swing.JLabel();
@@ -190,6 +193,7 @@ public class ARP_UI extends javax.swing.JFrame {
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         dashboard.setBackground(new java.awt.Color(95, 106, 105));
+        dashboard.setPreferredSize(new java.awt.Dimension(210, 700));
 
         jButtonUserManagement.setBackground(new java.awt.Color(95, 106, 105));
         jButtonUserManagement.setFont(new java.awt.Font("Serif", 0, 20)); // NOI18N
@@ -264,6 +268,16 @@ public class ARP_UI extends javax.swing.JFrame {
             }
         });
 
+        btnHome.setBackground(new java.awt.Color(95, 106, 105));
+        btnHome.setFont(new java.awt.Font("Serif", 1, 18)); // NOI18N
+        btnHome.setIcon(new javax.swing.ImageIcon("/Volumes/Macintosh HD/Users/jolin/Downloads/home (1).png")); // NOI18N
+        btnHome.setBorder(null);
+        btnHome.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnHomeActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout dashboardLayout = new javax.swing.GroupLayout(dashboard);
         dashboard.setLayout(dashboardLayout);
         dashboardLayout.setHorizontalGroup(
@@ -276,14 +290,21 @@ public class ARP_UI extends javax.swing.JFrame {
                     .addComponent(jButtonEligibility, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(0, 0, Short.MAX_VALUE))
             .addGroup(dashboardLayout.createSequentialGroup()
-                .addGap(53, 53, 53)
-                .addComponent(logout)
+                .addGroup(dashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(dashboardLayout.createSequentialGroup()
+                        .addGap(53, 53, 53)
+                        .addComponent(logout))
+                    .addGroup(dashboardLayout.createSequentialGroup()
+                        .addGap(45, 45, 45)
+                        .addComponent(btnHome, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         dashboardLayout.setVerticalGroup(
             dashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(dashboardLayout.createSequentialGroup()
-                .addGap(132, 132, 132)
+                .addGap(45, 45, 45)
+                .addComponent(btnHome, javax.swing.GroupLayout.DEFAULT_SIZE, 45, Short.MAX_VALUE)
+                .addGap(53, 53, 53)
                 .addComponent(jButtonUserManagement, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButtonEligibility, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -291,12 +312,12 @@ public class ARP_UI extends javax.swing.JFrame {
                 .addComponent(jButtonRecovery, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButtonAPR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 174, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 167, Short.MAX_VALUE)
                 .addComponent(logout)
                 .addGap(62, 62, 62))
         );
 
-        jPanel1.add(dashboard, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 210, 700));
+        jPanel1.add(dashboard, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         apr_titile.setFont(new java.awt.Font("Serif", 1, 36)); // NOI18N
         apr_titile.setText("Academic Performance Report");
@@ -391,28 +412,6 @@ public class ARP_UI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButtonUserManagementActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonUserManagementActionPerformed
-
-    }//GEN-LAST:event_jButtonUserManagementActionPerformed
-
-    private void jButtonEligibilityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEligibilityActionPerformed
-        new ECE_UI().setVisible(true);
-        this.dispose();
-    }//GEN-LAST:event_jButtonEligibilityActionPerformed
-
-    private void jButtonRecoveryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRecoveryActionPerformed
- 
-    }//GEN-LAST:event_jButtonRecoveryActionPerformed
-
-    private void jButtonAPRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAPRActionPerformed
-        new ARP_UI().setVisible(true);
-        this.dispose();
-    }//GEN-LAST:event_jButtonAPRActionPerformed
-
-    private void logoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logoutActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_logoutActionPerformed
-
     private void apr_searchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_apr_searchActionPerformed
         String studentID = sid_search.getText().trim();
 
@@ -474,6 +473,37 @@ public class ARP_UI extends javax.swing.JFrame {
         apr_searchActionPerformed(evt); //when keyin the sid and press enter also can search
     }//GEN-LAST:event_sid_searchActionPerformed
 
+    private void jButtonUserManagementActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonUserManagementActionPerformed
+        new AdminDashboard(currentUser).setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jButtonUserManagementActionPerformed
+
+    private void jButtonEligibilityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEligibilityActionPerformed
+        new ECE_UI(currentUser).setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jButtonEligibilityActionPerformed
+
+    private void jButtonRecoveryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRecoveryActionPerformed
+        new CRP_UI(currentUser).setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jButtonRecoveryActionPerformed
+
+    private void jButtonAPRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAPRActionPerformed
+        new APR_UI(currentUser).setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jButtonAPRActionPerformed
+
+    private void logoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logoutActionPerformed
+        Logger.writeLog(currentUser.getUsername(), "LOGOUT");
+        new LoginUI().setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_logoutActionPerformed
+
+    private void btnHomeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHomeActionPerformed
+        new MainDashboard(currentUser).setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_btnHomeActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -508,7 +538,7 @@ public class ARP_UI extends javax.swing.JFrame {
         }
         
         //Create and Display Form
-        java.awt.EventQueue.invokeLater(() -> new ARP_UI().setVisible(true));
+//        java.awt.EventQueue.invokeLater(() -> new APR_UI().setVisible(true));
     }
 
     //Table Summary ComboBox
@@ -1225,6 +1255,7 @@ public class ARP_UI extends javax.swing.JFrame {
     private javax.swing.JTable apr_tabel1;
     private javax.swing.JLabel apr_titile;
     private javax.swing.JScrollPane arp_jScrollPane;
+    private javax.swing.JButton btnHome;
     private javax.swing.JPanel dashboard;
     private javax.swing.JButton jButtonAPR;
     private javax.swing.JButton jButtonEligibility;

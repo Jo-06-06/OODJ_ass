@@ -14,7 +14,7 @@ import java.util.Properties;
 
 
 public class ECE_UI extends javax.swing.JFrame {
-    
+    private User currentUser;
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ECE_UI.class.getName());
 
     /**
@@ -103,8 +103,10 @@ public class ECE_UI extends javax.swing.JFrame {
         });
     }
     
-    public ECE_UI() {
+    public ECE_UI(User user) {
         initComponents();
+        this.currentUser = user;
+                
         jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 int row = jTable1.rowAtPoint(evt.getPoint());
@@ -279,18 +281,18 @@ public class ECE_UI extends javax.swing.JFrame {
         jTable1 = new javax.swing.JTable();
         search2 = new javax.swing.JButton();
         title = new javax.swing.JLabel();
+        ece_sid = new javax.swing.JLabel();
+        eceSendEmail = new javax.swing.JButton();
         dashboard = new javax.swing.JPanel();
         jButtonUserManagement = new javax.swing.JButton();
         jButtonEligibility = new javax.swing.JButton();
         jButtonRecovery = new javax.swing.JButton();
         jButtonAPR = new javax.swing.JButton();
         logout = new javax.swing.JButton();
-        ece_sid = new javax.swing.JLabel();
-        eceSendEmail = new javax.swing.JButton();
+        btnHome = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Eligibility Check and Enrolment");
-        setMaximumSize(new java.awt.Dimension(1160, 700));
         setMinimumSize(new java.awt.Dimension(1160, 700));
         setResizable(false);
 
@@ -357,7 +359,21 @@ public class ECE_UI extends javax.swing.JFrame {
         title.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         backgroud.add(title, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 40, -1, -1));
 
+        ece_sid.setFont(new java.awt.Font("Serif", 0, 18)); // NOI18N
+        ece_sid.setText("Student ID:");
+        backgroud.add(ece_sid, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 120, -1, -1));
+
+        eceSendEmail.setFont(new java.awt.Font("Serif", 0, 18)); // NOI18N
+        eceSendEmail.setText("Send Eligibility Email");
+        eceSendEmail.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                eceSendEmailActionPerformed(evt);
+            }
+        });
+        backgroud.add(eceSendEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(930, 620, -1, -1));
+
         dashboard.setBackground(new java.awt.Color(95, 106, 105));
+        dashboard.setPreferredSize(new java.awt.Dimension(210, 700));
 
         jButtonUserManagement.setBackground(new java.awt.Color(95, 106, 105));
         jButtonUserManagement.setFont(new java.awt.Font("Serif", 0, 20)); // NOI18N
@@ -432,6 +448,16 @@ public class ECE_UI extends javax.swing.JFrame {
             }
         });
 
+        btnHome.setBackground(new java.awt.Color(95, 106, 105));
+        btnHome.setFont(new java.awt.Font("Serif", 1, 18)); // NOI18N
+        btnHome.setIcon(new javax.swing.ImageIcon("/Volumes/Macintosh HD/Users/jolin/Downloads/home (1).png")); // NOI18N
+        btnHome.setBorder(null);
+        btnHome.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnHomeActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout dashboardLayout = new javax.swing.GroupLayout(dashboard);
         dashboard.setLayout(dashboardLayout);
         dashboardLayout.setHorizontalGroup(
@@ -444,14 +470,21 @@ public class ECE_UI extends javax.swing.JFrame {
                     .addComponent(jButtonEligibility, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(0, 0, Short.MAX_VALUE))
             .addGroup(dashboardLayout.createSequentialGroup()
-                .addGap(53, 53, 53)
-                .addComponent(logout)
+                .addGroup(dashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(dashboardLayout.createSequentialGroup()
+                        .addGap(53, 53, 53)
+                        .addComponent(logout))
+                    .addGroup(dashboardLayout.createSequentialGroup()
+                        .addGap(45, 45, 45)
+                        .addComponent(btnHome, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         dashboardLayout.setVerticalGroup(
             dashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(dashboardLayout.createSequentialGroup()
-                .addGap(132, 132, 132)
+                .addGap(45, 45, 45)
+                .addComponent(btnHome, javax.swing.GroupLayout.DEFAULT_SIZE, 45, Short.MAX_VALUE)
+                .addGap(53, 53, 53)
                 .addComponent(jButtonUserManagement, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButtonEligibility, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -459,25 +492,12 @@ public class ECE_UI extends javax.swing.JFrame {
                 .addComponent(jButtonRecovery, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButtonAPR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 174, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 167, Short.MAX_VALUE)
                 .addComponent(logout)
                 .addGap(62, 62, 62))
         );
 
-        backgroud.add(dashboard, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 210, 700));
-
-        ece_sid.setFont(new java.awt.Font("Serif", 0, 18)); // NOI18N
-        ece_sid.setText("Student ID:");
-        backgroud.add(ece_sid, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 120, -1, -1));
-
-        eceSendEmail.setFont(new java.awt.Font("Serif", 0, 18)); // NOI18N
-        eceSendEmail.setText("Send Eligibility Email");
-        eceSendEmail.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                eceSendEmailActionPerformed(evt);
-            }
-        });
-        backgroud.add(eceSendEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(930, 620, -1, -1));
+        backgroud.add(dashboard, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -545,28 +565,6 @@ public class ECE_UI extends javax.swing.JFrame {
         updateTable(filtered);
     }//GEN-LAST:event_dropdownActionPerformed
 
-    private void jButtonUserManagementActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonUserManagementActionPerformed
-
-    }//GEN-LAST:event_jButtonUserManagementActionPerformed
-
-    private void jButtonEligibilityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEligibilityActionPerformed
-        new ECE_UI().setVisible(true);
-        this.dispose();
-    }//GEN-LAST:event_jButtonEligibilityActionPerformed
-
-    private void jButtonRecoveryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRecoveryActionPerformed
-
-    }//GEN-LAST:event_jButtonRecoveryActionPerformed
-
-    private void jButtonAPRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAPRActionPerformed
-        new ARP_UI().setVisible(true);
-        this.dispose();
-    }//GEN-LAST:event_jButtonAPRActionPerformed
-
-    private void logoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logoutActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_logoutActionPerformed
-
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
 
     }//GEN-LAST:event_jComboBox1ActionPerformed
@@ -584,34 +582,66 @@ public class ECE_UI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_eceSendEmailActionPerformed
 
+    private void jButtonUserManagementActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonUserManagementActionPerformed
+        new AdminDashboard(currentUser).setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jButtonUserManagementActionPerformed
+
+    private void jButtonEligibilityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEligibilityActionPerformed
+        new ECE_UI(currentUser).setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jButtonEligibilityActionPerformed
+
+    private void jButtonRecoveryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRecoveryActionPerformed
+        new CRP_UI(currentUser).setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jButtonRecoveryActionPerformed
+
+    private void jButtonAPRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAPRActionPerformed
+        new APR_UI(currentUser).setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jButtonAPRActionPerformed
+
+    private void logoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logoutActionPerformed
+        Logger.writeLog(currentUser.getUsername(), "LOGOUT");
+        new LoginUI().setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_logoutActionPerformed
+
+    private void btnHomeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHomeActionPerformed
+        new MainDashboard(currentUser).setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_btnHomeActionPerformed
+
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new ECE_UI().setVisible(true));
-    }
+//    public static void main(String args[]) {
+//        /* Set the Nimbus look and feel */
+//        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+//        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+//         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+//         */
+//        try {
+//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+//                if ("Nimbus".equals(info.getName())) {
+//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//                    break;
+//                }
+//            }
+//        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
+//            logger.log(java.util.logging.Level.SEVERE, null, ex);
+//        }
+//        //</editor-fold>
+//
+//        /* Create and display the form */
+//        java.awt.EventQueue.invokeLater(() -> new ECE_UI().setVisible(true));
+//    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel backgroud;
+    private javax.swing.JButton btnHome;
     private javax.swing.JPanel dashboard;
     private javax.swing.JComboBox<String> dropdown;
     private javax.swing.JButton eceSendEmail;

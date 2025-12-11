@@ -18,31 +18,49 @@ import javax.swing.table.TableColumnModel;
 
 
 public class CRP_UI extends javax.swing.JFrame {
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(CRP_UI.class.getName());
+    private User currentUser;
+    private FileLoader fileLoader;
+    private CRP crp;
+    
     private static final String RECOVERY_PLAN_FILE = "data/recoveryPlans.txt";
     private static final String MILESTONE_FILE = "data/recoveryMilestones.txt";
-
-    private FileLoader fileLoader;
-    private RecoveryPlan currentPlan;
-    private CRP crp;
 
     // key = "studentID|courseID|attemptNum"
     private Map<String, RecoveryPlan> planByKey = new LinkedHashMap<>();
     // key = planID
     private Map<String, RecoveryPlan> planByID = new LinkedHashMap<>();
-
+    
+    private RecoveryPlan currentPlan;
     private int lastPlanNumber = 0; 
     private String recommendation;
     private int hoveredRow = -1;
     private int hoveredMilestoneRow = -1;
+    
+    public CRP_UI(User user) {
+        FileLoader loader = new FileLoader();
+        loader.loadAll(); // load students, courses, grades etc.
 
+        List<Student> students = loader.getStudents();
+        Email mailer = new Email(); // or your existing Email object
+
+        CRP crpManager = new CRP(students, mailer);
+
+        // Call your main constructor
+        this.fileLoader = loader;
+        this.crp = crpManager;
+        this.currentUser = user;
+
+        initComponents();
+        tabTwoWay.setSelectedIndex(0);
+    }
     /**
      * Creates new form CRP_UI
      */
-    public CRP_UI(FileLoader loader, CRP crpManager) {
+    public CRP_UI(FileLoader loader, CRP crpManager, User user) {
         this.fileLoader = loader;
         this.crp = crpManager;  
         initComponents();
+        this.currentUser = user;
         tabTwoWay.setSelectedIndex(0);
         
         // Load data
@@ -1197,7 +1215,6 @@ public class CRP_UI extends javax.swing.JFrame {
 
         jFrame1 = new javax.swing.JFrame();
         jPanel1 = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
         tabTwoWay = new javax.swing.JTabbedPane();
         panelOverview = new javax.swing.JPanel();
         txtStudentID = new javax.swing.JTextField();
@@ -1260,6 +1277,13 @@ public class CRP_UI extends javax.swing.JFrame {
         lblSelectCourse = new javax.swing.JLabel();
         btnSaveChanges = new javax.swing.JButton();
         btnUpdateGrade = new javax.swing.JButton();
+        dashboard = new javax.swing.JPanel();
+        jButtonUserManagement = new javax.swing.JButton();
+        jButtonEligibility = new javax.swing.JButton();
+        jButtonRecovery = new javax.swing.JButton();
+        jButtonAPR = new javax.swing.JButton();
+        logout = new javax.swing.JButton();
+        btnHome = new javax.swing.JButton();
 
         javax.swing.GroupLayout jFrame1Layout = new javax.swing.GroupLayout(jFrame1.getContentPane());
         jFrame1.getContentPane().setLayout(jFrame1Layout);
@@ -1281,22 +1305,6 @@ public class CRP_UI extends javax.swing.JFrame {
         jPanel1.setBackground(new java.awt.Color(183, 201, 197));
         jPanel1.setPreferredSize(new java.awt.Dimension(1160, 700));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        jPanel2.setBackground(new java.awt.Color(86, 96, 95));
-        jPanel2.setPreferredSize(new java.awt.Dimension(210, 700));
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 210, Short.MAX_VALUE)
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 700, Short.MAX_VALUE)
-        );
-
-        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 700));
 
         tabTwoWay.setPreferredSize(new java.awt.Dimension(870, 945));
 
@@ -1468,7 +1476,6 @@ public class CRP_UI extends javax.swing.JFrame {
             .addGroup(RPpanelLayout.createSequentialGroup()
                 .addGap(4, 4, 4)
                 .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(RPpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(RPpanelLayout.createSequentialGroup()
                         .addGap(36, 36, 36)
@@ -1486,9 +1493,7 @@ public class CRP_UI extends javax.swing.JFrame {
                                 .addGroup(RPpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                     .addComponent(jLabel6)
                                     .addComponent(priorityCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addGroup(RPpanelLayout.createSequentialGroup()
-                                .addComponent(jLabel5)
-                                .addGap(117, 117, 117)))))
+                            .addComponent(jLabel5))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, 20, Short.MAX_VALUE)
                 .addGroup(RPpanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(btnEditPlan, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
@@ -1671,10 +1676,10 @@ public class CRP_UI extends javax.swing.JFrame {
                     .addComponent(lblInfoAssScore, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblInfoExamScore, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(lblInfoStudentName, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(lblStudentName, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(lblInfoExamScore, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(lblStudentName, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(lblExamScore, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(panelFBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -1768,7 +1773,7 @@ public class CRP_UI extends javax.swing.JFrame {
                 .addGroup(panelOverviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(RPpanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(panelFB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(262, Short.MAX_VALUE))
+                .addContainerGap(53, Short.MAX_VALUE))
         );
 
         tabTwoWay.addTab("Overview", panelOverview);
@@ -1831,7 +1836,6 @@ public class CRP_UI extends javax.swing.JFrame {
 
         btnEdit.setFont(new java.awt.Font("Helvetica Neue", 0, 18)); // NOI18N
         btnEdit.setText("Edit");
-        btnEdit.setPreferredSize(new java.awt.Dimension(72, 29));
         btnEdit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnEditActionPerformed(evt);
@@ -1858,14 +1862,14 @@ public class CRP_UI extends javax.swing.JFrame {
         });
         milestoneTab.add(btnMarkAsCompleted, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 460, 210, 30));
 
-        btnBack.setFont(new java.awt.Font("Helvetica Neue", 0, 16)); // NOI18N
+        btnBack.setFont(new java.awt.Font("Helvetica Neue", 0, 18)); // NOI18N
         btnBack.setText("Back");
         btnBack.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnBackActionPerformed(evt);
             }
         });
-        milestoneTab.add(btnBack, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 510, 100, 30));
+        milestoneTab.add(btnBack, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 510, 110, 30));
 
         lblCRP.setBackground(new java.awt.Color(0, 0, 0));
         lblCRP.setFont(new java.awt.Font("Serif", 1, 36)); // NOI18N
@@ -1905,6 +1909,133 @@ public class CRP_UI extends javax.swing.JFrame {
         tabTwoWay.addTab("Milestone", milestoneTab);
 
         jPanel1.add(tabTwoWay, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, -30, 960, 730));
+
+        dashboard.setBackground(new java.awt.Color(95, 106, 105));
+        dashboard.setPreferredSize(new java.awt.Dimension(210, 700));
+
+        jButtonUserManagement.setBackground(new java.awt.Color(95, 106, 105));
+        jButtonUserManagement.setFont(new java.awt.Font("Serif", 0, 20)); // NOI18N
+        jButtonUserManagement.setForeground(new java.awt.Color(255, 255, 255));
+        jButtonUserManagement.setText("User Management");
+        jButtonUserManagement.setToolTipText("");
+        jButtonUserManagement.setBorderPainted(false);
+        jButtonUserManagement.setContentAreaFilled(false);
+        jButtonUserManagement.setFocusPainted(false);
+        jButtonUserManagement.setOpaque(true);
+        jButtonUserManagement.setPreferredSize(new java.awt.Dimension(210, 70));
+        jButtonUserManagement.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonUserManagementActionPerformed(evt);
+            }
+        });
+
+        jButtonEligibility.setBackground(new java.awt.Color(95, 106, 105));
+        jButtonEligibility.setFont(new java.awt.Font("Serif", 0, 20)); // NOI18N
+        jButtonEligibility.setForeground(new java.awt.Color(255, 255, 255));
+        jButtonEligibility.setText("<html><center>Eligibility Check<br>and Enrolment</center></html> ");
+        jButtonEligibility.setToolTipText("");
+        jButtonEligibility.setBorderPainted(false);
+        jButtonEligibility.setContentAreaFilled(false);
+        jButtonEligibility.setFocusPainted(false);
+        jButtonEligibility.setOpaque(true);
+        jButtonEligibility.setPreferredSize(new java.awt.Dimension(210, 70));
+        jButtonEligibility.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonEligibilityActionPerformed(evt);
+            }
+        });
+
+        jButtonRecovery.setBackground(new java.awt.Color(95, 106, 105));
+        jButtonRecovery.setFont(new java.awt.Font("Serif", 0, 20)); // NOI18N
+        jButtonRecovery.setForeground(new java.awt.Color(255, 255, 255));
+        jButtonRecovery.setText("Course Recovery Plan");
+        jButtonRecovery.setToolTipText("");
+        jButtonRecovery.setBorderPainted(false);
+        jButtonRecovery.setContentAreaFilled(false);
+        jButtonRecovery.setFocusPainted(false);
+        jButtonRecovery.setOpaque(true);
+        jButtonRecovery.setPreferredSize(new java.awt.Dimension(210, 70));
+        jButtonRecovery.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonRecoveryActionPerformed(evt);
+            }
+        });
+
+        jButtonAPR.setBackground(new java.awt.Color(95, 106, 105));
+        jButtonAPR.setFont(new java.awt.Font("Serif", 0, 20)); // NOI18N
+        jButtonAPR.setForeground(new java.awt.Color(255, 255, 255));
+        jButtonAPR.setText("<html><center>Academic<br>Performance Report</center></html> ");
+        jButtonAPR.setBorderPainted(false);
+        jButtonAPR.setContentAreaFilled(false);
+        jButtonAPR.setFocusPainted(false);
+        jButtonAPR.setOpaque(true);
+        jButtonAPR.setPreferredSize(new java.awt.Dimension(210, 70));
+        jButtonAPR.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonAPRActionPerformed(evt);
+            }
+        });
+
+        logout.setFont(new java.awt.Font("Serif", 0, 20)); // NOI18N
+        logout.setText("Log Out");
+        logout.setBorderPainted(false);
+        logout.setFocusPainted(false);
+        logout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                logoutActionPerformed(evt);
+            }
+        });
+
+        btnHome.setBackground(new java.awt.Color(95, 106, 105));
+        btnHome.setFont(new java.awt.Font("Serif", 1, 18)); // NOI18N
+        btnHome.setIcon(new javax.swing.ImageIcon("/Volumes/Macintosh HD/Users/jolin/Downloads/home (1).png")); // NOI18N
+        btnHome.setBorder(null);
+        btnHome.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnHomeActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout dashboardLayout = new javax.swing.GroupLayout(dashboard);
+        dashboard.setLayout(dashboardLayout);
+        dashboardLayout.setHorizontalGroup(
+            dashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(dashboardLayout.createSequentialGroup()
+                .addGroup(dashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButtonRecovery, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonUserManagement, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonAPR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonEligibility, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(dashboardLayout.createSequentialGroup()
+                .addGroup(dashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(dashboardLayout.createSequentialGroup()
+                        .addGap(53, 53, 53)
+                        .addComponent(logout))
+                    .addGroup(dashboardLayout.createSequentialGroup()
+                        .addGap(45, 45, 45)
+                        .addComponent(btnHome, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        dashboardLayout.setVerticalGroup(
+            dashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(dashboardLayout.createSequentialGroup()
+                .addGap(45, 45, 45)
+                .addComponent(btnHome, javax.swing.GroupLayout.DEFAULT_SIZE, 45, Short.MAX_VALUE)
+                .addGap(53, 53, 53)
+                .addComponent(jButtonUserManagement, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButtonEligibility, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButtonRecovery, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButtonAPR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 167, Short.MAX_VALUE)
+                .addComponent(logout)
+                .addGap(62, 62, 62))
+        );
+
+        jPanel1.add(dashboard, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -2344,6 +2475,37 @@ public class CRP_UI extends javax.swing.JFrame {
         populateMilestoneTable(currentPlan);
         refreshButtonsByStatus();
     }//GEN-LAST:event_btnUpdateGradeActionPerformed
+
+    private void jButtonUserManagementActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonUserManagementActionPerformed
+        new AdminDashboard(currentUser).setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jButtonUserManagementActionPerformed
+
+    private void jButtonEligibilityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEligibilityActionPerformed
+        new ECE_UI(currentUser).setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jButtonEligibilityActionPerformed
+
+    private void jButtonRecoveryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRecoveryActionPerformed
+        new CRP_UI(currentUser).setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jButtonRecoveryActionPerformed
+
+    private void jButtonAPRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAPRActionPerformed
+        new APR_UI(currentUser).setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jButtonAPRActionPerformed
+
+    private void logoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logoutActionPerformed
+        Logger.writeLog(currentUser.getUsername(), "LOGOUT");
+        new LoginUI().setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_logoutActionPerformed
+
+    private void btnHomeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHomeActionPerformed
+        new MainDashboard(currentUser).setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_btnHomeActionPerformed
     
     private void populatePlanUI(RecoveryPlan plan) {
         if (plan == null) {
@@ -2409,7 +2571,7 @@ public class CRP_UI extends javax.swing.JFrame {
 //    /**
 //     * @param args the command line arguments
 //     */
-//    public static void main(String args[]) {
+    public static void main(String args[]) {
 //        java.awt.EventQueue.invokeLater(new Runnable() {
 //            public void run() {
 //        /* Set the Nimbus look and feel */
@@ -2433,8 +2595,10 @@ public class CRP_UI extends javax.swing.JFrame {
 //        /* Create and display the form */        
 //        new CRP_UI(loader, ).setVisible(true);
 //        }
+//        CRP_UI ui = new CRP_UI(fl, crp);
+//        ui.setVisible(true);
 //    });
-//}
+}
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel RPpanel;
@@ -2444,6 +2608,7 @@ public class CRP_UI extends javax.swing.JFrame {
     private javax.swing.JButton btnCreatePlan;
     private javax.swing.JButton btnEdit;
     private javax.swing.JButton btnEditPlan;
+    private javax.swing.JButton btnHome;
     private javax.swing.JButton btnMarkAsCompleted;
     private javax.swing.JButton btnMilestoneTab;
     private javax.swing.JButton btnRemove;
@@ -2452,13 +2617,17 @@ public class CRP_UI extends javax.swing.JFrame {
     private javax.swing.JButton btnSearch;
     private javax.swing.JButton btnUpdateGrade;
     private javax.swing.JComboBox<String> comboxCourseSelector;
+    private javax.swing.JPanel dashboard;
+    private javax.swing.JButton jButtonAPR;
+    private javax.swing.JButton jButtonEligibility;
+    private javax.swing.JButton jButtonRecovery;
+    private javax.swing.JButton jButtonUserManagement;
     private javax.swing.JFrame jFrame1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JScrollPane jMilestoneScrollPane;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JSeparator jSeparator1;
@@ -2493,6 +2662,7 @@ public class CRP_UI extends javax.swing.JFrame {
     private javax.swing.JLabel lblStudentName;
     private javax.swing.JLabel lblTitleDetails;
     private javax.swing.JLabel lblplanid;
+    private javax.swing.JButton logout;
     private javax.swing.JPanel milestoneTab;
     private javax.swing.JPanel panelFB;
     private javax.swing.JPanel panelFailureBadge;
