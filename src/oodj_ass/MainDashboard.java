@@ -10,13 +10,6 @@ public class MainDashboard extends javax.swing.JFrame {
     public MainDashboard(User user) {
         initComponents();
         this.currentUser = user;
-    
-        textField.setText("Welcome, " + user.getUsername() + " (" + user.getRole() + ")");
-
-        btnUserMgmt.setVisible(true);       
-        btnECE.setVisible(true);
-        btnAPR.setVisible(true);
-        btnCRP.setVisible(true);   
     }
 
     /**
@@ -29,238 +22,272 @@ public class MainDashboard extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
-        btnECE = new javax.swing.JButton();
-        btnUserMgmt = new javax.swing.JButton();
-        btnAPR = new javax.swing.JButton();
-        btnCRP = new javax.swing.JButton();
-        btnLogout = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jPanel5 = new javax.swing.JPanel();
-        textField = new javax.swing.JTextField();
+        labelWelcomeMessg = new javax.swing.JLabel();
+        labelWelcomeMessg1 = new javax.swing.JLabel();
+        labelWelcomeMessg2 = new javax.swing.JLabel();
+        dashboard = new javax.swing.JPanel();
+        jButtonUserManagement = new javax.swing.JButton();
+        jButtonEligibility = new javax.swing.JButton();
+        jButtonRecovery = new javax.swing.JButton();
+        jButtonAPR = new javax.swing.JButton();
+        logout = new javax.swing.JButton();
+        btnHome = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setMaximumSize(new java.awt.Dimension(1160, 700));
         setMinimumSize(new java.awt.Dimension(1160, 700));
-        setPreferredSize(new java.awt.Dimension(1160, 700));
         setResizable(false);
 
+        jPanel1.setPreferredSize(new java.awt.Dimension(1160, 700));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        jPanel2.setBackground(new java.awt.Color(0, 0, 0));
-        jPanel2.setMaximumSize(new java.awt.Dimension(210, 700));
-        jPanel2.setMinimumSize(new java.awt.Dimension(210, 700));
-        jPanel2.setPreferredSize(new java.awt.Dimension(210, 700));
-        jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        btnECE.setBackground(new java.awt.Color(0, 0, 0));
-        btnECE.setFont(new java.awt.Font("Serif", 1, 18)); // NOI18N
-        btnECE.setForeground(new java.awt.Color(255, 255, 255));
-        btnECE.setText("Eligibity Check");
-        btnECE.setMaximumSize(new java.awt.Dimension(172, 31));
-        btnECE.setMinimumSize(new java.awt.Dimension(172, 31));
-        btnECE.setPreferredSize(new java.awt.Dimension(172, 31));
-        btnECE.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnECEActionPerformed(evt);
-            }
-        });
-        jPanel2.add(btnECE, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 230, 210, 40));
-
-        btnUserMgmt.setBackground(new java.awt.Color(0, 0, 0));
-        btnUserMgmt.setFont(new java.awt.Font("Serif", 1, 18)); // NOI18N
-        btnUserMgmt.setForeground(new java.awt.Color(255, 255, 255));
-        btnUserMgmt.setText("User Management");
-        btnUserMgmt.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnUserMgmtActionPerformed(evt);
-            }
-        });
-        jPanel2.add(btnUserMgmt, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 130, 210, 40));
-
-        btnAPR.setBackground(new java.awt.Color(0, 0, 0));
-        btnAPR.setFont(new java.awt.Font("Serif", 1, 18)); // NOI18N
-        btnAPR.setForeground(new java.awt.Color(255, 255, 255));
-        btnAPR.setText("Academic Reporting");
-        btnAPR.setMaximumSize(new java.awt.Dimension(172, 31));
-        btnAPR.setMinimumSize(new java.awt.Dimension(172, 31));
-        btnAPR.setPreferredSize(new java.awt.Dimension(172, 31));
-        btnAPR.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAPRActionPerformed(evt);
-            }
-        });
-        jPanel2.add(btnAPR, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 330, 210, 40));
-
-        btnCRP.setBackground(new java.awt.Color(0, 0, 0));
-        btnCRP.setFont(new java.awt.Font("Serif", 1, 18)); // NOI18N
-        btnCRP.setForeground(new java.awt.Color(255, 255, 255));
-        btnCRP.setText("Course Recovery");
-        btnCRP.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCRPActionPerformed(evt);
-            }
-        });
-        jPanel2.add(btnCRP, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 430, 210, 40));
-
-        btnLogout.setFont(new java.awt.Font("Serif", 1, 18)); // NOI18N
-        btnLogout.setText("Logout");
-        btnLogout.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLogoutActionPerformed(evt);
-            }
-        });
-        jPanel2.add(btnLogout, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 550, 210, 50));
-
-        jButton1.setFont(new java.awt.Font("Serif", 1, 18)); // NOI18N
-        jButton1.setText("Home");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-        jPanel2.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 60, 210, 40));
-
-        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 880));
 
         jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
         jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(216, 0, -1, -1));
 
-        jPanel4.setBackground(new java.awt.Color(113, 149, 115));
+        jPanel4.setBackground(new java.awt.Color(183, 201, 197));
+        jPanel4.setPreferredSize(new java.awt.Dimension(1160, 700));
 
-        jLabel1.setFont(new java.awt.Font("Serif", 1, 36)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel1.setText("DASHBOARD");
+        labelWelcomeMessg.setFont(new java.awt.Font("Serif", 0, 48)); // NOI18N
+        labelWelcomeMessg.setText("TO");
+
+        labelWelcomeMessg1.setFont(new java.awt.Font("Serif", 0, 48)); // NOI18N
+        labelWelcomeMessg1.setText("COURSE RECOVERY SYSTEM");
+
+        labelWelcomeMessg2.setFont(new java.awt.Font("Serif", 0, 48)); // NOI18N
+        labelWelcomeMessg2.setText("WELCOME");
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGap(352, 352, 352)
-                .addComponent(jLabel1)
-                .addContainerGap(631, Short.MAX_VALUE))
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGap(407, 407, 407)
+                        .addComponent(labelWelcomeMessg))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGap(140, 140, 140)
+                        .addComponent(labelWelcomeMessg1)))
+                .addContainerGap(357, Short.MAX_VALUE))
+            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel4Layout.createSequentialGroup()
+                    .addGap(330, 330, 330)
+                    .addComponent(labelWelcomeMessg2)
+                    .addContainerGap(588, Short.MAX_VALUE)))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGap(35, 35, 35)
-                .addComponent(jLabel1)
-                .addContainerGap(49, Short.MAX_VALUE))
+                .addGap(277, 277, 277)
+                .addComponent(labelWelcomeMessg)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(labelWelcomeMessg1)
+                .addContainerGap(305, Short.MAX_VALUE))
+            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel4Layout.createSequentialGroup()
+                    .addGap(220, 220, 220)
+                    .addComponent(labelWelcomeMessg2)
+                    .addContainerGap(424, Short.MAX_VALUE)))
         );
 
         jPanel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 0, -1, -1));
 
-        jPanel5.setBackground(new java.awt.Color(130, 196, 156));
+        dashboard.setBackground(new java.awt.Color(95, 106, 105));
+        dashboard.setPreferredSize(new java.awt.Dimension(210, 700));
 
-        textField.setBackground(new java.awt.Color(130, 196, 156));
-        textField.setFont(new java.awt.Font("Serif", 1, 24)); // NOI18N
-        textField.addActionListener(new java.awt.event.ActionListener() {
+        jButtonUserManagement.setBackground(new java.awt.Color(95, 106, 105));
+        jButtonUserManagement.setFont(new java.awt.Font("Serif", 0, 20)); // NOI18N
+        jButtonUserManagement.setForeground(new java.awt.Color(255, 255, 255));
+        jButtonUserManagement.setText("User Management");
+        jButtonUserManagement.setToolTipText("");
+        jButtonUserManagement.setBorderPainted(false);
+        jButtonUserManagement.setContentAreaFilled(false);
+        jButtonUserManagement.setFocusPainted(false);
+        jButtonUserManagement.setOpaque(true);
+        jButtonUserManagement.setPreferredSize(new java.awt.Dimension(210, 70));
+        jButtonUserManagement.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                textFieldActionPerformed(evt);
+                jButtonUserManagementActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addComponent(textField, javax.swing.GroupLayout.PREFERRED_SIZE, 1022, javax.swing.GroupLayout.PREFERRED_SIZE)
+        jButtonEligibility.setBackground(new java.awt.Color(95, 106, 105));
+        jButtonEligibility.setFont(new java.awt.Font("Serif", 0, 20)); // NOI18N
+        jButtonEligibility.setForeground(new java.awt.Color(255, 255, 255));
+        jButtonEligibility.setText("<html><center>Eligibility Check<br>and Enrolment</center></html> ");
+        jButtonEligibility.setToolTipText("");
+        jButtonEligibility.setBorderPainted(false);
+        jButtonEligibility.setContentAreaFilled(false);
+        jButtonEligibility.setFocusPainted(false);
+        jButtonEligibility.setOpaque(true);
+        jButtonEligibility.setPreferredSize(new java.awt.Dimension(210, 70));
+        jButtonEligibility.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonEligibilityActionPerformed(evt);
+            }
+        });
+
+        jButtonRecovery.setBackground(new java.awt.Color(95, 106, 105));
+        jButtonRecovery.setFont(new java.awt.Font("Serif", 0, 20)); // NOI18N
+        jButtonRecovery.setForeground(new java.awt.Color(255, 255, 255));
+        jButtonRecovery.setText("Course Recovery Plan");
+        jButtonRecovery.setToolTipText("");
+        jButtonRecovery.setBorderPainted(false);
+        jButtonRecovery.setContentAreaFilled(false);
+        jButtonRecovery.setFocusPainted(false);
+        jButtonRecovery.setOpaque(true);
+        jButtonRecovery.setPreferredSize(new java.awt.Dimension(210, 70));
+        jButtonRecovery.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonRecoveryActionPerformed(evt);
+            }
+        });
+
+        jButtonAPR.setBackground(new java.awt.Color(95, 106, 105));
+        jButtonAPR.setFont(new java.awt.Font("Serif", 0, 20)); // NOI18N
+        jButtonAPR.setForeground(new java.awt.Color(255, 255, 255));
+        jButtonAPR.setText("<html><center>Academic<br>Performance Report</center></html> ");
+        jButtonAPR.setBorderPainted(false);
+        jButtonAPR.setContentAreaFilled(false);
+        jButtonAPR.setFocusPainted(false);
+        jButtonAPR.setOpaque(true);
+        jButtonAPR.setPreferredSize(new java.awt.Dimension(210, 70));
+        jButtonAPR.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonAPRActionPerformed(evt);
+            }
+        });
+
+        logout.setFont(new java.awt.Font("Serif", 0, 20)); // NOI18N
+        logout.setText("Log Out");
+        logout.setBorderPainted(false);
+        logout.setFocusPainted(false);
+        logout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                logoutActionPerformed(evt);
+            }
+        });
+
+        btnHome.setBackground(new java.awt.Color(95, 106, 105));
+        btnHome.setFont(new java.awt.Font("Serif", 1, 18)); // NOI18N
+        btnHome.setIcon(new javax.swing.ImageIcon("/Volumes/Macintosh HD/Users/jolin/Downloads/home (1).png")); // NOI18N
+        btnHome.setBorder(null);
+        btnHome.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnHomeActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout dashboardLayout = new javax.swing.GroupLayout(dashboard);
+        dashboard.setLayout(dashboardLayout);
+        dashboardLayout.setHorizontalGroup(
+            dashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(dashboardLayout.createSequentialGroup()
+                .addGroup(dashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButtonRecovery, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonUserManagement, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonAPR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonEligibility, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(dashboardLayout.createSequentialGroup()
+                .addGroup(dashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(dashboardLayout.createSequentialGroup()
+                        .addGap(53, 53, 53)
+                        .addComponent(logout))
+                    .addGroup(dashboardLayout.createSequentialGroup()
+                        .addGap(29, 29, 29)
+                        .addComponent(btnHome, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-        jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addGap(30, 30, 30)
-                .addComponent(textField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(712, Short.MAX_VALUE))
+        dashboardLayout.setVerticalGroup(
+            dashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(dashboardLayout.createSequentialGroup()
+                .addGap(47, 47, 47)
+                .addComponent(btnHome, javax.swing.GroupLayout.DEFAULT_SIZE, 45, Short.MAX_VALUE)
+                .addGap(51, 51, 51)
+                .addComponent(jButtonUserManagement, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButtonEligibility, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButtonRecovery, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButtonAPR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 167, Short.MAX_VALUE)
+                .addComponent(logout)
+                .addGap(62, 62, 62))
         );
 
-        jPanel1.add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 100, 1020, 780));
+        jPanel1.add(dashboard, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnAPRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAPRActionPerformed
-        // TODO add your handling code here:
-        JOptionPane.showMessageDialog(this, "Opening Academic Performance Reports...");
-    }//GEN-LAST:event_btnAPRActionPerformed
+    private void btnHomeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHomeActionPerformed
+        new MainDashboard(currentUser).setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_btnHomeActionPerformed
 
-    private void btnECEActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnECEActionPerformed
-        // TODO add your handling code here:
-        JOptionPane.showMessageDialog(this, "Opening Eligibility Check and Enrolment...");
-    }//GEN-LAST:event_btnECEActionPerformed
+    private void jButtonUserManagementActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonUserManagementActionPerformed
+        new AdminDashboard(currentUser).setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jButtonUserManagementActionPerformed
 
-    private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
-        // TODO add your handling code here:
+    private void jButtonEligibilityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEligibilityActionPerformed
+        new ECE_UI(currentUser).setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jButtonEligibilityActionPerformed
+
+    private void jButtonRecoveryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRecoveryActionPerformed
+        new CRP_UI(currentUser).setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jButtonRecoveryActionPerformed
+
+    private void jButtonAPRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAPRActionPerformed
+        new APR_UI(currentUser).setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jButtonAPRActionPerformed
+
+    private void logoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logoutActionPerformed
         Logger.writeLog(currentUser.getUsername(), "LOGOUT");
         new LoginUI().setVisible(true);
         this.dispose();
-    }//GEN-LAST:event_btnLogoutActionPerformed
-
-    private void btnCRPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCRPActionPerformed
-        // TODO add your handling code here:
-        if (currentUser.getRole().equalsIgnoreCase("ADMIN")) {
-            JOptionPane.showMessageDialog(this,
-                "ACCESS DENIED: Course Recovery is for Academic Officers only.",
-                "Restricted Access",
-                JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        JOptionPane.showMessageDialog(this, "Opening Course Recovery Plan...");
-    }//GEN-LAST:event_btnCRPActionPerformed
-
-    private void btnUserMgmtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUserMgmtActionPerformed
-        // TODO add your handling code here:
-        new AdminDashboard(currentUser).setVisible(true);
-        this.dispose();
-    }//GEN-LAST:event_btnUserMgmtActionPerformed
-
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
-
-    private void textFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textFieldActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_textFieldActionPerformed
+    }//GEN-LAST:event_logoutActionPerformed
 
 
     
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnAPR;
-    private javax.swing.JButton btnCRP;
-    private javax.swing.JButton btnECE;
-    private javax.swing.JButton btnLogout;
-    private javax.swing.JButton btnUserMgmt;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JButton btnHome;
+    private javax.swing.JPanel dashboard;
+    private javax.swing.JButton jButtonAPR;
+    private javax.swing.JButton jButtonEligibility;
+    private javax.swing.JButton jButtonRecovery;
+    private javax.swing.JButton jButtonUserManagement;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.JTextField textField;
+    private javax.swing.JLabel labelWelcomeMessg;
+    private javax.swing.JLabel labelWelcomeMessg1;
+    private javax.swing.JLabel labelWelcomeMessg2;
+    private javax.swing.JButton logout;
     // End of variables declaration//GEN-END:variables
 }
