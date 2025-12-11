@@ -47,21 +47,30 @@ public class ECE_UI extends javax.swing.JFrame {
 }
     
     private void updateTable(ArrayList<String[]> data) {
-        javax.swing.table.DefaultTableModel model =
-            (javax.swing.table.DefaultTableModel) jTable1.getModel();
+        javax.swing.table.DefaultTableModel model
+                = (javax.swing.table.DefaultTableModel) jTable1.getModel();
 
-        model.setRowCount(0); // clear table
+        // Clear the table COMPLETELY (fixes the missing rows issue)
+        model.setRowCount(0);
+        model.getDataVector().clear();
+        model.fireTableDataChanged();
 
         for (String[] row : data) {
+            // Prevent blank lines from crashing the table
+            if (row.length < 4) {
+                continue;
+            }
+
             model.addRow(new Object[]{
-                row[0],   // Student ID
-                row[1],   // Semester
-                row[2],   // CGPA
-                row[3],   // Eligibility
-                "View"    // Button label
+                row[0], // Student ID
+                row[1], // Semester
+                row[2], // CGPA
+                row[3], // Eligibility
+                "View" // Button column text
             });
         }
     }
+
     
     private void showDetails(String studentID, String semester, String eligibility) {
         ArrayList<String[]> grades = loadFile("grades.txt");
@@ -106,7 +115,8 @@ public class ECE_UI extends javax.swing.JFrame {
         initComponents();
         this.currentUser = user;
         
-        updateTable(loadFile("result.txt"));
+        ArrayList<String[]> all = loadFile("result.txt");
+        updateTable(all);
                 
         jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
