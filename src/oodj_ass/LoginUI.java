@@ -31,7 +31,7 @@ public class LoginUI extends javax.swing.JFrame {
         forgotPassw = new javax.swing.JButton();
         txtPassword = new javax.swing.JPasswordField();
         jLabel3 = new javax.swing.JLabel();
-        jPanel2 = new javax.swing.JPanel();
+        jSeparator1 = new javax.swing.JSeparator();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMaximumSize(new java.awt.Dimension(1160, 700));
@@ -40,78 +40,78 @@ public class LoginUI extends javax.swing.JFrame {
         setResizable(false);
         setSize(new java.awt.Dimension(1160, 700));
 
-        jPanel1.setBackground(new java.awt.Color(90, 142, 109));
+        jPanel1.setBackground(new java.awt.Color(183, 201, 197));
         jPanel1.setMaximumSize(new java.awt.Dimension(1160, 700));
         jPanel1.setMinimumSize(new java.awt.Dimension(1160, 700));
         jPanel1.setPreferredSize(new java.awt.Dimension(1160, 700));
         jPanel1.setVerifyInputWhenFocusTarget(false);
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel1.setFont(new java.awt.Font("Serif", 1, 14)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel1.setFont(new java.awt.Font("Serif", 1, 24)); // NOI18N
         jLabel1.setText("Username");
-        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 125, -1, 27));
+        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 210, -1, 27));
 
-        jLabel2.setFont(new java.awt.Font("Serif", 1, 14)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel2.setFont(new java.awt.Font("Serif", 1, 24)); // NOI18N
         jLabel2.setText("Password");
-        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(411, 200, -1, 22));
+        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 340, -1, 22));
 
-        btnLogin.setFont(new java.awt.Font("Serif", 1, 14)); // NOI18N
+        btnLogin.setFont(new java.awt.Font("Serif", 1, 24)); // NOI18N
         btnLogin.setText("Login");
-        btnLogin.setPreferredSize(new java.awt.Dimension(132, 26));
+        btnLogin.setPreferredSize(new java.awt.Dimension(135, 35));
         btnLogin.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnLoginActionPerformed(evt);
             }
         });
-        jPanel1.add(btnLogin, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 330, 122, -1));
-        jPanel1.add(txtUsername, new org.netbeans.lib.awtextra.AbsoluteConstraints(391, 164, 281, 30));
+        jPanel1.add(btnLogin, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 490, 122, -1));
 
-        forgotPassw.setFont(new java.awt.Font("Serif", 1, 14)); // NOI18N
+        txtUsername.setFont(new java.awt.Font("Serif", 0, 24)); // NOI18N
+        txtUsername.setPreferredSize(new java.awt.Dimension(350, 35));
+        jPanel1.add(txtUsername, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 240, -1, -1));
+
+        forgotPassw.setBackground(new java.awt.Color(183, 201, 197));
+        forgotPassw.setFont(new java.awt.Font("Serif", 0, 15)); // NOI18N
         forgotPassw.setText("Forgot Password");
+        forgotPassw.setBorderPainted(false);
+        forgotPassw.setContentAreaFilled(false);
+        forgotPassw.setFocusPainted(false);
         forgotPassw.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 forgotPasswActionPerformed(evt);
             }
         });
-        jPanel1.add(forgotPassw, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 400, -1, -1));
+        jPanel1.add(forgotPassw, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 420, -1, -1));
 
         txtPassword.setColumns(20);
-        jPanel1.add(txtPassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(411, 240, 280, -1));
+        txtPassword.setFont(new java.awt.Font("Serif", 0, 24)); // NOI18N
+        txtPassword.setPreferredSize(new java.awt.Dimension(350, 35));
+        txtPassword.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtPasswordActionPerformed(evt);
+            }
+        });
+        jPanel1.add(txtPassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 370, 350, -1));
 
-        jLabel3.setFont(new java.awt.Font("Serif", 1, 36)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel3.setBackground(new java.awt.Color(0, 0, 0));
+        jLabel3.setFont(new java.awt.Font("Serif", 1, 48)); // NOI18N
         jLabel3.setText("LOGIN");
-        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(391, 49, -1, -1));
+        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 90, -1, -1));
 
-        jPanel2.setBackground(new java.awt.Color(227, 238, 227));
-        jPanel2.setMaximumSize(new java.awt.Dimension(210, 700));
-        jPanel2.setMinimumSize(new java.awt.Dimension(210, 700));
-        jPanel2.setPreferredSize(new java.awt.Dimension(210, 700));
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 210, Short.MAX_VALUE)
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 700, Short.MAX_VALUE)
-        );
-
-        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
+        jSeparator1.setBackground(new java.awt.Color(0, 0, 0));
+        jSeparator1.setForeground(new java.awt.Color(0, 0, 0));
+        jPanel1.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(505, 445, 110, 20));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 1425, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 712, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 12, Short.MAX_VALUE))
         );
 
         pack();
@@ -146,6 +146,10 @@ public class LoginUI extends javax.swing.JFrame {
         new ForgotPassword().setVisible(true);
     }//GEN-LAST:event_forgotPasswActionPerformed
 
+    private void txtPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPasswordActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtPasswordActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -177,7 +181,7 @@ public class LoginUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
+    private javax.swing.JSeparator jSeparator1;
     private javax.swing.JPasswordField txtPassword;
     private javax.swing.JTextField txtUsername;
     // End of variables declaration//GEN-END:variables

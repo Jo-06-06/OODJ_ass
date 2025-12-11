@@ -555,9 +555,7 @@ public class ECE_UI extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonEligibilityActionPerformed
 
     private void jButtonRecoveryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRecoveryActionPerformed
-        CRP_UI crp = new CRP_UI(new FileLoader());
-        crp.setVisible(true);
-        this.dispose();
+
     }//GEN-LAST:event_jButtonRecoveryActionPerformed
 
     private void jButtonAPRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAPRActionPerformed
