@@ -16,4 +16,4 @@ S014,Diana,Brown,Bachelor of Science in Computer Science,diana.brown@university.
 S015,Alice,Wilson,Bachelor of International Hospitality Management,alice.wilson@university.edu
 S016,Hannah,Lim,Bachelor of Mechanical Engineering,hannah.lim@university.edu
 S017,Joel,Johnson,Bachelor of Science in Computer Science,joel.johnson@university.edu
-S018,Julia,Davis,Bachelor of International Hospitality Management,julia.davis@university.edu
+S018,Julia,Davis,Bachelor of International Hospitality Management,tp081917@mail.apu.edu.my
