@@ -90,7 +90,6 @@ public class CRP_UI extends javax.swing.JFrame {
         sp.getVerticalScrollBar().setUnitIncrement(16);
         sp.getHorizontalScrollBar().setUnitIncrement(16);
         
-        normaliseButtons();
         // ==== TABLE HOVER HANDLER ====
         jTableFailedComponents.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
@@ -355,25 +354,7 @@ public class CRP_UI extends javax.swing.JFrame {
             refreshMilestoneButtons();
         });
     }
-
-    private void normaliseButtons() {
-        JButton[] buttons = {
-            btnAdd, btnEdit, btnSaveChanges, btnRemove,
-            btnMarkAsCompleted, btnUpdateGrade, btnCreatePlan,
-            btnCreateAllPlans, btnSavePlan, btnEditPlan, btnBack
-        };
-
-        for (JButton b : buttons) {
-            if (b == null) continue;
-
-            b.setFocusPainted(false);
-            b.setContentAreaFilled(true);
-            b.setOpaque(true);
-            b.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
-            b.setBackground(new Color(245, 245, 245)); // slight 3D feel
-        }
-    }
-
+    
     private void styleFlatButton(JButton btn) {
         Color normal   = new Color(235, 235, 235);  // base
         Color hover    = new Color(215, 215, 215);  // on hover
@@ -1332,6 +1313,7 @@ public class CRP_UI extends javax.swing.JFrame {
         btnSearch.setFont(new java.awt.Font("Helvetica Neue", 0, 14)); // NOI18N
         btnSearch.setText("Search");
         btnSearch.setBorder(null);
+        btnSearch.setOpaque(true);
         btnSearch.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSearchActionPerformed(evt);
