@@ -11,3 +11,4 @@ ADM002,priya,PrIyA,priyanka,priyankakannan929@gmail.com,ACADEMIC_OFFICER,true
 AO002,tharini,Reset7346,tharu,tharini@gmail.com,ACADEMIC_OFFICER,true
 ADM008,marcusisthecoolestmosthandsomeguyaround,marcusissoawesome123,Priya Kannan,priyakannan@marcusiscool.com,ADMIN,true
 AO005,test3,test3,test3,test3@gmail.com,ACADEMIC_OFFICER,true
+AO006,john,Reset4136,john bob,johnsmith@gmail.com,ACADEMIC_OFFICER,true

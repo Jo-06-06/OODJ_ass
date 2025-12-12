@@ -226,12 +226,12 @@ public class CRP_UI extends javax.swing.JFrame {
         jTableMilestones.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
         TableColumnModel col = jTableMilestones.getColumnModel();
-        col.getColumn(0).setMinWidth(100);  // Week
-        col.getColumn(0).setMaxWidth(110);
+        col.getColumn(0).setMinWidth(110);  // Week
+        col.getColumn(0).setMaxWidth(130);
         col.getColumn(1).setPreferredWidth(370); // Task
         col.getColumn(1).setMinWidth(320);
-        col.getColumn(2).setMinWidth(100); // Status
-        col.getColumn(2).setMaxWidth(120);
+        col.getColumn(2).setMinWidth(110); // Status
+        col.getColumn(2).setMaxWidth(130);
         col.getColumn(3).setPreferredWidth(140); // Remarks
         
         jTableMilestones.getSelectionModel().addListSelectionListener(e -> {
@@ -2589,22 +2589,26 @@ public class CRP_UI extends javax.swing.JFrame {
             if (in == null) return;
             newExamRaw = Integer.parseInt(in.trim());
         }
-
+        
         // ---- Pass values to CRP ----
         boolean ok = crp.enterRecoveryGrade(
-                currentPlan.getPlanID(),
-                newAssRaw,
-                newExamRaw
-        );
+            currentPlan,
+            newAssRaw,
+            newExamRaw
+    );
 
         if (!ok) {
             JOptionPane.showMessageDialog(this, "Grade update failed.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
+        
+        String finalStatus = currentPlan.getStatus();
         JOptionPane.showMessageDialog(this,
-                "Grades updated.\nFinal Status: " + currentPlan.getStatus());
+                "Grades updated.\nFinal Status: " + finalStatus,
+                "Message", JOptionPane.INFORMATION_MESSAGE);
 
+        refreshPlanButtons();
+        refreshFailedCoursesTableHighlight();
         populatePlanUI(currentPlan);
         populateMilestoneTable(currentPlan);
         refreshButtonsByStatus();

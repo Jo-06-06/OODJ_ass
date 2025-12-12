@@ -227,16 +227,16 @@ public class RecoveryPlan {
             case "Exam Only":
                 addMilestone("Week 1", "Analyse exam mistakes and revise core chapters.");
                 addMilestone("Week 2", "Attend revision or tutorial class for exam topics.");
-                addMilestone("Week 4", "Complete 3 sets of past-year practice questions.");
-                addMilestone("Week 6", "Attempt mock test and evaluate performance.");
+                addMilestone("Week 3", "Complete 3 sets of past-year practice questions.");
+                addMilestone("Week 4", "Attempt mock test and evaluate performance.");
                 break;
 
             case "Both Components":
                 addMilestone("Week 1", "Review feedback for both assignment and exam.");
-                addMilestone("Week 2", "Attend consultation for coursework + exam planning.");
+                addMilestone("Week 2-3", "Attend consultation for coursework + exam planning.");
                 addMilestone("Week 4", "Submit coursework improvement draft.");
-                addMilestone("Week 6", "Complete revision of exam chapters and attempt practice test.");
-                addMilestone("Week 8", "Final assignment submission + exam reattempt preparation.");
+                addMilestone("Week 5-6", "Complete revision of exam chapters and attempt practice test.");
+                addMilestone("Week 7", "Final assignment submission + exam reattempt preparation.");
                 break;
 
             default:

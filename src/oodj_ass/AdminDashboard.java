@@ -38,37 +38,39 @@ public class AdminDashboard extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
     }
-    private void initTable() {
-        model = (DefaultTableModel) tblUsers.getModel();
-        model.setColumnIdentifiers(new Object[]{"ID", "Username", "Name", "Role", "Active"});
-    }
-    
-    private void loadTableData(String query) {
-        model.setRowCount(0); // Clear table
-        List<User> users = userManager.getAllUsers();
-        
-        for (User u : users) {
-            boolean matches = query.isEmpty() || 
-                              u.getUsername().toLowerCase().contains(query.toLowerCase()) ||
-                              u.getUserId().toLowerCase().contains(query.toLowerCase()) ||
-                              u.getFullName().toLowerCase().contains(query.toLowerCase());
-            
-            if (matches) {
-                model.addRow(new Object[]{
-                    u.getUserId(), u.getUsername(), u.getFullName(), 
-                    u.getEmail(), u.getRole(), u.isActive()
-                });
-            }
-        }
-    }
-    
-    
     private void clearFields() {
         txtUsername.setText("");
         txtPassword.setText("");
         txtName.setText("");
         txtEmail.setText("");
     }
+    private void initTable() {
+        model = (DefaultTableModel) tblUsers.getModel();
+        model.setColumnIdentifiers(new Object[]{"Username", "Password", "Name", "Email", "Role", "Status"});
+    }
+    
+    private void loadTableData(String query) {
+            model.setRowCount(0); // Clear table
+            List<User> users = userManager.getAllUsers();
+
+            for (User u : users) {
+                boolean matches = query.isEmpty() || 
+                                  u.getUsername().toLowerCase().contains(query.toLowerCase()) ||
+                                  u.getUserId().toLowerCase().contains(query.toLowerCase()) ||
+                                  u.getFullName().toLowerCase().contains(query.toLowerCase());
+
+                if (matches) {
+                    model.addRow(new Object[]{
+                        u.getUsername(),    // Col 0
+                        u.getPassword(),    // Col 1
+                        u.getFullName(),    // Col 2
+                        u.getEmail(),       // Col 3
+                        u.getRole(),        // Col 4
+                        u.isActive()        // Col 5 (Status)
+                    });
+                }
+            }
+        }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -298,14 +300,13 @@ public class AdminDashboard extends javax.swing.JFrame {
                     .addComponent(jButtonEligibility, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(0, 0, Short.MAX_VALUE))
             .addGroup(dashboardLayout.createSequentialGroup()
-                .addGroup(dashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(dashboardLayout.createSequentialGroup()
-                        .addGap(53, 53, 53)
-                        .addComponent(logout))
-                    .addGroup(dashboardLayout.createSequentialGroup()
-                        .addGap(45, 45, 45)
-                        .addComponent(btnHome, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addGap(53, 53, 53)
+                .addComponent(logout)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(dashboardLayout.createSequentialGroup()
+                .addGap(37, 37, 37)
+                .addComponent(btnHome, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         dashboardLayout.setVerticalGroup(
             dashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -490,8 +491,7 @@ public class AdminDashboard extends javax.swing.JFrame {
         loadTableData("");
         
         javax.swing.JOptionPane.showMessageDialog(this, "User Added! ID: " + newID);
-        clearFields();
-        
+        clearFields();        
     }//GEN-LAST:event_btnAddActionPerformed
 
     private void btnDeactivateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeactivateActionPerformed
@@ -499,7 +499,7 @@ public class AdminDashboard extends javax.swing.JFrame {
         int selectedRow = tblUsers.getSelectedRow();
         if (selectedRow == -1) return;
         
-        String username = (String) model.getValueAt(selectedRow, 1);
+        String username = (String) model.getValueAt(selectedRow, 0);
         User userToBan = userManager.findByUsername(username);
 
 
@@ -518,7 +518,7 @@ public class AdminDashboard extends javax.swing.JFrame {
             return;
         }
 
-        String currentUsername = (String) model.getValueAt(selectedRow, 1);
+        String currentUsername = (String) model.getValueAt(selectedRow, 0);
         User userToUpdate = userManager.findByUsername(currentUsername);
 
         if (userToUpdate != null) {
@@ -573,7 +573,7 @@ public class AdminDashboard extends javax.swing.JFrame {
         int selectedRow = tblUsers.getSelectedRow();
         if (selectedRow == -1) return;
 
-        String username = (String) model.getValueAt(selectedRow, 1);
+        String username = (String) model.getValueAt(selectedRow, 0);
         User userToActivate = userManager.findByUsername(username);
 
         if (userToActivate != null) {

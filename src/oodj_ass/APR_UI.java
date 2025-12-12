@@ -167,6 +167,7 @@ public class APR_UI extends javax.swing.JFrame {
         jButtonAPR = new javax.swing.JButton();
         logout = new javax.swing.JButton();
         btnHome = new javax.swing.JButton();
+        btnHome1 = new javax.swing.JButton();
         apr_titile = new javax.swing.JLabel();
         sid_search = new javax.swing.JTextField();
         apr_intake = new javax.swing.JLabel();
@@ -277,6 +278,16 @@ public class APR_UI extends javax.swing.JFrame {
             }
         });
 
+        btnHome1.setBackground(new java.awt.Color(95, 106, 105));
+        btnHome1.setFont(new java.awt.Font("Serif", 1, 18)); // NOI18N
+        btnHome1.setIcon(new javax.swing.ImageIcon("/Volumes/Macintosh HD/Users/jolin/Downloads/home (1).png")); // NOI18N
+        btnHome1.setBorder(null);
+        btnHome1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnHome1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout dashboardLayout = new javax.swing.GroupLayout(dashboard);
         dashboard.setLayout(dashboardLayout);
         dashboardLayout.setHorizontalGroup(
@@ -294,7 +305,9 @@ public class APR_UI extends javax.swing.JFrame {
                         .addGap(53, 53, 53)
                         .addComponent(logout))
                     .addGroup(dashboardLayout.createSequentialGroup()
-                        .addGap(45, 45, 45)
+                        .addGap(41, 41, 41)
+                        .addComponent(btnHome1, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnHome, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -302,8 +315,13 @@ public class APR_UI extends javax.swing.JFrame {
             dashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(dashboardLayout.createSequentialGroup()
                 .addGap(45, 45, 45)
-                .addComponent(btnHome, javax.swing.GroupLayout.DEFAULT_SIZE, 45, Short.MAX_VALUE)
-                .addGap(53, 53, 53)
+                .addGroup(dashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(dashboardLayout.createSequentialGroup()
+                        .addComponent(btnHome, javax.swing.GroupLayout.DEFAULT_SIZE, 45, Short.MAX_VALUE)
+                        .addGap(53, 53, 53))
+                    .addGroup(dashboardLayout.createSequentialGroup()
+                        .addComponent(btnHome1, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addComponent(jButtonUserManagement, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButtonEligibility, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -511,6 +529,11 @@ public class APR_UI extends javax.swing.JFrame {
     private void apr_pdfButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_apr_pdfButtonActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_apr_pdfButtonActionPerformed
+
+    private void btnHome1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHome1ActionPerformed
+        new MainDashboard(currentUser).setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_btnHome1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1265,6 +1288,7 @@ public class APR_UI extends javax.swing.JFrame {
     private javax.swing.JLabel apr_titile;
     private javax.swing.JScrollPane arp_jScrollPane;
     private javax.swing.JButton btnHome;
+    private javax.swing.JButton btnHome1;
     private javax.swing.JPanel dashboard;
     private javax.swing.JButton jButtonAPR;
     private javax.swing.JButton jButtonEligibility;
