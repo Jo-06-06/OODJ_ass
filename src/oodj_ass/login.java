@@ -19,17 +19,8 @@ public class login {
         if (user == null) return null; 
         if (!user.isActive()) return null; 
         if (!user.getPassword().equals(password)) return null; 
+        
         String expectedRole;
-//        if ("Admin".equals(selectedRole)) {
-//            expectedRole = "ADMIN";
-//        } else if ("Academic Officer".equals(selectedRole)) {
-//            expectedRole = "ACADEMIC_OFFICER";
-//        } else {
-//            expectedRole = selectedRole.toUpperCase();
-//        }
-//        if (!user.getRole().equalsIgnoreCase(expectedRole)) {
-//            return null;
-//        }
         Logger.writeLog(user.getUsername(), "LOGIN");
 
         return user;

@@ -96,9 +96,9 @@
                               <Component id="logout" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
-                              <EmptySpace min="-2" pref="54" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="51" max="-2" attributes="0"/>
                               <Component id="btnHome1" min="-2" pref="110" max="-2" attributes="0"/>
-                              <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="31" max="-2" attributes="0"/>
                               <Component id="btnHome" max="32767" attributes="0"/>
                           </Group>
                       </Group>
@@ -111,10 +111,10 @@
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace min="-2" pref="45" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="btnHome" pref="45" max="32767" attributes="0"/>
-                          <Component id="btnHome1" pref="45" max="32767" attributes="0"/>
+                          <Component id="btnHome" max="32767" attributes="0"/>
+                          <Component id="btnHome1" pref="48" max="32767" attributes="0"/>
                       </Group>
-                      <EmptySpace min="-2" pref="53" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="50" max="-2" attributes="0"/>
                       <Component id="jButtonUserManagement" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jButtonEligibility" min="-2" max="-2" attributes="0"/>

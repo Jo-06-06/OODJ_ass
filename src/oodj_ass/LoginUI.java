@@ -7,9 +7,6 @@ public class LoginUI extends javax.swing.JFrame {
     private final UserManager userManager = new UserManager();
     private final login login = new login(userManager);
 
-    /**
-     * Creates new form LoginUI
-     */
     public LoginUI() {
         initComponents();
         getRootPane().setDefaultButton(btnLogin);

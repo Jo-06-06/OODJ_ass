@@ -13,7 +13,6 @@ public class Email {
     public Email() {
         props = new Properties();
 
-        // Gmail SMTP — change host/port if you use another provider
         props.put("mail.smtp.host", "smtp.gmail.com");
         props.put("mail.smtp.port", "587");
         props.put("mail.smtp.auth", "true");

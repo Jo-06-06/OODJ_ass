@@ -254,70 +254,6 @@ public class CRP {
         return ok;
     }
 
-    // ENTER RECOVERY GRADE
-//    public boolean enterRecoveryGrade(String planId, Integer newAssRaw, Integer newExamRaw) {
-//        RecoveryPlan rp = planIndex.get(planId);
-//        if (rp == null) return false;
-//
-//        Student stu = rp.getStudent();
-//        Course  c   = rp.getCourse();
-//
-//        int oldAss  = c.getAssScore();
-//        int oldExam = c.getExamScore();
-//
-//        boolean assFailed  = (c.getAssignmentWeight() > 0 && oldAss  < 50);
-//        boolean examFailed = (c.getExamWeight()      > 0 && oldExam < 50);
-//
-//        int newAss  = oldAss;
-//        int newExam = oldExam;
-//
-//        if (assFailed && newAssRaw != null) {
-//            newAss = Math.min(newAssRaw, 50);  // Cap at 50
-//        }
-//        if (examFailed && newExamRaw != null) {
-//            newExam = Math.min(newExamRaw, 50); // Cap at 50
-//        }
-//
-//        double finalMark =
-//                (newAss  * c.getAssignmentWeight() / 100.0) +
-//                (newExam * c.getExamWeight()      / 100.0);
-//
-//        String newGrade = Course.mapGradeFromMark((int)Math.round(finalMark));
-//        double newGpa   = Student.getGradePoint(newGrade);
-//        int newAttempt  = c.getAttemptNumber() + 1;
-//
-//        c.setScores(newAss, newExam);
-//        c.setGrade(newGrade);
-//        c.setAttemptNumber(newAttempt);
-//
-//
-//        String rawCombined = 
-//            "ASS=" + (newAssRaw != null ? newAssRaw : oldAss) +
-//            ", EXAM=" + (newExamRaw != null ? newExamRaw : oldExam);
-//
-//        rp.setRecoveryGradeString(rawCombined);
-//
-//        rp.setStatus(!c.isFailed() && newGpa >= 2.0
-//                ? "COMPLETED-PASSED"
-//                : "COMPLETED-FAILED"
-//        );
-//        
-//        appendSingleLine(GRADES_FILE_PATH,
-//                stu.getStudentID() + "," +
-//                c.getCourseID() + "," +
-//                c.getSemester() + "," +
-//                newAss + "," + newExam + "," +
-//                newGrade + "," +
-//                String.format("%.2f", newGpa) + "," +
-//                newAttempt);
-//
-//        recalculateCgpaAndResult(stu);
-//        saveRecoveryPlans();
-//        savePlanMilestones();
-//
-//        return true;
-//    }
-
     public boolean enterRecoveryGrade(RecoveryPlan rp, Integer newAssRaw, Integer newExamRaw) {
         if (rp == null) return false;
 
@@ -335,10 +271,10 @@ public class CRP {
         int newExam = oldExam;
 
         if (assFailed && newAssRaw != null) {
-            newAss = Math.min(newAssRaw, 50);  // cap at 50
+            newAss = Math.min(newAssRaw, 50); 
         }
         if (examFailed && newExamRaw != null) {
-            newExam = Math.min(newExamRaw, 50); // cap at 50
+            newExam = Math.min(newExamRaw, 50);
         }
 
         double finalMark =
@@ -479,7 +415,7 @@ public class CRP {
 
     // EMAIL SEND (UI may call)
     private void sendRecoveryPlanEmail(RecoveryPlan rp) {
-        String to   = rp.getStudent().getEmail();       // student email address
+        String to   = rp.getStudent().getEmail();
         String name = rp.getStudent().getFullName();
         String cid  = rp.getCourse().getCourseID();
 

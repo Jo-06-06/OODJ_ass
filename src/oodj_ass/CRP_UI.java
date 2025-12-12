@@ -48,7 +48,6 @@ public class CRP_UI extends javax.swing.JFrame {
     }
 
     private void initEverything() {
-
         fileLoader = new FileLoader();
         fileLoader.loadAll();
 
@@ -59,18 +58,7 @@ public class CRP_UI extends javax.swing.JFrame {
         loadAllFailedStudents();
         loadRecoveryPlansFromFile();
         loadMilestonesFromFile();
-//    public CRP_UI(FileLoader loader, CRP crpManager) {
-//        this.fileLoader = loader;
-//        this.crp = crpManager;  
-//
-//        Email mailer = new Email();        
-//        initComponents();
-//        tabTwoWay.setSelectedIndex(0);
-//
-//        loadAllFailedStudents();
-//        loadRecoveryPlansFromFile();
-//        loadMilestonesFromFile();
-//        
+        
         // Style all buttons
         styleFlatButton(btnSearch);
         styleFlatButton(btnCreatePlan);
@@ -96,7 +84,7 @@ public class CRP_UI extends javax.swing.JFrame {
         jTableMilestones.setIntercellSpacing(new Dimension(1, 1));
         jTableMilestones.setRowHeight(30);
 
-        // Set bounds (you may adjust for better alignment)
+        // Set bounds 
         lblSelectCourse.setBounds(40, 70, 150, 25);
         comboxCourseSelector.setBounds(185, 70, 180, 25);
 
@@ -105,7 +93,6 @@ public class CRP_UI extends javax.swing.JFrame {
         jTableFailedComponents.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         JTableHeader hd = jTableFailedComponents.getTableHeader();
         //header.setPreferredSize(new Dimension(header.getWidth(), 32)); 
-        hd.setFont(new Font("Helvetica Neue", Font.BOLD, 16)); 
 
         JScrollPane sp = (JScrollPane) SwingUtilities.getAncestorOfClass(
                 JScrollPane.class, jTableFailedComponents
@@ -264,7 +251,6 @@ public class CRP_UI extends javax.swing.JFrame {
                 boolean isCompleted = status.equalsIgnoreCase("Completed");
                 boolean isHover = (row == hoveredMilestoneRow);
 
-                // PRIORITY ORDER (very important)
                 // selected → completed → hover → default
                 if (isSelected) {
                     c.setBackground(new Color(150,170,200));   // selected blue
@@ -372,9 +358,9 @@ public class CRP_UI extends javax.swing.JFrame {
     }
     
     private void styleFlatButton(JButton btn) {
-        Color normal   = new Color(235, 235, 235);  // base
-        Color hover    = new Color(215, 215, 215);  // on hover
-        Color click  = new Color(195, 195, 195);  // on click
+        Color normal = new Color(235, 235, 235);  // base
+        Color hover = new Color(215, 215, 215);  // on hover
+        Color click = new Color(195, 195, 195);  // on click
         Color disabled = new Color(230, 230, 230);  // when setEnabled(false)
 
         btn.addMouseListener(new MouseAdapter() {
@@ -677,7 +663,6 @@ public class CRP_UI extends javax.swing.JFrame {
         DefaultTableModel model = (DefaultTableModel) jTableFailedComponents.getModel();
         model.setRowCount(0);
 
-        // If search box empty, just show all failed students (same as initial view)
         if (studentID == null || studentID.trim().isEmpty()) {
             loadAllFailedStudents();
             return;
@@ -691,10 +676,10 @@ public class CRP_UI extends javax.swing.JFrame {
         }
 
         for (Course c : student.getCourses()) {
-            String failed = c.getFailedComponent();   // <-- now uses weights
+            String failed = c.getFailedComponent();
 
             if ("None".equals(failed)) {
-                continue; // passed, so skip
+                continue;
             }
 
             model.addRow(new Object[]{
@@ -736,7 +721,6 @@ public class CRP_UI extends javax.swing.JFrame {
             plan != null ? getFormattedRecommendation(plan) : ""
         );
         
-
         // If the student has no failed modules
         if (model.getRowCount() == 0) {
             lblPlanID.setText(" ");
@@ -779,13 +763,12 @@ public class CRP_UI extends javax.swing.JFrame {
         if (!f.exists()) return;
 
         try (BufferedReader br = new BufferedReader(new FileReader(f))) {
-            String header = br.readLine(); // skip header
+            String header = br.readLine();
             String line;
 
             while ((line = br.readLine()) != null) {
                 if (line.trim().isEmpty()) continue;
 
-                // limit=10 so recommendation (last field) can contain commas safely
                 String[] p = line.split(",", 10);
                 if (p.length < 10) continue;
 
@@ -793,7 +776,6 @@ public class CRP_UI extends javax.swing.JFrame {
                 String sid           = p[1].trim();
                 String cid           = p[2].trim();
                 int attempt          = Integer.parseInt(p[3].trim());
-                // String failureType = p[4].trim();   // not strictly needed; we can recompute
                 String status        = p[5].trim();
                 String gradeText     = p[6].trim();
                 String createdDate   = p[7].trim();

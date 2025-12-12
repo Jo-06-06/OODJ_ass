@@ -2,7 +2,6 @@ package oodj_ass;
 
 import javax.swing.JOptionPane;
 
-
 public class ForgotPassword extends javax.swing.JFrame {
     
     private final UserManager userManager;

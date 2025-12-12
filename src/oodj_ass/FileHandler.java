@@ -10,13 +10,11 @@ public class FileHandler {
             "data/users.txt",
             "data/students.txt",
             "data/courses.txt",
-            "data/logs.txt",
+            "data/grades.txt",
             "data/recoveryPlans.txt",
             "data/result.txt",
             "data/resultArchive.txt",
-            "data/emailRecords.txt",
             "data/recoveryMilestones.txt",
-            "data/gradeArchive.txt",
             "data/studentInfo.txt",
             "data/studentCourse.txt"
         };

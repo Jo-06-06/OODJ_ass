@@ -8,7 +8,6 @@ import javax.swing.table.DefaultTableModel;
 public class AdminDashboard extends javax.swing.JFrame {
     private final UserManager userManager;
     private DefaultTableModel model;
-//    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(AdminDashboard.class.getName());
     private final User currentUser;
 
     public AdminDashboard(User user) {
