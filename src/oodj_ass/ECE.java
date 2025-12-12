@@ -185,12 +185,3 @@ public class ECE {
     }
 
 }
-
-
-// =============================== MAIN ================================
-
-//    public static void main(String[] args) {
-//        updateGrades();
-//        calculateCGPA();
-//    }
-//}
