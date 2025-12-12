@@ -1,10 +1,5 @@
 package oodj_ass;
 
-/**
- *
- * @author User
- */
-//11/12 10.30
 import java.util.ArrayList;
 import java.io.*;
 import java.awt.Color;
@@ -16,9 +11,6 @@ public class ECE_UI extends javax.swing.JFrame {
     private User currentUser;
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ECE_UI.class.getName());
 
-    /**
-     * Creates new form ECE_UI
-     */
    
     // Load CSV file
     public ArrayList<String[]> loadFile(String filename) {
