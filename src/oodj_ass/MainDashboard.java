@@ -48,49 +48,19 @@ public class MainDashboard extends javax.swing.JFrame {
 
         jPanel4.setBackground(new java.awt.Color(183, 201, 197));
         jPanel4.setPreferredSize(new java.awt.Dimension(1160, 700));
+        jPanel4.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         labelWelcomeMessg.setFont(new java.awt.Font("Serif", 0, 48)); // NOI18N
         labelWelcomeMessg.setText("TO");
+        jPanel4.add(labelWelcomeMessg, new org.netbeans.lib.awtextra.AbsoluteConstraints(407, 277, -1, -1));
 
         labelWelcomeMessg1.setFont(new java.awt.Font("Serif", 0, 48)); // NOI18N
         labelWelcomeMessg1.setText("COURSE RECOVERY SYSTEM");
+        jPanel4.add(labelWelcomeMessg1, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 339, -1, -1));
 
         labelWelcomeMessg2.setFont(new java.awt.Font("Serif", 0, 48)); // NOI18N
         labelWelcomeMessg2.setText("WELCOME");
-
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGap(407, 407, 407)
-                        .addComponent(labelWelcomeMessg))
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGap(140, 140, 140)
-                        .addComponent(labelWelcomeMessg1)))
-                .addContainerGap(357, Short.MAX_VALUE))
-            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel4Layout.createSequentialGroup()
-                    .addGap(330, 330, 330)
-                    .addComponent(labelWelcomeMessg2)
-                    .addContainerGap(588, Short.MAX_VALUE)))
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGap(277, 277, 277)
-                .addComponent(labelWelcomeMessg)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(labelWelcomeMessg1)
-                .addContainerGap(305, Short.MAX_VALUE))
-            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel4Layout.createSequentialGroup()
-                    .addGap(220, 220, 220)
-                    .addComponent(labelWelcomeMessg2)
-                    .addContainerGap(424, Short.MAX_VALUE)))
-        );
+        jPanel4.add(labelWelcomeMessg2, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 220, -1, -1));
 
         jPanel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 0, -1, -1));
 
@@ -172,8 +142,8 @@ public class MainDashboard extends javax.swing.JFrame {
 
         btnHome.setBackground(new java.awt.Color(95, 106, 105));
         btnHome.setFont(new java.awt.Font("Serif", 1, 18)); // NOI18N
-        btnHome.setIcon(new javax.swing.ImageIcon("/Volumes/Macintosh HD/Users/jolin/Downloads/home (1).png")); // NOI18N
-        btnHome.setBorder(null);
+        btnHome.setText("HOME");
+        btnHome.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         btnHome.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnHomeActionPerformed(evt);
@@ -197,16 +167,16 @@ public class MainDashboard extends javax.swing.JFrame {
                         .addGap(53, 53, 53)
                         .addComponent(logout))
                     .addGroup(dashboardLayout.createSequentialGroup()
-                        .addGap(29, 29, 29)
-                        .addComponent(btnHome, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(46, 46, 46)
+                        .addComponent(btnHome, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         dashboardLayout.setVerticalGroup(
             dashboardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(dashboardLayout.createSequentialGroup()
-                .addGap(47, 47, 47)
+                .addGap(57, 57, 57)
                 .addComponent(btnHome, javax.swing.GroupLayout.DEFAULT_SIZE, 45, Short.MAX_VALUE)
-                .addGap(51, 51, 51)
+                .addGap(41, 41, 41)
                 .addComponent(jButtonUserManagement, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButtonEligibility, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
