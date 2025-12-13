@@ -532,8 +532,15 @@ public class AdminDashboard extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonEligibilityActionPerformed
 
     private void jButtonRecoveryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRecoveryActionPerformed
-        new CRP_UI(currentUser).setVisible(true);
-        this.dispose();
+        if (currentUser.getRole().equalsIgnoreCase("ADMIN")) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "Access Denied: Administrators are not allowed to access the Course Recovery Plan.", 
+                "Restricted Access", 
+                javax.swing.JOptionPane.WARNING_MESSAGE);
+        } else {
+            new CRP_UI(currentUser).setVisible(true);
+            this.dispose();
+       }
     }//GEN-LAST:event_jButtonRecoveryActionPerformed
 
     private void jButtonAPRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAPRActionPerformed
