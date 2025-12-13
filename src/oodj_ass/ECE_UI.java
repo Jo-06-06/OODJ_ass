@@ -107,6 +107,9 @@ public class ECE_UI extends javax.swing.JFrame {
         initComponents();
         this.currentUser = user;
         
+        ECE.updateGrades();
+        ECE.calculateCGPA();
+        
         ArrayList<String[]> all = loadFile("result.txt");
         updateTable(all);
                 
