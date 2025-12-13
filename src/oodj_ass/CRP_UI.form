@@ -392,7 +392,6 @@
                     </Component>
                     <Component class="javax.swing.JComboBox" name="priorityCombo">
                       <Properties>
-                        <Property name="editable" type="boolean" value="true"/>
                         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                           <Font name="Helvetica Neue" size="14" style="0"/>
                         </Property>
@@ -442,7 +441,6 @@
                       <SubComponents>
                         <Component class="javax.swing.JTextArea" name="txtRecommendation">
                           <Properties>
-                            <Property name="editable" type="boolean" value="false"/>
                             <Property name="columns" type="int" value="20"/>
                             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                               <Font name="sansserif" size="14" style="0"/>

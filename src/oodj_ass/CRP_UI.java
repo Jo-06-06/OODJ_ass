@@ -92,7 +92,7 @@ public class CRP_UI extends javax.swing.JFrame {
         jTableFailedComponents.setFillsViewportHeight(true);
         jTableFailedComponents.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         JTableHeader hd = jTableFailedComponents.getTableHeader();
-        //header.setPreferredSize(new Dimension(header.getWidth(), 32)); 
+        hd.setFont(new Font("Serif", Font.BOLD, 16)); 
 
         JScrollPane sp = (JScrollPane) SwingUtilities.getAncestorOfClass(
                 JScrollPane.class, jTableFailedComponents
@@ -213,13 +213,13 @@ public class CRP_UI extends javax.swing.JFrame {
         jTableMilestones.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
         TableColumnModel col = jTableMilestones.getColumnModel();
-        col.getColumn(0).setMinWidth(110);  // Week
-        col.getColumn(0).setMaxWidth(130);
-        col.getColumn(1).setPreferredWidth(370); // Task
+        col.getColumn(0).setMinWidth(120);  // Week
+        col.getColumn(0).setMaxWidth(140);
+        col.getColumn(1).setPreferredWidth(390); // Task
         col.getColumn(1).setMinWidth(320);
-        col.getColumn(2).setMinWidth(110); // Status
-        col.getColumn(2).setMaxWidth(130);
-        col.getColumn(3).setPreferredWidth(140); // Remarks
+        col.getColumn(2).setMinWidth(120); // Status
+        col.getColumn(2).setMaxWidth(135);
+        col.getColumn(3).setPreferredWidth(150); // Remarks
         
         jTableMilestones.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
@@ -474,6 +474,21 @@ public class CRP_UI extends javax.swing.JFrame {
             btnUpdateGrade.setEnabled(false);
         }
     }
+    
+    private void refreshUpdateGradeButton() {
+        if (currentPlan == null) {
+            btnUpdateGrade.setEnabled(false);
+            return;
+        }
+
+        boolean allCompleted = currentPlan.areAllMilestonesCompleted();
+        String status = currentPlan.getStatus();
+
+        btnUpdateGrade.setEnabled(
+                allCompleted &&
+                "AWAITING_GRADE".equalsIgnoreCase(status)
+        );
+    }
 
     private void refreshCourseSelector() {
         comboxCourseSelector.removeAllItems();
@@ -594,7 +609,6 @@ public class CRP_UI extends javax.swing.JFrame {
         jTableFailedComponents.repaint();
     }
     
-    // Called whenever table selection changes
     private void handleFailedRowSelection() {
         int row = jTableFailedComponents.getSelectedRow();
         
@@ -655,6 +669,7 @@ public class CRP_UI extends javax.swing.JFrame {
         refreshCourseSelectorForStudent(student);
         refreshMilestoneButtons();
         updateMilestoneProgressBar();
+        refreshUpdateGradeButton();
 
         tabTwoWay.setSelectedIndex(0);
     }
@@ -1073,21 +1088,28 @@ public class CRP_UI extends javax.swing.JFrame {
             progressBarMilestones.setValue(0);
             progressBarMilestones.setString("0%");
             progressBarMilestones.setForeground(new Color(0, 122, 204));
+            progressBarMilestones.setStringPainted(true);
+            progressBarMilestones.setFont(new Font("Serif", Font.BOLD, 14));
+            progressBarMilestones.setForeground(new Color(200, 30, 30));
+            progressBarMilestones.setUI(new javax.swing.plaf.basic.BasicProgressBarUI());
             return;
         }
 
         int progress = (int) Math.round(currentPlan.getProgressPercentage());
         progressBarMilestones.setValue(progress);
         progressBarMilestones.setString(progress + "%");
+        progressBarMilestones.setStringPainted(true);
 
-        // Make it more professional
+        // Border
         progressBarMilestones.setBorderPainted(true);
         progressBarMilestones.setBorder(
                 javax.swing.BorderFactory.createLineBorder(Color.DARK_GRAY, 1)
         );
-        progressBarMilestones.setUI(new javax.swing.plaf.basic.BasicProgressBarUI());
 
-        // --- Colour logic ---
+        // Font for visibility
+        progressBarMilestones.setFont(new Font("Serif", Font.BOLD, 14));
+
+        // --- Bar colour ---
         if (progress == 100) {
             progressBarMilestones.setForeground(new Color(0, 170, 0));       // green
         } else if (progress >= 50) {
@@ -1096,11 +1118,22 @@ public class CRP_UI extends javax.swing.JFrame {
             progressBarMilestones.setForeground(new Color(200, 30, 30));     // red
         }
 
-        // --- Update Grade button ---
-        btnUpdateGrade.setEnabled(
-                "AWAITING_GRADE".equalsIgnoreCase(currentPlan.getStatus())
-        );
+        // 🔹 IMPORTANT: text colour stays BLACK
+        progressBarMilestones.setUI(new javax.swing.plaf.basic.BasicProgressBarUI() {
+            @Override
+            protected Color getSelectionForeground() {
+                return Color.BLACK;   // text colour
+            }
+
+            @Override
+            protected Color getSelectionBackground() {
+                return Color.BLACK;
+            }
+        });
+
+        refreshUpdateGradeButton();
     }
+
 
 
     private void saveMilestonesToFile() {
@@ -1456,7 +1489,6 @@ public class CRP_UI extends javax.swing.JFrame {
         jLabel6.setFont(new java.awt.Font("Serif", 1, 15)); // NOI18N
         jLabel6.setText("Priority Level:");
 
-        priorityCombo.setEditable(true);
         priorityCombo.setFont(new java.awt.Font("Helvetica Neue", 0, 14)); // NOI18N
         priorityCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "High", "Medium", "Low" }));
         priorityCombo.addActionListener(new java.awt.event.ActionListener() {
@@ -1481,7 +1513,6 @@ public class CRP_UI extends javax.swing.JFrame {
             }
         });
 
-        txtRecommendation.setEditable(false);
         txtRecommendation.setColumns(20);
         txtRecommendation.setFont(new java.awt.Font("sansserif", 0, 14)); // NOI18N
         txtRecommendation.setLineWrap(true);
@@ -2257,28 +2288,30 @@ public class CRP_UI extends javax.swing.JFrame {
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
         tabTwoWay.setSelectedIndex(0);
 
-    // Hide course selector in overview 
-    comboxCourseSelector.setVisible(false);
-    lblSelectCourse.setVisible(false);
+        // Hide course selector in overview 
+        comboxCourseSelector.setVisible(false);
+        lblSelectCourse.setVisible(false);
 
-    // Refresh the failed course table (remove passed courses)
-    loadAllFailedStudents();
+        // Refresh the failed course table (remove passed courses)
+        loadAllFailedStudents();
 
-    // If the plan was completed, remove UI plan details
-    if (currentPlan != null && currentPlan.getStatus().startsWith("COMPLETED")) {
-        currentPlan = null;
-        clearDetails();
-    }
+        // If the plan was completed, remove UI plan details
+        if (currentPlan != null && currentPlan.getStatus().startsWith("COMPLETED")) {
+            currentPlan = null;
+            clearDetails();
+        }
 
-    // Reselect first row if exists
-    if (jTableFailedComponents.getRowCount() > 0) {
-        jTableFailedComponents.setRowSelectionInterval(0, 0);
-        handleFailedRowSelection();   // your own method
-    } else {
-        clearDetails();
-    }
+        // Reselect first row if exists
+        if (jTableFailedComponents.getRowCount() > 0) {
+            jTableFailedComponents.setRowSelectionInterval(0, 0);
+            handleFailedRowSelection();   // your own method
+        } else {
+            clearDetails();
+        }
 
-    refreshButtonsByStatus();
+        refreshButtonsByStatus();
+        handleFailedRowSelection();
+        refreshUpdateGradeButton();
     }//GEN-LAST:event_btnBackActionPerformed
 
     private void btnMilestoneTabActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMilestoneTabActionPerformed
@@ -2498,6 +2531,7 @@ public class CRP_UI extends javax.swing.JFrame {
         populateMilestoneTable(currentPlan);
         refreshMilestoneButtons();
         updateMilestoneProgressBar();
+        refreshUpdateGradeButton();
         checkPlanCompletion();
 
         jTableMilestones.repaint();
@@ -2647,6 +2681,7 @@ public class CRP_UI extends javax.swing.JFrame {
         txtRecommendation.setEditable(false);
         priorityCombo.setEnabled(false);
         refreshButtonsByStatus();
+        refreshUpdateGradeButton();
     }
     
     private void checkPlanCompletion() {
