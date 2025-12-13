@@ -145,7 +145,7 @@ public class ECE {
         for (String[] s : studentInfo) {
 
             String sid = s[0];
-            String currentSem = s[1];
+            String currentSem = s[1];   // 
 
             double totalGP = 0;
             int totalCH = 0;
@@ -153,8 +153,15 @@ public class ECE {
 
             for (String[] g : grades) {
 
+                //Student must match
                 if (!g[0].equals(sid)) continue;
+
+                //current semester
                 if (!g[2].equals(currentSem)) continue;
+
+                //first attempt
+                int attemptNum = Integer.parseInt(g[7]);
+                if (attemptNum != 1) continue;
 
                 String courseID = g[1];
                 String[] c = findCourse(courseID, courses);
@@ -171,6 +178,8 @@ public class ECE {
             }
 
             double cgpa = totalCH == 0 ? 0 : totalGP / totalCH;
+
+            //eligibility decision
             boolean eligible = (cgpa >= 2.0 && failCount <= 3);
 
             results.add(new String[]{
@@ -181,7 +190,8 @@ public class ECE {
             });
         }
 
-        saveResults(results);
-    }
+    saveResults(results);
+}
+
 
 }
