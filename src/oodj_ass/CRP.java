@@ -4,10 +4,10 @@ import java.io.*;
 import java.util.*;
 
 public class CRP {
-    private static final String PLAN_FILE_PATH      = "data/recoveryPlans.txt";
+    private static final String PLAN_FILE_PATH = "data/recoveryPlans.txt";
     private static final String MILESTONE_FILE_PATH = "data/recoveryMilestones.txt";
-    private static final String GRADES_FILE_PATH    = "data/grades.txt";
-    private static final String RESULT_FILE_PATH    = "data/result.txt";
+    private static final String GRADES_FILE_PATH = "data/grades.txt";
+    private static final String RESULT_FILE_PATH = "data/result.txt";
 
     private final List<Student> studentPool;
     private final List<RecoveryPlan> planList = new ArrayList<>();
