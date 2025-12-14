@@ -316,7 +316,6 @@ public class RecoveryPlan {
                 status);
     }
 
-    // Internal helpers
     private void updateTimestamp() {
         this.lastUpdated = now();
     }

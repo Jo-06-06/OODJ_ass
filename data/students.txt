@@ -7,7 +7,7 @@ S005,Steven,Goh,Bachelor of Science in Computer Science,tp086245@mail.apu.edu.my
 S006,Quinn,Chen,Bachelor of International Hospitality Management,tp081917@mail.apu.edu.my
 S007,Oscar,Smith,Bachelor of Mechanical Engineering,tp081917@mail.apu.edu.my
 S008,Eric,Teo,Bachelor of Science in Computer Science,tp081917@mail.apu.edu.my
-S009,Rachel,Davis,Bachelor of International Hospitality tp081917@mail.apu.edu.my
+S009,Rachel,Davis,Bachelor of International Hospitality,tp081917@mail.apu.edu.my
 S010,Charlie,Miller,Bachelor of Mechanical Engineering,tp081917@mail.apu.edu.my
 S011,Ivy,Smith,Bachelor of Science in Computer Science,tp081917@mail.apu.edu.my
 S012,Lin,Chen,Bachelor of International Hospitality Management,tp086245@mail.apu.edu.my

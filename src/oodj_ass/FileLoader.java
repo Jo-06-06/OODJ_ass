@@ -5,15 +5,15 @@ import java.util.*;
 
 public class FileLoader {
 
-    private static final String STUDENT_FILE       = "data/students.txt";
+    private static final String STUDENT_FILE = "data/students.txt";
     private static final String STUDENT_INFO_FILE  = "data/studentInfo.txt";
-    private static final String COURSE_FILE        = "data/courses.txt";
-    private static final String ENROLL_FILE        = "data/studentCourse.txt";
-    private static final String GRADES_FILE        = "data/grades.txt";
-    private static final String CGPA_FILE          = "data/result.txt";
+    private static final String COURSE_FILE = "data/courses.txt";
+    private static final String ENROLL_FILE = "data/studentCourse.txt";
+    private static final String GRADES_FILE = "data/grades.txt";
+    private static final String CGPA_FILE = "data/result.txt";
 
-    private final List<Student> students       = new ArrayList<>();
-    private final List<Course>  courseInfoList = new ArrayList<>();
+    private final List<Student> students = new ArrayList<>();
+    private final List<Course> courseInfoList = new ArrayList<>();
 
     public void loadAll() {
         System.out.println("=== Loading System Data ===");
@@ -270,7 +270,6 @@ public class FileLoader {
                 totalRows++;
                 String[] p = line.split(",", -1);
 
-                // Expected: studentID,courseID,semester,assScore,examScore,grade,gpa,attemptNum
                 if (p.length < 8) {
                     skippedRows++;
                     System.err.println("  Skipping invalid grade row (columns < 8): " + line);
@@ -310,7 +309,6 @@ public class FileLoader {
             }
         }
 
-        // Now push the latest grade info into each student's Course object
         int courseUpdated = 0;
 
         for (Student s : students) {

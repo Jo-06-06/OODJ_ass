@@ -1111,18 +1111,17 @@ public class CRP_UI extends javax.swing.JFrame {
 
         // --- Bar colour ---
         if (progress == 100) {
-            progressBarMilestones.setForeground(new Color(0, 170, 0));       // green
+            progressBarMilestones.setForeground(new Color(0, 170, 0));  // green
         } else if (progress >= 50) {
-            progressBarMilestones.setForeground(new Color(255, 153, 0));     // orange
+            progressBarMilestones.setForeground(new Color(255, 153, 0)); // orange
         } else {
-            progressBarMilestones.setForeground(new Color(200, 30, 30));     // red
+            progressBarMilestones.setForeground(new Color(200, 30, 30)); // red
         }
 
-        // 🔹 IMPORTANT: text colour stays BLACK
         progressBarMilestones.setUI(new javax.swing.plaf.basic.BasicProgressBarUI() {
             @Override
             protected Color getSelectionForeground() {
-                return Color.BLACK;   // text colour
+                return Color.BLACK; 
             }
 
             @Override
@@ -1130,6 +1129,12 @@ public class CRP_UI extends javax.swing.JFrame {
                 return Color.BLACK;
             }
         });
+        
+        String status = currentPlan.getStatus();
+
+        btnUpdateGrade.setEnabled(
+                "AWAITING_GRADE".equalsIgnoreCase(status)
+        );
 
         refreshUpdateGradeButton();
     }
@@ -2409,6 +2414,7 @@ public class CRP_UI extends javax.swing.JFrame {
             // UI updates
             populatePlanUI(plan);
             populateMilestoneTable(plan);
+            updateMilestoneProgressBar();
             refreshFailedCoursesTableHighlight();
             refreshMilestoneButtons();
             refreshCourseSelectorForStudent(student);
@@ -2425,7 +2431,6 @@ public class CRP_UI extends javax.swing.JFrame {
             
             refreshPlanButtons();
             refreshMilestoneButtons();
-            updateMilestoneProgressBar();
     }//GEN-LAST:event_btnCreatePlanActionPerformed
 
     private void btnSavePlanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSavePlanActionPerformed

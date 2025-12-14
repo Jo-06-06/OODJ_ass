@@ -265,7 +265,7 @@ public class CRP {
         int oldExam = c.getExamScore();
 
         boolean assFailed  = (c.getAssignmentWeight() > 0 && oldAss  < 50);
-        boolean examFailed = (c.getExamWeight()      > 0 && oldExam < 50);
+        boolean examFailed = (c.getExamWeight() > 0 && oldExam < 50);
 
         int newAss  = oldAss;
         int newExam = oldExam;
@@ -279,7 +279,7 @@ public class CRP {
 
         double finalMark =
                 (newAss  * c.getAssignmentWeight() / 100.0) +
-                (newExam * c.getExamWeight()      / 100.0);
+                (newExam * c.getExamWeight() / 100.0);
 
         String newGrade = Course.mapGradeFromMark((int) Math.round(finalMark));
         double newGpa   = Student.getGradePoint(newGrade);
@@ -296,10 +296,14 @@ public class CRP {
                 ", EXAM=" + (newExamRaw != null ? newExamRaw : oldExam);
         rp.setRecoveryGradeString(rawCombined);
 
-        // set plan status here (single source of truth)
+        // set plan status here 
         rp.setStatus(!c.isFailed() && newGpa >= 2.0
                 ? "COMPLETED-PASSED"
                 : "COMPLETED-FAILED");
+        
+        if (c.isFailed()) {
+            rp.getMilestones().clear();  
+        }
 
         // append to grades.txt
         appendSingleLine(GRADES_FILE_PATH,
